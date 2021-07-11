@@ -87,7 +87,6 @@ public class DescribeConnectorCommand implements Runnable {
             topics.add(new Tuple("", "  " + topic));
         }
         printTuples(topics);
-
     }
 
     private void printTuples(List<Tuple> tuples) {

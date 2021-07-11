@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import dev.morling.kccli.service.KafkaConnectApi;
+import dev.morling.kccli.service.KafkaConnectInfo;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
@@ -35,7 +36,10 @@ public class InfoCommand implements Runnable {
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        System.out.print(kafkaConnectApi.getWorkerInfo());
+        KafkaConnectInfo workerInfo = kafkaConnectApi.getWorkerInfo();
+        System.out.println("URL:               " + context.getCluster());
+        System.out.println("Version:           " + workerInfo.version);
+        System.out.println("Commit:            " + workerInfo.commit);
+        System.out.println("Kafka Cluster ID:  " + workerInfo.kafka_cluster_id);
     }
-
 }
