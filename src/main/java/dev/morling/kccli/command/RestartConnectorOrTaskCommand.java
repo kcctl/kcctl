@@ -15,8 +15,6 @@
  */
 package dev.morling.kccli.command;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
@@ -24,12 +22,16 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
-@Command(name = "list-connectors", hidden = true)
-public class ListConnectorNamesCommand implements Runnable {
+@Command(name = "restart", description = "Restarts the specified connector or task")
+public class RestartConnectorOrTaskCommand implements Runnable {
 
     @Inject
     ConfigurationContext context;
+
+    @Parameters(paramLabel = "NAME", description = "Name of the connector (e.g. 'my-connector') or task (e.g. 'my-connector/0')")
+    String name;
 
     @Override
     public void run() {
@@ -37,7 +39,18 @@ public class ListConnectorNamesCommand implements Runnable {
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        List<String> connectors = kafkaConnectApi.getConnectors();
-        System.out.println(String.join(" ", connectors));
+        if (name.contains("/")) {
+            String[] parts = name.split("\\/");
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("Invalid connector/task name, expecting format 'connector-name/task-id");
+            }
+
+            kafkaConnectApi.restartTask(parts[0], parts[1]);
+            System.out.println("Restarted task " + name);
+        }
+        else {
+            kafkaConnectApi.restartConnector(name);
+            System.out.println("Restarted connector " + name);
+        }
     }
 }

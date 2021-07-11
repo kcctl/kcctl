@@ -23,6 +23,8 @@ import picocli.CommandLine;
         InfoCommand.class,
         ConfigCommand.class,
         GetCommand.class,
+        DeleteConnectorCommand.class,
+        RestartConnectorOrTaskCommand.class,
         DescribeCommand.class,
         ApplyCommand.class,
         CommandLine.HelpCommand.class,

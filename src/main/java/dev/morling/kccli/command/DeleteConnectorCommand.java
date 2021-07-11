@@ -15,8 +15,6 @@
  */
 package dev.morling.kccli.command;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
@@ -24,12 +22,16 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
-@Command(name = "list-connectors", hidden = true)
-public class ListConnectorNamesCommand implements Runnable {
+@Command(name = "delete", description = "Deletes the specified connector")
+public class DeleteConnectorCommand implements Runnable {
 
     @Inject
     ConfigurationContext context;
+
+    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector")
+    String name;
 
     @Override
     public void run() {
@@ -37,7 +39,7 @@ public class ListConnectorNamesCommand implements Runnable {
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        List<String> connectors = kafkaConnectApi.getConnectors();
-        System.out.println(String.join(" ", connectors));
+        kafkaConnectApi.deleteConnector(name);
+        System.out.println("Deleted connector " + name);
     }
 }

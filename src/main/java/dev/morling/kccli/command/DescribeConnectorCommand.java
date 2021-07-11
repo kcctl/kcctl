@@ -39,7 +39,7 @@ public class DescribeConnectorCommand implements Runnable {
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "CONNECTOR NAME", description = "name of the connector")
+    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector")
     String name;
 
     @Override

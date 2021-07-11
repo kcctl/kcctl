@@ -18,6 +18,7 @@ package dev.morling.kccli.service;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -41,9 +42,21 @@ public interface KafkaConnectApi {
     @Path("/connectors/")
     List<String> getConnectors();
 
+    @POST
+    @Path("/connectors/")
+    ConnectorStatusInfo createConnector(String config);
+
     @GET
     @Path("/connectors/{name}")
     ConnectorInfo getConnector(@PathParam("name") String name);
+
+    @POST
+    @Path("/connectors/{name}/restart")
+    void restartConnector(@PathParam("name") String name);
+
+    @DELETE
+    @Path("/connectors/{name}")
+    void deleteConnector(@PathParam("name") String name);
 
     @GET
     @Path("/connectors/{name}/status")
@@ -53,11 +66,11 @@ public interface KafkaConnectApi {
     @Path("/connectors/{name}/config")
     Map<String, String> getConnectorConfig(@PathParam("name") String name);
 
-    @POST
-    @Path("/connectors/")
-    ConnectorStatusInfo createConnector(String config);
-
     @PUT
     @Path("/connectors/{name}/config")
     ConnectorStatusInfo updateConnector(@PathParam("name") String name, String config);
+
+    @POST
+    @Path("/connectors/{name}/tasks/{id}/restart")
+    ConnectorInfo restartTask(@PathParam("name") String name, @PathParam("id") String id);
 }
