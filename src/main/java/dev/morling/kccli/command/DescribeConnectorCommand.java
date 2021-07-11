@@ -15,12 +15,13 @@
  */
 package dev.morling.kccli.command;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
@@ -28,24 +29,28 @@ import dev.morling.kccli.service.ConnectorInfo;
 import dev.morling.kccli.service.ConnectorStatusInfo;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.service.TaskState;
+import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "connector", description = "Displays information about a given connector")
 public class DescribeConnectorCommand implements Runnable {
 
+    @Inject
+    ConfigurationContext context;
+
     @Parameters(paramLabel = "CONNECTOR NAME", description = "name of the connector")
     String name;
 
     @Override
     public void run() {
-        KafkaConnectApi simpleGetApi = RestClientBuilder.newBuilder()
-                .baseUri(URI.create("http://localhost:8083"))
+        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
+                .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        ConnectorInfo connector = simpleGetApi.getConnector(name);
-        ConnectorStatusInfo connectorStatus = simpleGetApi.getConnectorStatus(name);
-        Map<String, String> connectorConfig = simpleGetApi.getConnectorConfig(name);
+        ConnectorInfo connector = kafkaConnectApi.getConnector(name);
+        ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
+        Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(name);
 
         List<Tuple> connectorInfo = Arrays.asList(
                 new Tuple("Name", connector.name),

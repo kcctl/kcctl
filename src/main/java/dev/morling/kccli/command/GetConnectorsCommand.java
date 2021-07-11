@@ -39,16 +39,16 @@ public class GetConnectorsCommand implements Runnable {
 
     @Override
     public void run() {
-        KafkaConnectApi simpleGetApi = RestClientBuilder.newBuilder()
+        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        List<String> connectors = simpleGetApi.getConnectors();
+        List<String> connectors = kafkaConnectApi.getConnectors();
         String[][] data = new String[connectors.size()][];
 
         int i = 0;
         for (String name : connectors) {
-            ConnectorStatusInfo connectorStatus = simpleGetApi.getConnectorStatus(name);
+            ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
             data[i] = new String[]{ name, "" + connectorStatus.type, " " + connectorStatus.connector.state, " " + toString(connectorStatus.tasks) };
             i++;
         }

@@ -15,23 +15,27 @@
  */
 package dev.morling.kccli.command;
 
-import java.net.URI;
+import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import dev.morling.kccli.service.KafkaConnectApi;
+import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
 @Command(name = "info", description = "Displays information about the Kafka Connect cluster")
 public class InfoCommand implements Runnable {
 
+    @Inject
+    ConfigurationContext context;
+
     @Override
     public void run() {
-        KafkaConnectApi simpleGetApi = RestClientBuilder.newBuilder()
-                .baseUri(URI.create("http://localhost:8083"))
+        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
+                .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        System.out.print(simpleGetApi.getWorkerInfo());
+        System.out.print(kafkaConnectApi.getWorkerInfo());
     }
 
 }

@@ -15,9 +15,10 @@
  */
 package dev.morling.kccli.command;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
@@ -27,18 +28,22 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 import dev.morling.kccli.service.ConnectorPlugin;
 import dev.morling.kccli.service.KafkaConnectApi;
+import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
 @Command(name = "plugins")
 public class GetPluginsCommand implements Runnable {
 
+    @Inject
+    ConfigurationContext context;
+
     @Override
     public void run() {
-        KafkaConnectApi simpleGetApi = RestClientBuilder.newBuilder()
-                .baseUri(URI.create("http://localhost:8083"))
+        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
+                .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        List<ConnectorPlugin> connectorPlugins = simpleGetApi.getConnectorPlugins();
+        List<ConnectorPlugin> connectorPlugins = kafkaConnectApi.getConnectorPlugins();
 
         System.out.println();
         System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
