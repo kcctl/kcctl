@@ -1,12 +1,12 @@
 # kcctl -- A CLI for Apache Kafka Connect
 
-This project is a command-line client for https://kafka.apache.org/documentation/#connect[Kafka Connect].
+This project is a command-line client for [Kafka Connect](https://kafka.apache.org/documentation/#connect).
 Relying on the idioms and semantics of _kubectl_,
 it allows you to register and examine connectors, delete them, restart them, etc.
 
 ## Usage
 
-Display the help to learn about using _kcctl:
+Display the help to learn about using _kcctl_:
 
 ```shell script
 kcctl help
@@ -96,7 +96,7 @@ Edit the completion scrpt _kcctl_completion_, replace all the dummy completion p
 ### Related Quarkus Guides
 
 - Picocli ([guide](https://quarkus.io/guides/picocli)): Develop command line applications with Picocli
-- Quarkus native apps ([guide](https://quarkus.io/guides/maven-tooling.html): Develop native applications with Quarkus and GraalVM
+- Quarkus native apps ([guide](https://quarkus.io/guides/maven-tooling.html)): Develop native applications with Quarkus and GraalVM
 
 ## License
 
