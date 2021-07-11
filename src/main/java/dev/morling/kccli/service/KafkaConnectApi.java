@@ -63,6 +63,10 @@ public interface KafkaConnectApi {
     ConnectorStatusInfo getConnectorStatus(@PathParam("name") String name);
 
     @GET
+    @Path("/connectors/{name}/topics")
+    Map<String, TopicsInfo> getConnectorTopics(@PathParam("name") String name);
+
+    @GET
     @Path("/connectors/{name}/config")
     Map<String, String> getConnectorConfig(@PathParam("name") String name);
 

@@ -29,6 +29,7 @@ import dev.morling.kccli.service.ConnectorInfo;
 import dev.morling.kccli.service.ConnectorStatusInfo;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.service.TaskState;
+import dev.morling.kccli.service.TopicsInfo;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -51,6 +52,7 @@ public class DescribeConnectorCommand implements Runnable {
         ConnectorInfo connector = kafkaConnectApi.getConnector(name);
         ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
         Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(name);
+        Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(name);
 
         List<Tuple> connectorInfo = Arrays.asList(
                 new Tuple("Name", connector.name),
@@ -77,16 +79,15 @@ public class DescribeConnectorCommand implements Runnable {
         printTuples(Arrays.asList(new Tuple("Config", "")));
         printTuples(config);
 
-        // String[] headers = { "Name: ", connector.name };
-        // String[][] data = new String[][] {
-        // { "State: ", connectorStatus.connector.state },
-        // { "Worker ID: ", connectorStatus.connector.worker_id },
-        // { "Type: ", connectorStatus.type },
-        // { "Config: ", "" },
-        // { " " + connectorConfig.entrySet().iterator().next().getKey() + ":", connectorConfig.entrySet().iterator().next().getValue() }
-        // };
-        //
-        // System.out.println(AsciiTable.getTable(headers, data));
+        printTuples(Arrays.asList(new Tuple("Topics", "")));
+
+        List<Tuple> topics = new ArrayList<>();
+
+        for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
+            topics.add(new Tuple("", "  " + topic));
+        }
+        printTuples(topics);
+
     }
 
     private void printTuples(List<Tuple> tuples) {
@@ -100,7 +101,12 @@ public class DescribeConnectorCommand implements Runnable {
                 .getAsInt();
 
         for (Tuple tuple : tuples) {
-            System.out.printf("%-" + maxLength + "s  %s%n", tuple.key + ":", tuple.value);
+            if (!tuple.key.isEmpty()) {
+                System.out.printf("%-" + maxLength + "s  %s%n", tuple.key + ":", tuple.value);
+            }
+            else {
+                System.out.println(tuple.value);
+            }
         }
     }
 
