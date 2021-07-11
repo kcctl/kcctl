@@ -118,23 +118,25 @@ function _complete_kcctl() {
   local cmds0=(info)
   local cmds1=(config)
   local cmds2=(get)
-  local cmds3=(describe)
-  local cmds4=(apply)
-  local cmds5=(help)
-  local cmds6=(generate-completion)
-  local cmds7=(config set-context)
-  local cmds8=(get plugins)
-  local cmds9=(get connectors)
-  local cmds10=(describe connector)
+  local cmds3=(delete)
+  local cmds4=(restart)
+  local cmds5=(describe)
+  local cmds6=(apply)
+  local cmds7=(help)
+  local cmds8=(config set-context)
+  local cmds9=(get plugins)
+  local cmds10=(get connectors)
+  local cmds11=(describe connector)
 
-  if CompWordsContainsArray "${cmds10[@]}"; then _picocli_kcctl_describe_connector; return $?; fi
-  if CompWordsContainsArray "${cmds9[@]}"; then _picocli_kcctl_get_connectors; return $?; fi
-  if CompWordsContainsArray "${cmds8[@]}"; then _picocli_kcctl_get_plugins; return $?; fi
-  if CompWordsContainsArray "${cmds7[@]}"; then _picocli_kcctl_config_setcontext; return $?; fi
-  if CompWordsContainsArray "${cmds6[@]}"; then _picocli_kcctl_generatecompletion; return $?; fi
-  if CompWordsContainsArray "${cmds5[@]}"; then _picocli_kcctl_help; return $?; fi
-  if CompWordsContainsArray "${cmds4[@]}"; then _picocli_kcctl_apply; return $?; fi
-  if CompWordsContainsArray "${cmds3[@]}"; then _picocli_kcctl_describe; return $?; fi
+  if CompWordsContainsArray "${cmds11[@]}"; then _picocli_kcctl_describe_connector; return $?; fi
+  if CompWordsContainsArray "${cmds10[@]}"; then _picocli_kcctl_get_connectors; return $?; fi
+  if CompWordsContainsArray "${cmds9[@]}"; then _picocli_kcctl_get_plugins; return $?; fi
+  if CompWordsContainsArray "${cmds8[@]}"; then _picocli_kcctl_config_setcontext; return $?; fi
+  if CompWordsContainsArray "${cmds7[@]}"; then _picocli_kcctl_help; return $?; fi
+  if CompWordsContainsArray "${cmds6[@]}"; then _picocli_kcctl_apply; return $?; fi
+  if CompWordsContainsArray "${cmds5[@]}"; then _picocli_kcctl_describe; return $?; fi
+  if CompWordsContainsArray "${cmds4[@]}"; then _picocli_kcctl_restart; return $?; fi
+  if CompWordsContainsArray "${cmds3[@]}"; then _picocli_kcctl_delete; return $?; fi
   if CompWordsContainsArray "${cmds2[@]}"; then _picocli_kcctl_get; return $?; fi
   if CompWordsContainsArray "${cmds1[@]}"; then _picocli_kcctl_config; return $?; fi
   if CompWordsContainsArray "${cmds0[@]}"; then _picocli_kcctl_info; return $?; fi
@@ -148,7 +150,7 @@ function _picocli_kcctl() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="info config get describe apply help generate-completion"
+  local commands="info config get delete restart describe apply help"
   local flag_opts=""
   local arg_opts=""
 
@@ -211,6 +213,52 @@ function _picocli_kcctl_get() {
   fi
 }
 
+# Generates completions for the options and subcommands of the `delete` subcommand.
+function _picocli_kcctl_delete() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+  local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    local currIndex
+    currIndex=$(currentPositionalIndex "delete" "${arg_opts}" "${flag_opts}")
+    if (( currIndex >= 0 && currIndex <= 0 )); then
+      positionals=$( compgen -W "$CONNECTOR_NAME_pos_param_args" -- "${curr_word}" )
+    fi
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `restart` subcommand.
+function _picocli_kcctl_restart() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+  local NAME_pos_param_args=`kcctl connector-and-task-name-completions` # 0-0 values
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    local currIndex
+    currIndex=$(currentPositionalIndex "restart" "${arg_opts}" "${flag_opts}")
+    if (( currIndex >= 0 && currIndex <= 0 )); then
+      positionals=$( compgen -W "$NAME_pos_param_args" -- "${curr_word}" )
+    fi
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
 # Generates completions for the options and subcommands of the `describe` subcommand.
 function _picocli_kcctl_describe() {
   # Get completion data
@@ -264,25 +312,8 @@ function _picocli_kcctl_help() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="info config get describe apply generate-completion"
+  local commands="info config get delete restart describe apply"
   local flag_opts="-h --help"
-  local arg_opts=""
-
-  if [[ "${curr_word}" == -* ]]; then
-    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
-  else
-    local positionals=""
-    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
-  fi
-}
-
-# Generates completions for the options and subcommands of the `generate-completion` subcommand.
-function _picocli_kcctl_generatecompletion() {
-  # Get completion data
-  local curr_word=${COMP_WORDS[COMP_CWORD]}
-
-  local commands=""
-  local flag_opts="-h --help -V --version"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -361,8 +392,7 @@ function _picocli_kcctl_describe_connector() {
   local commands=""
   local flag_opts=""
   local arg_opts=""
-  # local CONNECTOR_NAME_pos_param_args="inventory-connector2 inventory-connector" # 0-0 values
-  local CONNECTOR_NAME_pos_param_args=`kcctl list-connectors`
+  local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )

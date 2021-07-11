@@ -15,18 +15,21 @@
  */
 package dev.morling.kccli.command;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
+import dev.morling.kccli.service.ConnectorStatusInfo;
 import dev.morling.kccli.service.KafkaConnectApi;
+import dev.morling.kccli.service.TaskState;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
-@Command(name = "list-connectors", hidden = true)
-public class ListConnectorNamesCommand implements Runnable {
+@Command(name = "connector-and-task-name-completions", hidden = true)
+public class ConnectorAndTaskNamesCompletionCandidateCommand implements Runnable {
 
     @Inject
     ConfigurationContext context;
@@ -38,6 +41,15 @@ public class ListConnectorNamesCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         List<String> connectors = kafkaConnectApi.getConnectors();
-        System.out.println(String.join(" ", connectors));
+        List<String> completions = new ArrayList<>(connectors);
+
+        for (String connector : connectors) {
+            ConnectorStatusInfo status = kafkaConnectApi.getConnectorStatus(connector);
+            for (TaskState task : status.tasks) {
+                completions.add(connector + "/" + task.id);
+            }
+        }
+
+        System.out.println(String.join(" ", completions));
     }
 }

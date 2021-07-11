@@ -30,7 +30,7 @@ public class DeleteConnectorCommand implements Runnable {
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector")
+    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector") // , completionCandidates = DummyCompletions.class)
     String name;
 
     @Override

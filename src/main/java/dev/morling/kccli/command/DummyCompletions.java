@@ -15,23 +15,14 @@
  */
 package dev.morling.kccli.command;
 
-import io.quarkus.picocli.runtime.annotations.TopCommand;
-import picocli.CommandLine;
+import java.util.Arrays;
+import java.util.Iterator;
 
-@TopCommand
-@CommandLine.Command(name = "kcctl", subcommands = {
-        InfoCommand.class,
-        ConfigCommand.class,
-        GetCommand.class,
-        DeleteConnectorCommand.class,
-        RestartConnectorOrTaskCommand.class,
-        DescribeCommand.class,
-        ApplyCommand.class,
-        CommandLine.HelpCommand.class,
-        ConnectorNamesCompletionCandidateCommand.class,
-        ConnectorAndTaskNamesCompletionCandidateCommand.class
-}, description = "A command-line interface for Kafka Connect"
+public class DummyCompletions implements Iterable<String> {
 
-)
-public class KcCtlCommand {
+    @Override
+    public Iterator<String> iterator() {
+        return Arrays.asList("connector-1", "connector-2", "connector-3").iterator();
+    }
+
 }
