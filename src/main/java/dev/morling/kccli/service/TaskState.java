@@ -20,4 +20,5 @@ public class TaskState {
     public int id;
     public String state;
     public String worker_id;
+    public String trace;
 }

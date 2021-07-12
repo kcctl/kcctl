@@ -70,9 +70,13 @@ public class DescribeConnectorCommand implements Runnable {
 
         for (TaskState task : connectorStatus.tasks) {
             printTuples(Arrays.asList(new Tuple("  " + task.id, "")));
-            printTuples(Arrays.asList(
-                    new Tuple("    State", colorizeState(task.state)),
-                    new Tuple("    Worker ID", task.worker_id)));
+            List<Tuple> tuples = new ArrayList<>();
+            tuples.add(new Tuple("    State", colorizeState(task.state)));
+            tuples.add(new Tuple("    Worker ID", task.worker_id));
+            if (task.state.equals("FAILED")) {
+                tuples.add(new Tuple("    Trace", task.trace.replaceAll("Caused by", "      Caused by")));
+            }
+            printTuples(tuples);
         }
 
         List<Tuple> config = new ArrayList<>();
