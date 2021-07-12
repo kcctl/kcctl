@@ -34,6 +34,11 @@ import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
+import static dev.morling.kccli.util.Colors.ANSI_GREEN;
+import static dev.morling.kccli.util.Colors.ANSI_RED;
+import static dev.morling.kccli.util.Colors.ANSI_RESET;
+import static dev.morling.kccli.util.Colors.ANSI_WHITE_BOLD;
+
 @Command(name = "connector", description = "Displays information about a given connector")
 public class DescribeConnectorCommand implements Runnable {
 
@@ -57,16 +62,16 @@ public class DescribeConnectorCommand implements Runnable {
         List<Tuple> connectorInfo = Arrays.asList(
                 new Tuple("Name", connector.name),
                 new Tuple("Type", connectorStatus.type),
-                new Tuple("State", connectorStatus.connector.state),
+                new Tuple("State", colorizeState(connectorStatus.connector.state)),
                 new Tuple("Worker ID", connectorStatus.connector.worker_id),
-                new Tuple("Tasks", ""));
+                new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, ""));
 
         printTuples(connectorInfo);
 
         for (TaskState task : connectorStatus.tasks) {
             printTuples(Arrays.asList(new Tuple("  " + task.id, "")));
             printTuples(Arrays.asList(
-                    new Tuple("    State", task.state),
+                    new Tuple("    State", colorizeState(task.state)),
                     new Tuple("    Worker ID", task.worker_id)));
         }
 
@@ -76,10 +81,10 @@ public class DescribeConnectorCommand implements Runnable {
             config.add(new Tuple("  " + configEntry.getKey(), configEntry.getValue()));
         }
 
-        printTuples(Arrays.asList(new Tuple("Config", "")));
+        printTuples(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
         printTuples(config);
 
-        printTuples(Arrays.asList(new Tuple("Topics", "")));
+        printTuples(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
 
         List<Tuple> topics = new ArrayList<>();
 
@@ -87,6 +92,18 @@ public class DescribeConnectorCommand implements Runnable {
             topics.add(new Tuple("", "  " + topic));
         }
         printTuples(topics);
+    }
+
+    private String colorizeState(String state) {
+        if (state.equals("RUNNING")) {
+            return ANSI_GREEN + "RUNNING" + ANSI_RESET;
+        }
+        else if (state.equals("FAILED")) {
+            return ANSI_RED + "FAILED" + ANSI_RESET;
+        }
+        else {
+            return state;
+        }
     }
 
     private void printTuples(List<Tuple> tuples) {

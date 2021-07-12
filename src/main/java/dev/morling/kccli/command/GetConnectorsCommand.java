@@ -31,6 +31,10 @@ import dev.morling.kccli.service.TaskState;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
+import static dev.morling.kccli.util.Colors.ANSI_GREEN;
+import static dev.morling.kccli.util.Colors.ANSI_RED;
+import static dev.morling.kccli.util.Colors.ANSI_RESET;
+
 @Command(name = "connectors")
 public class GetConnectorsCommand implements Runnable {
 
@@ -49,20 +53,25 @@ public class GetConnectorsCommand implements Runnable {
         int i = 0;
         for (String name : connectors) {
             ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
-            data[i] = new String[]{ name, "" + connectorStatus.type, " " + connectorStatus.connector.state, " " + toString(connectorStatus.tasks) };
+            data[i] = new String[]{
+                    name,
+                    " " + connectorStatus.type,
+                    " " + connectorStatus.connector.state,
+                    " " + toString(connectorStatus.tasks) };
             i++;
         }
 
         System.out.println();
-        System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS,
+        String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
                 new Column[]{
                         new Column().header("NAME").dataAlign(HorizontalAlign.LEFT),
-                        new Column().header("TYPE").dataAlign(HorizontalAlign.LEFT),
+                        new Column().header(" TYPE").dataAlign(HorizontalAlign.LEFT),
                         new Column().header(" STATE").dataAlign(HorizontalAlign.LEFT),
                         new Column().header(" TASKS").dataAlign(HorizontalAlign.LEFT)
                 },
-                data));
+                data);
 
+        System.out.println(table.replace("RUNNING", ANSI_GREEN + "RUNNING" + ANSI_RESET).replace("FAILED", ANSI_RED + "FAILED" + ANSI_RESET));
         System.out.println();
     }
 
