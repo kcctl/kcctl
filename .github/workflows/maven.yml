@@ -14,46 +14,24 @@
 #  limitations under the License.
 #
 
-name: Java CI with Maven
+name: Build
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
-    name: 'Build with Graal on ${{ matrix.os }}'
-    strategy:
-      fail-fast: true
-      matrix:
-        #os: [ ubuntu-latest, macOS-latest, windows-latest ]
-        #gu-binary: [ gu, gu.cmd ]
-        #exclude:
-        #  - os: ubuntu-latest
-        #    gu-binary: gu.cmd
-        #  - os: macos-latest
-        #    gu-binary: gu.cmd
-        #  - os: windows-latest
-        #    gu-binary: gu
-        os: [ ubuntu-latest, macOS-latest ]
-        gu-binary: [ gu ]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@v2
 
-      - name: 'Set up Graal'
-        uses: DeLaGuardo/setup-graalvm@4.0
+      - name: 'Set up Java'
+        uses: actions/setup-java@v2
         with:
-          graalvm: '21.1.0'
-          java: 'java11'
-
-      - name: 'Install native-image component'
-        run: |
-          ${{ matrix.gu-binary }} install native-image
+          java-version: 11
+          distribution: 'zulu'
 
       - name: 'Cache Maven packages'
         uses: actions/cache@v1
@@ -62,43 +40,5 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: 'Build Native Image'
-        run: mvn -B --file pom.xml -Pnative package
-
-      - name: 'Create Distribution'
-        run: mvn -B --file pom.xml -Pdist package -DskipTests
-
-      - name: 'Upload Build Artifact'
-        uses: actions/upload-artifact@v2
-        with:
-          name: artifact
-          path: target/*.zip
-
-  release:
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Check out repository'
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: 'Download all build artifacts'
-        uses: actions/download-artifact@v2
-
-      - name: 'Display structure of downloaded files'
-        run: ls -R
-
-      - name: 'Set up Java'
-        uses: actions/setup-java@v2
-        with:
-          java-version: 11
-          distribution: 'zulu'
-
-      - name: 'Release with JReleaser'
-        uses: jreleaser/release-action@v1
-        with:
-          arguments: -V
-        env:
-          JRELEASER_GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          JRELEASER_PROJECT_VERSION: 1.0.0-SNAPSHOT
+      - name: 'Build'
+        run: mvn -B --file pom.xml verify
