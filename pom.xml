@@ -187,21 +187,43 @@
             </goals>
             <phase>process-sources</phase>
           </execution>
-      </executions>
-    </plugin>
-    <plugin>
-      <groupId>net.revelc.code</groupId>
-      <artifactId>impsort-maven-plugin</artifactId>
-      <executions>
-        <execution>
-          <id>sort-imports</id>
-          <goals>
-            <goal>sort</goal>
-          </goals>
-          <phase>process-sources</phase>
-        </execution>
-      </executions>
-    </plugin>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>net.revelc.code</groupId>
+        <artifactId>impsort-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sort-imports</id>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+            <phase>process-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <attach>false</attach>
+          <appendAssemblyId>false</appendAssemblyId>
+          <finalName>kcctl-${project.version}-${os.detected.classifier}</finalName>
+          <outputDirectory>${app.distribution.directory}</outputDirectory>
+          <workDirectory>${project.build.directory}/assembly/work</workDirectory>
+          <skipAssembly>true</skipAssembly>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-distribution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -252,26 +274,34 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.2.0</version>
-            <configuration>
-              <attach>false</attach>
-              <appendAssemblyId>false</appendAssemblyId>
-              <finalName>kcctl-${project.version}-${os.detected.classifier}</finalName>
+            <configuration combine.self="append">
+              <skipAssembly>false</skipAssembly>
               <descriptors>
                 <descriptor>src/main/assembly/assembly.xml</descriptor>
               </descriptors>
-              <outputDirectory>${app.distribution.directory}</outputDirectory>
-              <workDirectory>${project.build.directory}/assembly/work</workDirectory>
             </configuration>
-            <executions>
-              <execution>
-                <id>make-distribution</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-              </execution>
-            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>dist-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration combine.self="append">
+              <skipAssembly>false</skipAssembly>
+              <descriptors>
+                <descriptor>src/main/assembly/assembly-windows.xml</descriptor>
+              </descriptors>
+            </configuration>
           </plugin>
         </plugins>
       </build>
