@@ -16,6 +16,7 @@
 package dev.morling.kccli.command;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ public class GetPluginsCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         List<ConnectorPlugin> connectorPlugins = kafkaConnectApi.getConnectorPlugins();
+        Collections.sort(connectorPlugins, (c1, c2) -> -c1.type.compareTo(c2.type));
 
         System.out.println();
         System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
