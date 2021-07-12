@@ -86,11 +86,11 @@ public class ApplyCommand implements Callable<Integer> {
             boolean existing = kafkaConnectApi.getConnectors().contains(config.get("name"));
             kafkaConnectApi.updateConnector(name, contents);
 
-            if (existing) {
-                System.out.println("Created connector " + config.get("name"));
+            if (!existing) {
+                System.out.println("Created connector " + name);
             }
             else {
-                System.out.println("Updated connector " + config.get("name"));
+                System.out.println("Updated connector " + name);
             }
         }
 

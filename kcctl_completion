@@ -126,9 +126,13 @@ function _complete_kcctl() {
   local cmds8=(config set-context)
   local cmds9=(get plugins)
   local cmds10=(get connectors)
-  local cmds11=(describe connector)
+  local cmds11=(restart connector)
+  local cmds12=(restart task)
+  local cmds13=(describe connector)
 
-  if CompWordsContainsArray "${cmds11[@]}"; then _picocli_kcctl_describe_connector; return $?; fi
+  if CompWordsContainsArray "${cmds13[@]}"; then _picocli_kcctl_describe_connector; return $?; fi
+  if CompWordsContainsArray "${cmds12[@]}"; then _picocli_kcctl_restart_task; return $?; fi
+  if CompWordsContainsArray "${cmds11[@]}"; then _picocli_kcctl_restart_connector; return $?; fi
   if CompWordsContainsArray "${cmds10[@]}"; then _picocli_kcctl_get_connectors; return $?; fi
   if CompWordsContainsArray "${cmds9[@]}"; then _picocli_kcctl_get_plugins; return $?; fi
   if CompWordsContainsArray "${cmds8[@]}"; then _picocli_kcctl_config_setcontext; return $?; fi
@@ -241,20 +245,14 @@ function _picocli_kcctl_restart() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands=""
+  local commands="connector task"
   local flag_opts=""
   local arg_opts=""
-  local NAME_pos_param_args=`kcctl connector-and-task-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
   else
     local positionals=""
-    local currIndex
-    currIndex=$(currentPositionalIndex "restart" "${arg_opts}" "${flag_opts}")
-    if (( currIndex >= 0 && currIndex <= 0 )); then
-      positionals=$( compgen -W "$NAME_pos_param_args" -- "${curr_word}" )
-    fi
     COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
   fi
 }
@@ -380,6 +378,52 @@ function _picocli_kcctl_get_connectors() {
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
   else
     local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `connector` subcommand.
+function _picocli_kcctl_restart_connector() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+  local NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    local currIndex
+    currIndex=$(currentPositionalIndex "connector" "${arg_opts}" "${flag_opts}")
+    if (( currIndex >= 0 && currIndex <= 0 )); then
+      positionals=$( compgen -W "$NAME_pos_param_args" -- "${curr_word}" )
+    fi
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `task` subcommand.
+function _picocli_kcctl_restart_task() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+  local NAME_pos_param_args=`kcctl task-name-completions` # 0-0 values
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    local currIndex
+    currIndex=$(currentPositionalIndex "task" "${arg_opts}" "${flag_opts}")
+    if (( currIndex >= 0 && currIndex <= 0 )); then
+      positionals=$( compgen -W "$NAME_pos_param_args" -- "${curr_word}" )
+    fi
     COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
   fi
 }

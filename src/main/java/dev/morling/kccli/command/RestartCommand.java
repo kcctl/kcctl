@@ -15,23 +15,8 @@
  */
 package dev.morling.kccli.command;
 
-import io.quarkus.picocli.runtime.annotations.TopCommand;
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 
-@TopCommand
-@CommandLine.Command(name = "kcctl", subcommands = {
-        InfoCommand.class,
-        ConfigCommand.class,
-        GetCommand.class,
-        DeleteConnectorCommand.class,
-        RestartCommand.class,
-        DescribeCommand.class,
-        ApplyCommand.class,
-        CommandLine.HelpCommand.class,
-        ConnectorNamesCompletionCandidateCommand.class,
-        TaskNamesCompletionCandidateCommand.class
-}, description = "A command-line interface for Kafka Connect"
-
-)
-public class KcCtlCommand {
+@Command(name = "restart", subcommands = { RestartConnectorCommand.class, RestartTaskCommand.class }, description = "Restarts a connector or task")
+public class RestartCommand {
 }
