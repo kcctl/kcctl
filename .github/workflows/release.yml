@@ -1,0 +1,213 @@
+#
+#  Copyright 2021 The original authors
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
+      next:
+        description: "Next version"
+        required: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 'Set up Java'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu'
+
+      - name: 'Cache Maven packages'
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: 'Set release version'
+        id: version
+        run: |
+          RELEASE_VERSION=${{ github.event.inputs.version }}
+          NEXT_VERSION=${{ github.event.inputs.next }}
+          PLAIN_VERSION=`echo ${RELEASE_VERSION} | awk 'match($0, /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)/) { print substr($0, RSTART, RLENGTH); }'`
+          COMPUTED_NEXT_VERSION="${PLAIN_VERSION}-SNAPSHOT"
+          if [ -z $NEXT_VERSION ]
+          then
+            NEXT_VERSION=$COMPUTED_NEXT_VERSION
+          fi
+          ./mvnw -B versions:set versions:commit -DnewVersion=$RELEASE_VERSION
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Action"
+          git commit -a -m "🏁 Releasing version $RELEASE_VERSION"
+          git push origin HEAD:main
+          git rev-parse HEAD > HEAD
+          echo $RELEASE_VERSION > RELEASE_VERSION
+          echo $PLAIN_VERSION > PLAIN_VERSION
+          echo $NEXT_VERSION > NEXT_VERSION
+
+      - name: 'Upload version files'
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: |
+            HEAD
+            *_VERSION
+
+  # Build native executable per runner
+  build:
+    needs: [ version ]
+    name: 'Build with Graal on ${{ matrix.os }}'
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        gu-binary: [ gu, gu.cmd ]
+        exclude:
+          - os: ubuntu-latest
+            gu-binary: gu.cmd
+          - os: macos-latest
+            gu-binary: gu.cmd
+          - os: windows-latest
+            gu-binary: gu
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: 'Download all build artifacts'
+        uses: actions/download-artifact@v2
+
+      - name: 'Read HEAD ref'
+        id: head
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: artifacts/HEAD
+
+      - name: 'Check out repository'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.head.outputs.content }}
+        
+      - name: 'Add Developer Command Prompt for Microsoft Visual C++ '
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: 'Set up Graal'
+        uses: DeLaGuardo/setup-graalvm@4.0
+        with:
+          graalvm: '21.1.0'
+          java: 'java11'
+
+      - name: 'Install native-image component'
+        run: |
+          ${{ matrix.gu-binary }} install native-image
+
+      - name: 'Cache Maven packages'
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: 'Build Native Image'
+        run: ./mvnw -B --file pom.xml -Pnative package
+
+      - name: 'Create distribution'
+        run: ./mvnw -B --file pom.xml -Pdist package -DskipTests
+
+      - name: 'Upload build artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: target/*.zip
+
+  # Collect all executables and release
+  release:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    steps:
+      # must read HEAD before checkout
+      - name: 'Download all build artifacts'
+        uses: actions/download-artifact@v2
+
+      - name: 'Read HEAD ref'
+        id: head
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: artifacts/HEAD
+
+      - name: 'Read versions'
+        id: version
+        run: |
+          RELEASE_VERSION=`cat artifacts/RELEASE_VERSION`
+          PLAIN_VERSION=`cat artifacts/PLAIN_VERSION`
+          NEXT_VERSION=`cat artifacts/NEXT_VERSION`
+          echo "RELEASE_VERSION = $RELEASE_VERSION"
+          echo "PLAIN_VERSION   = $PLAIN_VERSION"
+          echo "NEXT_VERSION    = $NEXT_VERSION"
+          echo "::set-output name=RELEASE_VERSION::$RELEASE_VERSION"
+          echo "::set-output name=PLAIN_VERSION::$PLAIN_VERSION"
+          echo "::set-output name=NEXT_VERSION::$NEXT_VERSION"
+
+      - name: 'Check out repository'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.head.outputs.content }}
+          fetch-depth: 0
+
+      # checkout will clobber downloaded artifacts
+      # we have to download them again
+      - name: 'Download all build artifacts'
+        uses: actions/download-artifact@v2
+
+      - name: 'Set up Java'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu'
+
+      - name: 'Release with JReleaser'
+        uses: jreleaser/release-action@v1
+        with:
+          version: early-access
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
+          KCCTL_VERSION: ${{ steps.version.outputs.PLAIN_VERSION }}
+
+      - name: 'Cache Maven packages'
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+          
+      - name: 'Set next version'
+        env:
+          NEXT_VERSION: ${{ steps.version.outputs.NEXT_VERSION }}
+        run: |
+          ./mvnw -B versions:set versions:commit -DnewVersion=$NEXT_VERSION
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Action"
+          git commit -a -m "⬆️  Next version $NEXT_VERSION"
+          git push origin HEAD:main

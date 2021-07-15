@@ -24,7 +24,7 @@ jobs:
   # Build native executable per runner
   build:
     name: 'Build with Graal on ${{ matrix.os }}'
-    if: github.repository == 'gunnarmorling/kcctl' && startsWith(github.event.head_commit.message, 'Releasing version') != true
+    if: github.repository == 'gunnarmorling/kcctl' && startsWith(github.event.head_commit.message, '🏁 Releasing version') != true && startsWith(github.event.head_commit.message, '⬆️  Next version') != true
     strategy:
       fail-fast: true
       matrix:
@@ -65,10 +65,10 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: 'Build Native Image'
-        run: mvn -B --file pom.xml -Pnative package
+        run: ./mvnw -B --file pom.xml -Pnative package
 
       - name: 'Create distribution'
-        run: mvn -B --file pom.xml -Pdist package -DskipTests
+        run: ./mvnw -B --file pom.xml -Pdist package -DskipTests
 
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v2
