@@ -21,6 +21,7 @@ on:
 
 jobs:
   build:
+    if: startsWith(github.event.head_commit.message, '🏁 Releasing version') != true && startsWith(github.event.head_commit.message, '⬆️  Next version') != true
     runs-on: ubuntu-latest
 
     steps:
@@ -41,4 +42,4 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: 'Build'
-        run: mvn -B --file pom.xml verify
+        run: ./mvnw -B --file pom.xml verify
