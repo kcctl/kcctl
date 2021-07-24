@@ -18,6 +18,6 @@ package dev.morling.kccli.command;
 import picocli.CommandLine.Command;
 
 @Command(name = "get", subcommands = { GetPluginsCommand.class,
-        GetConnectorsCommand.class }, description = "Displays information about connector plug-ins and connectors")
+        GetConnectorsCommand.class, GetLoggersCommand.class }, description = "Displays information about connector plug-ins and connectors")
 public class GetCommand {
 }

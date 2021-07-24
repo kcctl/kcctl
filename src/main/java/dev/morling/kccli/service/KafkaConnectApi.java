@@ -27,6 +27,8 @@ import javax.ws.rs.PathParam;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @Path("/")
 @RegisterRestClient
 public interface KafkaConnectApi {
@@ -80,5 +82,9 @@ public interface KafkaConnectApi {
 
     @PUT
     @Path("/admin/loggers/{classPath}")
-    LogLevelInfo updateLogLevel(@PathParam("classPath") String classPath);
+    List<String> updateLogLevel(@PathParam("classPath") String classPath, String content);
+
+    @GET
+    @Path("/admin/loggers/{path}")
+    ObjectNode getLoggers(@PathParam("path") String path);
 }
