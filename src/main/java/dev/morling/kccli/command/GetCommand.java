@@ -17,7 +17,7 @@ package dev.morling.kccli.command;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "get", subcommands = { GetPluginsCommand.class,
-        GetConnectorsCommand.class, GetLoggersCommand.class }, description = "Displays information about connector plug-ins and connectors")
+@Command(name = "get", subcommands = { GetPluginsCommand.class, GetConnectorsCommand.class, GetLoggersCommand.class,
+        GetLoggerCommand.class }, description = "Displays information about connector plug-ins, connectors, and loggers")
 public class GetCommand {
 }

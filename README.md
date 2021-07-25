@@ -15,13 +15,14 @@ A command-line interface for Kafka Connect
 Commands:
   info      Displays information about the Kafka Connect cluster
   config    Sets or retrieves the configuration of this client
-  get       Displays information about connector plug-ins, connectors and log level of connectors
+  get       Displays information about connector plug-ins, connectors, and
+              loggers
   delete    Deletes the specified connector
-  restart   Restarts the specified connector or task
+  restart   Restarts a connector or task
   describe  Displays detailed information about the specified resource
   apply     Applies the given file for registering or updating a connector
-  patch     Applies the patch to the connector depending on subcommand. (e.g. Changing log level at runtime) 
   help      Displays help information about the specified command
+  patch     Modify a configuration of the connector
 ```
 
 It is recommended to install the bash/zsh completion script _kcctl_completion_:

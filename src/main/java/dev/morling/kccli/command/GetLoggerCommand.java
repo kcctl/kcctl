@@ -31,6 +31,7 @@ import com.github.freva.asciitable.HorizontalAlign;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine;
+import picocli.CommandLine.Parameters;
 
 import static dev.morling.kccli.util.Colors.ANSI_CYAN;
 import static dev.morling.kccli.util.Colors.ANSI_GREEN;
@@ -38,11 +39,16 @@ import static dev.morling.kccli.util.Colors.ANSI_RED;
 import static dev.morling.kccli.util.Colors.ANSI_RESET;
 import static dev.morling.kccli.util.Colors.ANSI_YELLOW;
 
-@CommandLine.Command(name = "loggers", description = "Displays information about all configured loggers")
-public class GetLoggersCommand implements Runnable {
+@CommandLine.Command(name = "logger", description = "Displays information about a specific logger")
+public class GetLoggerCommand implements Runnable {
+
+    private static final String DEFAULT_PATH = "ALL";
 
     @Inject
     ConfigurationContext context;
+
+    @Parameters(paramLabel = "LOGGER NAME", description = "Name of the logger") // , completionCandidates = DummyCompletions.class)
+    String path;
 
     @Override
     public void run() {
@@ -50,20 +56,32 @@ public class GetLoggersCommand implements Runnable {
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        ObjectNode connectorLoggers = kafkaConnectApi.getLoggers("");
-        Iterator<String> classPaths = connectorLoggers.fieldNames();
+        String[][] data;
+        if (path.equals(DEFAULT_PATH)) {
+            // all
+            ObjectNode connectorLoggers = kafkaConnectApi.getLoggers("");
+            Iterator<String> classPaths = connectorLoggers.fieldNames();
 
-        String[][] data = new String[connectorLoggers.size()][];
+            data = new String[connectorLoggers.size()][];
 
-        int i = 0;
-        for (final JsonNode header : (Iterable<JsonNode>) connectorLoggers::elements) {
-            for (final Map.Entry<String, JsonNode> field : (Iterable<Map.Entry<String, JsonNode>>) header::fields) {
-                data[i] = new String[]{
-                        classPaths.next(),
-                        " " + field.getValue().textValue()
-                };
+            int i = 0;
+            for (final JsonNode header : (Iterable<JsonNode>) connectorLoggers::elements) {
+                for (final Map.Entry<String, JsonNode> field : (Iterable<Map.Entry<String, JsonNode>>) header::fields) {
+                    data[i] = new String[]{
+                            classPaths.next(),
+                            " " + field.getValue().textValue()
+                    };
+                }
+                i++;
             }
-            i++;
+        }
+        else {
+            ObjectNode connectorLoggers = kafkaConnectApi.getLoggers(path);
+            data = new String[connectorLoggers.size()][];
+            data[0] = new String[]{
+                    path,
+                    connectorLoggers.findValue("level").textValue()
+            };
         }
         System.out.println();
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,

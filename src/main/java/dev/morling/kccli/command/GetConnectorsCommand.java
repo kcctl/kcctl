@@ -35,7 +35,7 @@ import static dev.morling.kccli.util.Colors.ANSI_GREEN;
 import static dev.morling.kccli.util.Colors.ANSI_RED;
 import static dev.morling.kccli.util.Colors.ANSI_RESET;
 
-@Command(name = "connectors")
+@Command(name = "connectors", description = "Displays information about deployed connectors")
 public class GetConnectorsCommand implements Runnable {
 
     @Inject

@@ -32,7 +32,7 @@ import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
-@Command(name = "plugins")
+@Command(name = "plugins", description = "Displays information about available connector plug-ins")
 public class GetPluginsCommand implements Runnable {
 
     @Inject
