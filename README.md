@@ -15,11 +15,12 @@ A command-line interface for Kafka Connect
 Commands:
   info      Displays information about the Kafka Connect cluster
   config    Sets or retrieves the configuration of this client
-  get       Displays information about connector plug-ins and connectors
+  get       Displays information about connector plug-ins, connectors and log level of connectors
   delete    Deletes the specified connector
   restart   Restarts the specified connector or task
   describe  Displays detailed information about the specified resource
   apply     Applies the given file for registering or updating a connector
+  patch     Applies the patch to the connector depending on subcommand. (e.g. Changing log level at runtime) 
   help      Displays help information about the specified command
 ```
 
@@ -41,6 +42,11 @@ You can run your application in dev mode that enables live coding using:
 
 ```shell script
 ./mvnw compile quarkus:dev
+```
+### Add a remote debugger in Intellij 
+Default port is 5005, execute below script in debug mode and start the debugger. It will hit the breakpoint 
+```shell script
+mvn compile quarkus:dev -Dquarkus.args='patch get connectors' -Dsuspend
 ```
 
 ### Packaging and running the application
