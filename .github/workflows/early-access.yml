@@ -24,7 +24,7 @@ jobs:
   # Build native executable per runner
   build:
     name: 'Build with Graal on ${{ matrix.os }}'
-    if: github.repository == 'gunnarmorling/kcctl' && startsWith(github.event.head_commit.message, '🏁 Releasing version') != true && startsWith(github.event.head_commit.message, '⬆️  Next version') != true
+    if: github.repository == 'kcctl/kcctl' && startsWith(github.event.head_commit.message, '🏁 Releasing version') != true && startsWith(github.event.head_commit.message, '⬆️  Next version') != true
     strategy:
       fail-fast: true
       matrix:
