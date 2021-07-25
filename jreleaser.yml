@@ -14,6 +14,10 @@
 #  limitations under the License.
 #
 
+environment:
+  properties:
+    artifactsDir: target
+
 project:
   name: kcctl
   description: kcctl -- A CLI for Apache Kafka Connect
@@ -23,7 +27,7 @@ project:
     - Gunnar Morling
   license: Apache-2.0
   snapshot:
-    label: '{{ Env.KCCTL_VERSION }}-early-access'
+    label: '{{ projectVersionNumber }}-early-access'
   extraProperties:
     inceptionYear: 2021
 
@@ -31,12 +35,12 @@ distributions:
   kcctl:
     type: NATIVE_IMAGE
     artifacts:
-      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-linux-x86_64.zip'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.zip'
         transform: 'artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-x86_64.zip'
         platform: linux-x86_64
-      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip'
         transform: 'artifacts/{{distributionName}}-{{projectEffectiveVersion}}-windows-x86_64.zip'
         platform: windows-x86_64
-      - path: 'artifacts/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip'
         transform: 'artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-x86_64.zip'
         platform: osx-x86_64

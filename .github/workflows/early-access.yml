@@ -100,17 +100,14 @@ jobs:
         id: version
         run: |
           POM_VERSION=`grep -oE -m 1 "<version>(.*)</version>" pom.xml | awk 'match($0, />.*?</) { print substr($0, RSTART+1, RLENGTH-2); }'`
-          KCCTL_VERSION=`echo $POM_VERSION | awk 'match($0, /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)/) { print substr($0, RSTART, RLENGTH); }'`
           echo "POM_VERSION = $POM_VERSION"
-          echo "KCCTL_VERSION = $KCCTL_VERSION"
           echo "::set-output name=POM_VERSION::$POM_VERSION"
-          echo "::set-output name=KCCTL_VERSION::$KCCTL_VERSION"
 
       - name: 'Release with JReleaser'
         uses: jreleaser/release-action@v1
         with:
           version: early-access
+          arguments: full-release -p artifactsDir=artifacts
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.POM_VERSION }}
-          KCCTL_VERSION: ${{ steps.version.outputs.KCCTL_VERSION }}

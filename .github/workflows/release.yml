@@ -190,10 +190,10 @@ jobs:
         uses: jreleaser/release-action@v1
         with:
           version: early-access
+          arguments: full-release -p artifactsDir=artifacts
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
-          KCCTL_VERSION: ${{ steps.version.outputs.PLAIN_VERSION }}
 
       - name: 'Cache Maven packages'
         uses: actions/cache@v1
