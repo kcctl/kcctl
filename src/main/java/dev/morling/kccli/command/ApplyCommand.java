@@ -28,6 +28,7 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.morling.kccli.service.KafkaConnectApi;
+import dev.morling.kccli.service.KafkaConnectException;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -66,32 +67,38 @@ public class ApplyCommand implements Callable<Integer> {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> config = mapper.readValue(contents, Map.class);
 
-        if (config.containsKey("name") && config.containsKey("config")) {
-            boolean existing = kafkaConnectApi.getConnectors().contains(config.get("name"));
-            if (!existing) {
-                kafkaConnectApi.createConnector(contents);
-                System.out.println("Created connector " + config.get("name"));
+        try {
+            if (config.containsKey("name") && config.containsKey("config")) {
+                boolean existing = kafkaConnectApi.getConnectors().contains(config.get("name"));
+                if (!existing) {
+                    kafkaConnectApi.createConnector(contents);
+                    System.out.println("Created connector " + config.get("name"));
+                }
+                else {
+                    kafkaConnectApi.updateConnector(name, mapper.writeValueAsString(config.get("config")));
+                    System.out.println("Updated connector " + config.get("name"));
+                }
             }
             else {
-                kafkaConnectApi.updateConnector(name, mapper.writeValueAsString(config.get("config")));
-                System.out.println("Updated connector " + config.get("name"));
+                if (name == null) {
+                    System.out.println("Connector name must be specified either via --name or in the given file");
+                    return 1;
+                }
+
+                boolean existing = kafkaConnectApi.getConnectors().contains(config.get("name"));
+                kafkaConnectApi.updateConnector(name, contents);
+
+                if (!existing) {
+                    System.out.println("Created connector " + name);
+                }
+                else {
+                    System.out.println("Updated connector " + name);
+                }
             }
         }
-        else {
-            if (name == null) {
-                System.out.println("Connector name must be specified either via --name or in the given file");
-                return 1;
-            }
-
-            boolean existing = kafkaConnectApi.getConnectors().contains(config.get("name"));
-            kafkaConnectApi.updateConnector(name, contents);
-
-            if (!existing) {
-                System.out.println("Created connector " + name);
-            }
-            else {
-                System.out.println("Updated connector " + name);
-            }
+        catch (KafkaConnectException kce) {
+            System.out.println(kce.getMessage());
+            return 1;
         }
 
         return 0;
