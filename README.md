@@ -1,4 +1,4 @@
-# kcctl -- A CLI for Apache Kafka Connect
+# 🧸 kcctl – Your Cuddly CLI for Apache Kafka Connect
 
 This project is a command-line client for [Kafka Connect](https://kafka.apache.org/documentation/#connect).
 Relying on the idioms and semantics of _kubectl_,
