@@ -12,6 +12,12 @@ You can see what _kcctl_ is about in this short video:
 You can obtain early access binaries of _kcctl_ (x86) for Linux, macOS, and Windows from [here](https://github.com/kcctl/kcctl/releases).
 This is a rolling release, new binaries are published upon each commit pushed to the kcctl repository.
 
+Note: on macOS, you need to remove the quarantine flag after downloading, as the distribution currently is not signed:
+
+```shell script
+xattr -r -d com.apple.quarantine path /to/kcctl-1.0.0-SNAPSHOT-osx-x86_64/
+```
+
 We're planning to publish _kcctl_ binaries via [SDKMAN!](https://sdkman.io/) soon, too.
 
 It is recommended to install the bash/zsh completion script _kcctl_completion_:
