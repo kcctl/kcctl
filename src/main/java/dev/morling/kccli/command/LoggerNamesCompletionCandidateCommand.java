@@ -15,55 +15,37 @@
  */
 package dev.morling.kccli.command;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 
-@CommandLine.Command(name = "logger", description = "Changes the log level of given class/Connector path")
-public class PatchLogLevelCommand implements Callable {
+@Command(name = "logger-name-completions", hidden = true)
+public class LoggerNamesCompletionCandidateCommand implements Runnable {
 
     @Inject
     ConfigurationContext context;
 
-    @CommandLine.Parameters(paramLabel = "Logger NAME", description = "Name of the logger") //, completionCandidates = DummyCompletions.class)
-    String name;
-
-    @CommandLine.Option(names = { "-l", "--level" }, description = "Name of log level to apply", required = true)
-    LogLevel level;
-
     @Override
-    public Object call() throws Exception {
+    public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
 
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode data = mapper.createObjectNode();
-        data.put("level", level.name());
-        List<String> classes = kafkaConnectApi.updateLogLevel(name, mapper.writeValueAsString(data));
-        for (String s : classes) {
-            System.out.println(s);
-        }
+        ObjectNode connectorLoggers = kafkaConnectApi.getLoggers("");
+        Iterator<String> fieldNames = connectorLoggers.fieldNames();
+        List<String> loggers = new ArrayList<>();
+        fieldNames.forEachRemaining(loggers::add);
 
-        return 0;
-    }
-
-    public static enum LogLevel {
-        ERROR,
-        WARN,
-        FATAL,
-        DEBUG,
-        INFO,
-        TRACE;
+        System.out.println(String.join(" ", loggers));
     }
 }
