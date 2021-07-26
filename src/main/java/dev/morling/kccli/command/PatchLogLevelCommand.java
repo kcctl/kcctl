@@ -35,7 +35,7 @@ public class PatchLogLevelCommand implements Callable {
     @Inject
     ConfigurationContext context;
 
-    @CommandLine.Parameters(paramLabel = "Logger NAME", description = "Name of the logger") //, completionCandidates = DummyCompletions.class)
+    @CommandLine.Parameters(paramLabel = "Logger NAME", description = "Name of the logger") // , completionCandidates = DummyCompletions.class)
     String name;
 
     @CommandLine.Option(names = { "-l", "--level" }, description = "Name of log level to apply", required = true)

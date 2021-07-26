@@ -33,12 +33,12 @@ Commands:
   config    Sets or retrieves the configuration of this client
   get       Displays information about connector plug-ins, connectors, and
               loggers
-  delete    Deletes the specified connector
-  restart   Restarts a connector or task
   describe  Displays detailed information about the specified resource
   apply     Applies the given file for registering or updating a connector
+  patch     Modifies the configuration of a connector or logger
+  restart   Restarts a connector or task
+  delete    Deletes the specified connector
   help      Displays help information about the specified command
-  patch     Modify a configuration of the connector
 ```
 
 ## Development
@@ -54,11 +54,15 @@ You can run your application in dev mode that enables live coding using:
 ```shell script
 ./mvnw compile quarkus:dev
 ```
-### Add a remote debugger in Intellij 
-Default port is 5005, execute below script in debug mode and start the debugger. It will hit the breakpoint 
+
+To seed the command line arguments, pass the `-Dquarkus.args` option:
+
 ```shell script
-mvn compile quarkus:dev -Dquarkus.args='patch get connectors' -Dsuspend
+./mvnw compile quarkus:dev -Dquarkus.args='patch get connectors'
 ```
+
+In dev mode, remote debuggers can connect to the running application on port 5005.
+In order to wait for a debugger to connect, pass the `-Dsuspend` option.
 
 ### Packaging and running the application
 
