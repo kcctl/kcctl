@@ -4,6 +4,19 @@ This project is a command-line client for [Kafka Connect](https://kafka.apache.o
 Relying on the idioms and semantics of _kubectl_,
 it allows you to register and examine connectors, delete them, restart them, etc.
 
+## Installation
+
+You can obtain early access binaries of _kcctl_ (x86) for Linux, macOS, and Windows from [here](https://github.com/kcctl/kcctl/releases).
+This is a rolling release, new binaries are published upon each commit pushed to the kcctl repository.
+
+We're planning to publish _kcctl_ binaries via [SDKMAN!](https://sdkman.io/) soon, too.
+
+It is recommended to install the bash/zsh completion script _kcctl_completion_:
+
+```shell script
+. kcctl_completion
+```
+
 ## Usage
 
 Display the help to learn about using _kcctl_:
@@ -23,12 +36,6 @@ Commands:
   apply     Applies the given file for registering or updating a connector
   help      Displays help information about the specified command
   patch     Modify a configuration of the connector
-```
-
-It is recommended to install the bash/zsh completion script _kcctl_completion_:
-
-```shell script
-. kcctl_completion
 ```
 
 ## Development
@@ -90,7 +97,8 @@ Build the application in JVM mode.
 Recreate the completion script:
 
 ```shell script
-java -cp "target/quarkus-app/app/*:target/quarkus-app/lib/main/*:target/quarkus-app/quarkus-run.jar" picoclutoutoComplete -n kcctl --force dev.morling.kccli.command.KcCtlCommand
+java -cp "target/quarkus-app/app/*:target/quarkus-app/lib/main/*:target/quarkus-app/quarkus-run.jar" \
+  picocli.AutoComplete -n kcctl --force dev.morling.kccli.command.KcCtlCommand
 ```
 
 Edit the completion scrpt _kcctl_completion_, replace all the dummy completion placeholders with invocations of one of the (hidden) completion candidate commands, e.g. like so:
