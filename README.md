@@ -3,6 +3,9 @@
 This project is a command-line client for [Kafka Connect](https://kafka.apache.org/documentation/#connect).
 Relying on the idioms and semantics of _kubectl_,
 it allows you to register and examine connectors, delete them, restart them, etc.
+You can see what _kcctl_ is about in this short video:
+
+[![kcctl Intro](https://img.youtube.com/vi/F9bUsM1ZwKk/0.jpg)](https://www.youtube.com/watch?v=F9bUsM1ZwKk)
 
 ## Installation
 
