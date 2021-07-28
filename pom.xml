@@ -36,11 +36,24 @@
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus.platform.version>2.0.1.Final</quarkus.platform.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+    <artifactsDir>target</artifactsDir>
   </properties>
+
+  <name>kcctl</name>
+  <description>kcctl -- A CLI for Apache Kafka Connect</description>
+  <inceptionYear>2021</inceptionYear>
+  <url>https://github.com/kcctl/kcctl</url>
+
+  <developers>
+    <developer>
+      <id>gunnarmorling</id>
+      <name>Gunnar Morling</name>
+    </developer>
+  </developers>
 
   <licenses>
     <license>
-      <name>The Apache Software License, Version 2.0</name>
+      <name>Apache-2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
@@ -295,6 +308,50 @@
       <properties>
         <executable-suffix>.exe</executable-suffix>
       </properties>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jreleaser</groupId>
+            <artifactId>jreleaser-maven-plugin</artifactId>
+            <version>0.6.0</version>
+            <configuration>
+              <jreleaser>
+                <project>
+                  <snapshot>
+                    <label>{{ projectVersionNumber }}-early-access</label>
+                  </snapshot>
+                </project>
+                <distributions>
+                  <kcctl>
+                    <name>kcctl</name>
+                    <type>NATIVE_IMAGE</type>
+                    <artifacts>
+                      <artifact>
+                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz</path>
+                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-x86_64.tar.gz</transform>
+                        <platform>linux-x86_64</platform>
+                      </artifact>
+                      <artifact>
+                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip</path>
+                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-windows-x86_64.zip</transform>
+                        <platform>windows-x86_64</platform>
+                      </artifact>
+                      <artifact>
+                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip</path>
+                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-x86_64.zip</transform>
+                        <platform>osx-x86_64</platform>
+                      </artifact>
+                    </artifacts>
+                  </kcctl>
+                </distributions>
+              </jreleaser>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
