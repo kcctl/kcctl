@@ -188,21 +188,17 @@ jobs:
           java-version: 11
           distribution: 'zulu'
 
-      - name: 'Release with JReleaser'
-        uses: jreleaser/release-action@v1
-        with:
-          version: early-access
-          arguments: full-release -p artifactsDir=artifacts
-        env:
-          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
-
       - name: 'Cache Maven packages'
         uses: actions/cache@v1
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      - name: 'Release with JReleaser'
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./mvnw -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
           
       - name: 'Set next version'
         env:

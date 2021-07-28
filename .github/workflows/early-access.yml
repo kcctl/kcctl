@@ -98,18 +98,14 @@ jobs:
           java-version: 11
           distribution: 'zulu'
 
-      - name: 'Version'
-        id: version
-        run: |
-          POM_VERSION=`grep -oE -m 1 "<version>(.*)</version>" pom.xml | awk 'match($0, />.*?</) { print substr($0, RSTART+1, RLENGTH-2); }'`
-          echo "POM_VERSION = $POM_VERSION"
-          echo "::set-output name=POM_VERSION::$POM_VERSION"
+      - name: 'Cache Maven packages'
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
       - name: 'Release with JReleaser'
-        uses: jreleaser/release-action@v1
-        with:
-          version: early-access
-          arguments: full-release -p artifactsDir=artifacts
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.POM_VERSION }}
+        run: ./mvnw -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
