@@ -35,9 +35,9 @@
             <outputDirectory>./</outputDirectory>
         </file>
         <file>
-            <source>${project.build.directory}/${project.artifactId}-${project.version}-runner</source>
+            <source>${project.build.directory}/${project.artifactId}-${project.version}-runner${executable-suffix}</source>
             <outputDirectory>./bin</outputDirectory>
-            <destName>kcctl</destName>
+            <destName>kcctl${executable-suffix}</destName>
         </file>
     </files>
 </assembly>
