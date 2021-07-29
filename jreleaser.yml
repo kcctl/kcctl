@@ -35,8 +35,8 @@ distributions:
   kcctl:
     type: NATIVE_IMAGE
     artifacts:
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.zip'
-        transform: 'artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-x86_64.zip'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz'
+        transform: 'artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-x86_64.tar.gz'
         platform: linux-x86_64
       - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip'
         transform: 'artifacts/{{distributionName}}-{{projectEffectiveVersion}}-windows-x86_64.zip'
