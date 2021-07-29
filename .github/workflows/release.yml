@@ -138,7 +138,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: artifacts
-          path: target/*.zip
+          path: |
+            target/*.zip
+            target/*.tar.gz
 
   # Collect all executables and release
   release:
