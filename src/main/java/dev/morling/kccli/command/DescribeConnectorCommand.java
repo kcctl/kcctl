@@ -31,7 +31,10 @@ import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.service.TaskState;
 import dev.morling.kccli.service.TopicsInfo;
 import dev.morling.kccli.util.ConfigurationContext;
+import dev.morling.kccli.util.Tuple;
+import dev.morling.kccli.util.Version;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import static dev.morling.kccli.util.Colors.ANSI_GREEN;
@@ -48,11 +51,24 @@ public class DescribeConnectorCommand implements Runnable {
     @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector") // , completionCandidates = DummyCompletions.class)
     String name;
 
+    @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
+    boolean includeTasksConfig;
+
+    private final Version requiredVersionForTasksConfig = new Version(2, 8);
+
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
+
+        if (includeTasksConfig) {
+            Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version);
+            if (!currentVersion.greaterOrEquals(requiredVersionForTasksConfig)) {
+                System.out.println("--tasks-config requires at least Kafka Connect 2.8. Current version: " + currentVersion);
+                return;
+            }
+        }
 
         ConnectorInfo connector = kafkaConnectApi.getConnector(name);
         ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
@@ -66,17 +82,17 @@ public class DescribeConnectorCommand implements Runnable {
                 new Tuple("Worker ID", connectorStatus.connector.worker_id),
                 new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, ""));
 
-        printTuples(connectorInfo);
+        Tuple.print(connectorInfo);
 
         for (TaskState task : connectorStatus.tasks) {
-            printTuples(Arrays.asList(new Tuple("  " + task.id, "")));
+            Tuple.print(Arrays.asList(new Tuple("  " + task.id, "")));
             List<Tuple> tuples = new ArrayList<>();
             tuples.add(new Tuple("    State", colorizeState(task.state)));
             tuples.add(new Tuple("    Worker ID", task.worker_id));
             if (task.state.equals("FAILED")) {
                 tuples.add(new Tuple("    Trace", task.trace.replaceAll("Caused by", "      Caused by")));
             }
-            printTuples(tuples);
+            Tuple.print(tuples);
         }
 
         List<Tuple> config = new ArrayList<>();
@@ -85,17 +101,31 @@ public class DescribeConnectorCommand implements Runnable {
             config.add(new Tuple("  " + configEntry.getKey(), configEntry.getValue()));
         }
 
-        printTuples(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
-        printTuples(config);
+        Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
+        Tuple.print(config);
 
-        printTuples(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
+        if (includeTasksConfig) {
+            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Tasks Config" + ANSI_RESET, "")));
+            Map<String, Map<String, String>> tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(name);
+
+            List<Tuple> tuples = new ArrayList<>();
+            for (Entry<String, Map<String, String>> task : tasksConfigs.entrySet()) {
+                tuples.add(new Tuple("  Task", task.getKey()));
+                for (Entry<String, String> taskConfig : task.getValue().entrySet()) {
+                    tuples.add(new Tuple("    " + taskConfig.getKey(), taskConfig.getValue()));
+                }
+            }
+            Tuple.print(tuples);
+        }
+
+        Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
 
         List<Tuple> topics = new ArrayList<>();
 
         for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
             topics.add(new Tuple("", "  " + topic));
         }
-        printTuples(topics);
+        Tuple.print(topics);
     }
 
     private String colorizeState(String state) {
@@ -107,36 +137,6 @@ public class DescribeConnectorCommand implements Runnable {
         }
         else {
             return state;
-        }
-    }
-
-    private void printTuples(List<Tuple> tuples) {
-        if (tuples.isEmpty()) {
-            return;
-        }
-
-        int maxLength = tuples.stream()
-                .mapToInt(t -> t.key.length() + 1)
-                .max()
-                .getAsInt();
-
-        for (Tuple tuple : tuples) {
-            if (!tuple.key.isEmpty()) {
-                System.out.printf("%-" + maxLength + "s  %s%n", tuple.key + ":", tuple.value);
-            }
-            else {
-                System.out.println(tuple.value);
-            }
-        }
-    }
-
-    private static class Tuple {
-        public String key;
-        public String value;
-
-        public Tuple(String key, String value) {
-            this.key = key;
-            this.value = value;
         }
     }
 }

@@ -82,6 +82,10 @@ public interface KafkaConnectApi {
     @Path("/connectors/{name}/tasks/{id}/restart")
     ConnectorInfo restartTask(@PathParam("name") String name, @PathParam("id") String id);
 
+    @GET
+    @Path("/connectors/{name}/tasks-config")
+    Map<String, Map<String, String>> getConnectorTasksConfig(@PathParam("name") String name);
+
     @PUT
     @Path("/admin/loggers/{classPath}")
     List<String> updateLogLevel(@PathParam("classPath") String classPath, String content);
