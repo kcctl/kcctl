@@ -453,7 +453,7 @@ function _picocli_kcctl_describe_connector() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="--tasks-config"
   local arg_opts=""
   local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
 
