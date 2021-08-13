@@ -62,6 +62,10 @@ public interface KafkaConnectApi {
     @Path("/connectors/{name}/pause")
     void pauseConnector(@PathParam("name") String name);
 
+    @PUT
+    @Path("/connectors/{name}/resume")
+    void resumeConnector(@PathParam("name") String name);
+
     @DELETE
     @Path("/connectors/{name}")
     void deleteConnector(@PathParam("name") String name);
