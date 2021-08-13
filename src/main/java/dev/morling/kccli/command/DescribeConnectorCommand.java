@@ -17,6 +17,7 @@ package dev.morling.kccli.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,22 +80,11 @@ public class DescribeConnectorCommand implements Runnable {
                 new Tuple("Name", connector.name),
                 new Tuple("Type", connectorStatus.type),
                 new Tuple("State", colorizeState(connectorStatus.connector.state)),
-                new Tuple("Worker ID", connectorStatus.connector.worker_id),
-                new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, ""));
+                new Tuple("Worker ID", connectorStatus.connector.worker_id));
 
         Tuple.print(connectorInfo);
 
-        for (TaskState task : connectorStatus.tasks) {
-            Tuple.print(Arrays.asList(new Tuple("  " + task.id, "")));
-            List<Tuple> tuples = new ArrayList<>();
-            tuples.add(new Tuple("    State", colorizeState(task.state)));
-            tuples.add(new Tuple("    Worker ID", task.worker_id));
-            if (task.state.equals("FAILED")) {
-                tuples.add(new Tuple("    Trace", task.trace.replaceAll("Caused by", "      Caused by")));
-            }
-            Tuple.print(tuples);
-        }
-
+        // Config
         List<Tuple> config = new ArrayList<>();
 
         for (Entry<String, String> configEntry : connectorConfig.entrySet()) {
@@ -104,16 +94,33 @@ public class DescribeConnectorCommand implements Runnable {
         Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
         Tuple.print(config);
 
-        if (includeTasksConfig) {
-            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Tasks Config" + ANSI_RESET, "")));
-            Map<String, Map<String, String>> tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(name);
+        Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, "")));
 
+        Map<String, Map<String, String>> tasksConfigs;
+        if (includeTasksConfig) {
+            tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(name);
+        }
+        else {
+            tasksConfigs = Collections.emptyMap();
+        }
+
+        // Tasks
+        for (TaskState task : connectorStatus.tasks) {
+            Tuple.print(Arrays.asList(new Tuple("  " + task.id, "")));
             List<Tuple> tuples = new ArrayList<>();
-            for (Entry<String, Map<String, String>> task : tasksConfigs.entrySet()) {
-                tuples.add(new Tuple("  Task", task.getKey()));
-                for (Entry<String, String> taskConfig : task.getValue().entrySet()) {
-                    tuples.add(new Tuple("    " + taskConfig.getKey(), taskConfig.getValue()));
+            tuples.add(new Tuple("    State", colorizeState(task.state)));
+            tuples.add(new Tuple("    Worker ID", task.worker_id));
+
+            if (includeTasksConfig) {
+                tuples.add(new Tuple("    Config", ""));
+
+                for (Entry<String, String> taskConfig : tasksConfigs.get(name + "-" + task.id).entrySet()) {
+                    tuples.add(new Tuple("      " + taskConfig.getKey(), taskConfig.getValue()));
                 }
+            }
+
+            if (task.state.equals("FAILED")) {
+                tuples.add(new Tuple("    Trace", task.trace.replaceAll("Caused by", "      Caused by")));
             }
             Tuple.print(tuples);
         }

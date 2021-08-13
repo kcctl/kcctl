@@ -17,6 +17,9 @@ package dev.morling.kccli.util;
 
 import java.util.List;
 
+import static dev.morling.kccli.util.Colors.ANSI_RESET;
+import static dev.morling.kccli.util.Colors.ANSI_WHITE_BOLD;
+
 public class Tuple {
 
     private final String key;
@@ -39,7 +42,8 @@ public class Tuple {
 
         for (Tuple tuple : tuples) {
             if (!tuple.key.isEmpty()) {
-                System.out.printf("%-" + maxLength + "s  %s%n", tuple.key + ":", tuple.value);
+                String key = tuple.key.replace("    Config", "    " + ANSI_WHITE_BOLD + "Config" + ANSI_RESET);
+                System.out.printf("%-" + maxLength + "s  %s%n", key + ":", tuple.value);
             }
             else {
                 System.out.println(tuple.value);
