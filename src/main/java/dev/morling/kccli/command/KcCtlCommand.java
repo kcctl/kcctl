@@ -28,6 +28,7 @@ import picocli.CommandLine;
         PatchCommand.class,
         RestartCommand.class,
         PauseCommand.class,
+        ResumeCommand.class,
         DeleteConnectorCommand.class,
         CommandLine.HelpCommand.class,
         ConnectorNamesCompletionCandidateCommand.class,
