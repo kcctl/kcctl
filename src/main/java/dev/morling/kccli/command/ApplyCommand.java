@@ -75,7 +75,7 @@ public class ApplyCommand implements Callable<Integer> {
                     System.out.println("Created connector " + config.get("name"));
                 }
                 else {
-                    kafkaConnectApi.updateConnector(name, mapper.writeValueAsString(config.get("config")));
+                    kafkaConnectApi.updateConnector((String) config.get("name"), mapper.writeValueAsString(config.get("config")));
                     System.out.println("Updated connector " + config.get("name"));
                 }
             }
@@ -85,7 +85,7 @@ public class ApplyCommand implements Callable<Integer> {
                     return 1;
                 }
 
-                boolean existing = kafkaConnectApi.getConnectors().contains(config.get("name"));
+                boolean existing = kafkaConnectApi.getConnectors().contains(name);
                 kafkaConnectApi.updateConnector(name, contents);
 
                 if (!existing) {
