@@ -163,7 +163,7 @@ function _picocli_kcctl() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="info config get describe apply patch restart delete help"
-  local flag_opts=""
+  local flag_opts="-h --help -V --version"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -196,7 +196,7 @@ function _picocli_kcctl_config() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="set-context"
+  local commands="set-context get-context"
   local flag_opts=""
   local arg_opts=""
 
@@ -370,6 +370,26 @@ function _picocli_kcctl_config_setcontext() {
   else
     local positionals=""
     COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `get-context` subcommand.
+function _picocli_kcctl_config_getcontext() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+
+  compopt +o default
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts}" ) )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}") )
   fi
 }
 
