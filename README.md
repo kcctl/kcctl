@@ -45,6 +45,8 @@ Commands:
   apply     Applies the given file for registering or updating a connector
   patch     Modifies the configuration of a connector or logger
   restart   Restarts a connector or task
+  pause     Pauses a connector
+  resume    Resumes a connector
   delete    Deletes the specified connector
   help      Displays help information about the specified command
 ```
