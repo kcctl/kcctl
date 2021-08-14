@@ -15,11 +15,14 @@
  */
 package dev.morling.kccli.command;
 
+import org.eclipse.microprofile.config.ConfigProvider;
+
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
+import picocli.CommandLine.IVersionProvider;
 
 @TopCommand
-@CommandLine.Command(name = "kcctl", subcommands = {
+@CommandLine.Command(name = "kcctl", mixinStandardHelpOptions = true, versionProvider = VersionProviderWithConfigProvider.class, subcommands = {
         InfoCommand.class,
         ConfigCommand.class,
         GetCommand.class,
@@ -31,10 +34,18 @@ import picocli.CommandLine;
         CommandLine.HelpCommand.class,
         ConnectorNamesCompletionCandidateCommand.class,
         TaskNamesCompletionCandidateCommand.class,
-        LoggerNamesCompletionCandidateCommand.class,
-        VersionCommand.class
+        LoggerNamesCompletionCandidateCommand.class
 }, description = "A command-line interface for Kafka Connect"
 
 )
+
 public class KcCtlCommand {
+}
+
+class VersionProviderWithConfigProvider implements IVersionProvider {
+    public String[] getVersion() {
+        String applicationName = ConfigProvider.getConfig().getValue("quarkus.application.name", String.class);
+        String applicationVersion = ConfigProvider.getConfig().getValue("quarkus.application.version", String.class);
+        return new String[]{ String.format("%s %s", applicationName, applicationVersion) };
+    }
 }
