@@ -1,7 +1,0 @@
-{
-  "connector.class": "dev.morling.kcetcd.source.EtcdSourceConnector",
-  "tasks.max": "2",
-  "clusters" : "etcd-a=http://etcd-a-1:2379,http://etcd-a-2:2379,http://etcd-a-3:2379;etcd-b=http://etcd-b-1:2379;etcd-c=http://etcd-c-1:2379",
-  "key.converter" : "org.apache.kafka.connect.storage.StringConverter",
-  "value.converter" : "org.apache.kafka.connect.storage.StringConverter"
-}
