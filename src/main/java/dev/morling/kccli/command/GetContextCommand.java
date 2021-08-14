@@ -15,20 +15,20 @@
  */
 package dev.morling.kccli.command;
 
+import javax.inject.Inject;
+
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 
-@Command(name = "set-context", description = "Set the context to cluster provided in arguments")
-public class SetContextCommand implements Runnable {
+@Command(name = "get-context", description = "Get the current context")
+public class GetContextCommand implements Runnable {
 
-    @Option(names = { "--cluster" }, description = "URL of the Kafka Connect cluster to connect to", required = true)
-    String cluster;
+    @Inject
+    ConfigurationContext context;
 
     @Override
     public void run() {
-        ConfigurationContext context = new ConfigurationContext();
-        context.setConfiguration(cluster);
-        System.out.println("Successfully set context to " + cluster);
+        String clusterUri = context.getCluster().toASCIIString();
+        System.out.println("Current context is set to " + clusterUri);
     }
 }
