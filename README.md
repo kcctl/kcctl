@@ -32,8 +32,10 @@ Display the help to learn about using _kcctl_:
 
 ```shell script
 kcctl help
-Usage: kcctl [COMMAND]
+Usage: kcctl [-hV] [COMMAND]
 A command-line interface for Kafka Connect
+  -h, --help      Show this help message and exit.
+  -V, --version   Print version information and exit.
 Commands:
   info      Displays information about the Kafka Connect cluster
   config    Sets or retrieves the configuration of this client
