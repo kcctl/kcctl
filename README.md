@@ -32,19 +32,21 @@ Display the help to learn about using _kcctl_:
 
 ```shell script
 kcctl help
-Usage: kcctl [COMMAND]
+Usage: kcctl [-hV] [COMMAND]
 A command-line interface for Kafka Connect
+  -h, --help      Show this help message and exit.
+  -V, --version   Print version information and exit.
 Commands:
-  info      Displays information about the Kafka Connect cluster
-  config    Sets or retrieves the configuration of this client
+  info      Displays information about the Kafka Connect cluster.
+  config    Sets or retrieves the configuration of this client.
   get       Displays information about connector plug-ins, connectors, and
-              loggers
-  describe  Displays detailed information about the specified resource
-  apply     Applies the given file for registering or updating a connector
-  patch     Modifies the configuration of a connector or logger
-  restart   Restarts a connector or task
-  delete    Deletes the specified connector
-  help      Displays help information about the specified command
+              loggers.
+  describe  Displays detailed information about the specified resource.
+  apply     Applies the given file for registering or updating a connector.
+  patch     Modifies the configuration of a connector or logger.
+  restart   Restarts a connector or task.
+  delete    Deletes the specified connector.
+  help      Displays help information about the specified command.
 ```
 
 ## Development
