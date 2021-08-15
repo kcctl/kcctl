@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -44,7 +45,7 @@ import static dev.morling.kccli.util.Colors.ANSI_RESET;
 import static dev.morling.kccli.util.Colors.ANSI_WHITE_BOLD;
 
 @Command(name = "connector", description = "Displays information about a given connector")
-public class DescribeConnectorCommand implements Runnable {
+public class DescribeConnectorCommand implements Callable<Integer> {
 
     @Inject
     ConfigurationContext context;
@@ -58,7 +59,7 @@ public class DescribeConnectorCommand implements Runnable {
     private final Version requiredVersionForTasksConfig = new Version(2, 8);
 
     @Override
-    public void run() {
+    public Integer call() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCluster())
                 .build(KafkaConnectApi.class);
@@ -67,7 +68,7 @@ public class DescribeConnectorCommand implements Runnable {
             Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version);
             if (!currentVersion.greaterOrEquals(requiredVersionForTasksConfig)) {
                 System.out.println("--tasks-config requires at least Kafka Connect 2.8. Current version: " + currentVersion);
-                return;
+                return 1;
             }
         }
 
@@ -136,15 +137,20 @@ public class DescribeConnectorCommand implements Runnable {
             Tuple.print(topics);
         }
         catch (Exception e) {
-            List<String> connectors = kafkaConnectApi.getConnectors();
-            System.out.println(e.getMessage());
-            System.out.println();
-            System.out.println("Following connector(s) are available");
-            for (String name : connectors) {
-                System.out.println(name);
-                System.out.println();
+            if (!e.getMessage().contains("not found")) {
+                throw e;
             }
+
+            System.out.println("Connector " + name + " not found. The following connector(s) are available:");
+
+            GetConnectorsCommand getConnectors = new GetConnectorsCommand();
+            getConnectors.context = context;
+            getConnectors.run();
+
+            return 1;
         }
+
+        return 0;
     }
 
     private String colorizeState(String state) {
