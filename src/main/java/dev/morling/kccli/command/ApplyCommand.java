@@ -18,6 +18,9 @@ package dev.morling.kccli.command;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -26,7 +29,11 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.freva.asciitable.AsciiTable;
+import com.github.freva.asciitable.Column;
+import com.github.freva.asciitable.HorizontalAlign;
 
+import dev.morling.kccli.service.ConnectorPlugin;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.service.KafkaConnectException;
 import dev.morling.kccli.util.ConfigurationContext;
@@ -98,6 +105,15 @@ public class ApplyCommand implements Callable<Integer> {
         }
         catch (KafkaConnectException kce) {
             System.out.println(kce.getMessage());
+            List<ConnectorPlugin> connectorPlugins = kafkaConnectApi.getConnectorPlugins();
+            Collections.sort(connectorPlugins, (c1, c2) -> -c1.type.compareTo(c2.type));
+    
+            System.out.println();
+            System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
+                    new Column().header("TYPE").dataAlign(HorizontalAlign.LEFT).with(plugin -> plugin.type),
+                    new Column().header(" CLASS").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.clazz),
+                    new Column().header(" VERSION").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.version))));
+            System.out.println();
             return 1;
         }
 

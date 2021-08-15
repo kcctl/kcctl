@@ -71,68 +71,80 @@ public class DescribeConnectorCommand implements Runnable {
             }
         }
 
-        ConnectorInfo connector = kafkaConnectApi.getConnector(name);
-        ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
-        Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(name);
-        Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(name);
+        try {
+            ConnectorInfo connector = kafkaConnectApi.getConnector(name);
+            ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
+            Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(name);
+            Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(name);
 
-        List<Tuple> connectorInfo = Arrays.asList(
-                new Tuple("Name", connector.name),
-                new Tuple("Type", connectorStatus.type),
-                new Tuple("State", colorizeState(connectorStatus.connector.state)),
-                new Tuple("Worker ID", connectorStatus.connector.worker_id));
+            List<Tuple> connectorInfo = Arrays.asList(
+                    new Tuple("Name", connector.name),
+                    new Tuple("Type", connectorStatus.type),
+                    new Tuple("State", colorizeState(connectorStatus.connector.state)),
+                    new Tuple("Worker ID", connectorStatus.connector.worker_id));
 
-        Tuple.print(connectorInfo);
+            Tuple.print(connectorInfo);
 
-        // Config
-        List<Tuple> config = new ArrayList<>();
+            // Config
+            List<Tuple> config = new ArrayList<>();
 
-        for (Entry<String, String> configEntry : connectorConfig.entrySet()) {
-            config.add(new Tuple("  " + configEntry.getKey(), configEntry.getValue()));
-        }
+            for (Entry<String, String> configEntry : connectorConfig.entrySet()) {
+                config.add(new Tuple("  " + configEntry.getKey(), configEntry.getValue()));
+            }
 
-        Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
-        Tuple.print(config);
+            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
+            Tuple.print(config);
 
-        Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, "")));
+            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, "")));
 
-        Map<String, Map<String, String>> tasksConfigs;
-        if (includeTasksConfig) {
-            tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(name);
-        }
-        else {
-            tasksConfigs = Collections.emptyMap();
-        }
-
-        // Tasks
-        for (TaskState task : connectorStatus.tasks) {
-            Tuple.print(Arrays.asList(new Tuple("  " + task.id, "")));
-            List<Tuple> tuples = new ArrayList<>();
-            tuples.add(new Tuple("    State", colorizeState(task.state)));
-            tuples.add(new Tuple("    Worker ID", task.worker_id));
-
+            Map<String, Map<String, String>> tasksConfigs;
             if (includeTasksConfig) {
-                tuples.add(new Tuple("    Config", ""));
+                tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(name);
+            }
+            else {
+                tasksConfigs = Collections.emptyMap();
+            }
 
-                for (Entry<String, String> taskConfig : tasksConfigs.get(name + "-" + task.id).entrySet()) {
-                    tuples.add(new Tuple("      " + taskConfig.getKey(), taskConfig.getValue()));
+            // Tasks
+            for (TaskState task : connectorStatus.tasks) {
+                Tuple.print(Arrays.asList(new Tuple("  " + task.id, "")));
+                List<Tuple> tuples = new ArrayList<>();
+                tuples.add(new Tuple("    State", colorizeState(task.state)));
+                tuples.add(new Tuple("    Worker ID", task.worker_id));
+
+                if (includeTasksConfig) {
+                    tuples.add(new Tuple("    Config", ""));
+
+                    for (Entry<String, String> taskConfig : tasksConfigs.get(name + "-" + task.id).entrySet()) {
+                        tuples.add(new Tuple("      " + taskConfig.getKey(), taskConfig.getValue()));
+                    }
                 }
+
+                if (task.state.equals("FAILED")) {
+                    tuples.add(new Tuple("    Trace", task.trace.replaceAll("Caused by", "      Caused by")));
+                }
+                Tuple.print(tuples);
             }
 
-            if (task.state.equals("FAILED")) {
-                tuples.add(new Tuple("    Trace", task.trace.replaceAll("Caused by", "      Caused by")));
+            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
+
+            List<Tuple> topics = new ArrayList<>();
+
+            for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
+                topics.add(new Tuple("", "  " + topic));
             }
-            Tuple.print(tuples);
+            Tuple.print(topics);
         }
-
-        Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
-
-        List<Tuple> topics = new ArrayList<>();
-
-        for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
-            topics.add(new Tuple("", "  " + topic));
+        catch (Exception e) {
+            List<String> connectors = kafkaConnectApi.getConnectors();
+            System.out.println(e.getMessage());
+            System.out.println();
+            System.out.println("Following connector(s) are available");
+            for (String name : connectors) {
+                System.out.println(name);
+                System.out.println();
+            }
         }
-        Tuple.print(topics);
     }
 
     private String colorizeState(String state) {
