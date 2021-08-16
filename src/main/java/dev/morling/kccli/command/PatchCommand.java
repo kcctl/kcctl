@@ -15,8 +15,8 @@
  */
 package dev.morling.kccli.command;
 
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 
-@CommandLine.Command(name = "patch", subcommands = { PatchLogLevelCommand.class }, description = "Modifies the configuration of a connector or logger")
+@Command(name = "patch", subcommands = { PatchLogLevelCommand.class, PatchConnectorCommand.class }, description = "Modifies the configuration of a connector or logger")
 public class PatchCommand {
 }
