@@ -106,24 +106,22 @@ As above, either define an alias _kcctl_ or rename the resulting executable acco
 
 ### Updating the Completion Script
 
-Grep for usages of `DummyCompletions` and uncomment them
-(they are used as placeholders in the generated completion script).
-
 Build the application in JVM mode.
-
-Recreate the completion script:
+Then recreate the completion script:
 
 ```shell script
 java -cp "target/quarkus-app/app/*:target/quarkus-app/lib/main/*:target/quarkus-app/quarkus-run.jar" \
   picocli.AutoComplete -n kcctl --force dev.morling.kccli.command.KcCtlCommand
 ```
 
-Edit the completion scrpt _kcctl_completion_, replace all the dummy completion placeholders with invocations of one of the (hidden) completion candidate commands, e.g. like so:
+Edit the completion scrpt _kcctl_completion_, replace all the quotes around generated completion invocations with back ticks, making them actual invocations of _kcctl_::
 
 ```shell script
---- local CONNECTOR_NAME_pos_param_args="connector-1 connector-2 connector-3" # 0-0 values
+--- local CONNECTOR_NAME_pos_param_args="kcctl connector-name-completions" # 0-0 values
 +++ local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
 ```
+
+Currently, three kinds of completions exist: `connector-name-completions`, `task-name-completions`, and `logger-name-completions`.
 
 ### Related Quarkus Guides
 

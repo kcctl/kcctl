@@ -28,6 +28,7 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
+import dev.morling.kccli.completion.LoggerNameCompletions;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine;
@@ -47,7 +48,7 @@ public class GetLoggerCommand implements Runnable {
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "LOGGER NAME", description = "Name of the logger") // , completionCandidates = DummyCompletions.class)
+    @Parameters(paramLabel = "LOGGER NAME", description = "Name of the logger", completionCandidates = LoggerNameCompletions.class)
     String path;
 
     @Override

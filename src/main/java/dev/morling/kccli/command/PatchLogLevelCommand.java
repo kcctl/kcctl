@@ -25,6 +25,7 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import dev.morling.kccli.completion.LoggerNameCompletions;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine;
@@ -35,7 +36,7 @@ public class PatchLogLevelCommand implements Callable {
     @Inject
     ConfigurationContext context;
 
-    @CommandLine.Parameters(paramLabel = "Logger NAME", description = "Name of the logger") // , completionCandidates = DummyCompletions.class)
+    @CommandLine.Parameters(paramLabel = "Logger NAME", description = "Name of the logger", completionCandidates = LoggerNameCompletions.class)
     String name;
 
     @CommandLine.Option(names = { "-l", "--level" }, description = "Name of log level to apply", required = true)

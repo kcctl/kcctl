@@ -27,6 +27,7 @@ import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
+import dev.morling.kccli.completion.ConnectorNameCompletions;
 import dev.morling.kccli.service.ConnectorInfo;
 import dev.morling.kccli.service.ConnectorStatusInfo;
 import dev.morling.kccli.service.KafkaConnectApi;
@@ -50,7 +51,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector") // , completionCandidates = DummyCompletions.class)
+    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")

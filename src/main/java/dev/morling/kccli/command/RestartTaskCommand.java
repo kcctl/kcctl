@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
+import dev.morling.kccli.completion.TaskNameCompletions;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
@@ -30,7 +31,7 @@ public class RestartTaskCommand implements Runnable {
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "NAME", description = "Name of the task (e.g. 'my-connector/0')") // , completionCandidates = DummyCompletions.class)
+    @Parameters(paramLabel = "NAME", description = "Name of the task (e.g. 'my-connector/0')", completionCandidates = TaskNameCompletions.class)
     String name;
 
     @Override

@@ -13,16 +13,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package dev.morling.kccli.command;
+package dev.morling.kccli.completion;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class DummyCompletions implements Iterable<String> {
+public class ConnectorNameCompletions implements Iterable<String> {
 
     @Override
     public Iterator<String> iterator() {
-        return Arrays.asList("connector-1", "connector-2", "connector-3").iterator();
+        return Arrays.asList("kcctl", "connector-name-completions").iterator();
     }
 
 }
