@@ -15,6 +15,7 @@
  */
 package dev.morling.kccli.command;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -25,23 +26,29 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dev.morling.kccli.completion.ConnectorNameCompletions;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import picocli.CommandLine.*;
+import picocli.CommandLine.Model.CommandSpec;
 
 @Command(name = "connector", description = "Patches the specified connector with the given configuration parameters")
 public class PatchConnectorCommand implements Callable<Integer> {
 
+    @Spec
+    CommandSpec commandSpec;
+
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector")
+    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
-    @Option(names = { "-p", "--parameter" }, description = "Configuration parameters for the connector", required = true)
-    Map<String, String> patchParameters;
+    @Option(names = { "-s", "--set" }, description = "Set the following configuration parameter")
+    Map<String, String> setParameters;
+
+    @Option(names = { "-r", "--remove" }, description = "Remove the following configuration parameter")
+    List<String> removeParameters;
 
     @Override
     public Integer call() throws JsonProcessingException {
@@ -51,7 +58,20 @@ public class PatchConnectorCommand implements Callable<Integer> {
                 .build(KafkaConnectApi.class);
 
         Map<String, String> connectorParameters = kafkaConnectApi.getConnectorConfig(name);
-        connectorParameters.putAll(patchParameters);
+
+        if (setParameters == null && removeParameters == null) {
+
+            throw new ParameterException(commandSpec.commandLine(), "Missing required arguments: " +
+                    " please enter at least one parameter to set or remove");
+        }
+
+        if (setParameters != null) {
+            connectorParameters.putAll(setParameters);
+        }
+
+        if (removeParameters != null) {
+            removeParameters.forEach(connectorParameters::remove);
+        }
 
         String connectorParametersString = new ObjectMapper().writeValueAsString(connectorParameters);
         kafkaConnectApi.updateConnector(name, connectorParametersString);
@@ -60,6 +80,8 @@ public class PatchConnectorCommand implements Callable<Integer> {
         describeConnectorCommand.context = context;
         describeConnectorCommand.name = name;
         describeConnectorCommand.includeTasksConfig = false;
+
+        System.out.println("New connector configuration:");
 
         return describeConnectorCommand.call();
     }
