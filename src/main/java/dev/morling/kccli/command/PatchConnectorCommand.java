@@ -15,6 +15,8 @@
  */
 package dev.morling.kccli.command;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -28,9 +30,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dev.morling.kccli.completion.ConnectorNameCompletions;
 import dev.morling.kccli.service.KafkaConnectApi;
+import dev.morling.kccli.service.KafkaConnectException;
 import dev.morling.kccli.util.ConfigurationContext;
-import picocli.CommandLine.*;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.Parameters;
+import picocli.CommandLine.Spec;
 
 @Command(name = "connector", description = "Patches the specified connector with the given configuration parameters")
 public class PatchConnectorCommand implements Callable<Integer> {
@@ -83,6 +90,27 @@ public class PatchConnectorCommand implements Callable<Integer> {
 
         System.out.println("New connector configuration:");
 
-        return describeConnectorCommand.call();
+        Instant start = Instant.now();
+
+        while (Duration.between(start, Instant.now()).toSeconds() < 30) {
+            try {
+                return describeConnectorCommand.call();
+            }
+            catch (KafkaConnectException kce) {
+                if (kce.getMessage().startsWith("Cannot complete request momentarily due to stale configuration")) {
+                    try {
+                        Thread.sleep(100);
+                    }
+                    catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+                }
+                else {
+                    throw kce;
+                }
+            }
+        }
+
+        return 0;
     }
 }
