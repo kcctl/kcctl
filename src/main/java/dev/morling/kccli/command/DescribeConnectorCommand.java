@@ -44,6 +44,7 @@ import static dev.morling.kccli.util.Colors.ANSI_GREEN;
 import static dev.morling.kccli.util.Colors.ANSI_RED;
 import static dev.morling.kccli.util.Colors.ANSI_RESET;
 import static dev.morling.kccli.util.Colors.ANSI_WHITE_BOLD;
+import static dev.morling.kccli.util.Colors.ANSI_YELLOW;
 
 @Command(name = "connector", description = "Displays information about a given connector")
 public class DescribeConnectorCommand implements Callable<Integer> {
@@ -158,8 +159,14 @@ public class DescribeConnectorCommand implements Callable<Integer> {
         if (state.equals("RUNNING")) {
             return ANSI_GREEN + "RUNNING" + ANSI_RESET;
         }
+        else if (state.equals("PAUSED")) {
+            return ANSI_YELLOW + "PAUSED" + ANSI_RESET;
+        }
         else if (state.equals("FAILED")) {
             return ANSI_RED + "FAILED" + ANSI_RESET;
+        }
+        else if (state.equals("UNASSIGNED")) {
+            return ANSI_YELLOW + "UNASSIGNED" + ANSI_RESET;
         }
         else {
             return state;
