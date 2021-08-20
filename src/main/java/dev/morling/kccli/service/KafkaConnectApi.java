@@ -42,6 +42,10 @@ public interface KafkaConnectApi {
     @Path("/connector-plugins")
     List<ConnectorPlugin> getConnectorPlugins();
 
+    @PUT
+    @Path("/connector-plugins/{name}/config/validate")
+    ConfigInfos validateConfig(@PathParam("name") String name, String config);
+
     @GET
     @Path("/connectors/")
     List<String> getConnectors();
