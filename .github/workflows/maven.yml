@@ -46,3 +46,6 @@ jobs:
 
       - name: 'Build'
         run: ./mvnw -B --file pom.xml verify
+
+      - name: 'Upload code coverage'
+        uses: codecov/codecov-action@v2.0.2
