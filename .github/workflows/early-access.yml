@@ -58,7 +58,7 @@ jobs:
           ${{ matrix.gu-binary }} install native-image
 
       - name: 'Cache Maven packages'
-        uses: actions/cache@v1
+        uses: actions/cache@v2.1.6
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -99,7 +99,7 @@ jobs:
           distribution: 'zulu'
 
       - name: 'Cache Maven packages'
-        uses: actions/cache@v1
+        uses: actions/cache@v2.1.6
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
