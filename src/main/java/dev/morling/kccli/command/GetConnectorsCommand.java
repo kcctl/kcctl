@@ -44,7 +44,7 @@ public class GetConnectorsCommand implements Runnable {
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCluster())
+                .baseUri(context.getContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         List<String> connectors = kafkaConnectApi.getConnectors();

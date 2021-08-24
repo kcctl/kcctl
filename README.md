@@ -26,6 +26,25 @@ It is recommended to install the bash/zsh completion script _kcctl_completion_:
 . kcctl_completion
 ```
 
+## Quickstart
+
+Before you can start using _kcctl_ you need to create a configuration context.
+A configuration context is a set of configuration parameters, grouped
+by a name.
+To create a configuration context named `local`, with the Kafka Connect cluster URL set to 
+`http://localhost:8083`, issue the following command
+
+```shell script
+kcctl set-context local --cluster http://localhost:8083
+```
+
+:exclamation: Note that certain commands will require additional parameters, like `bootstrap-servers` and 
+`offset-topic`.
+
+Type `kcctl info` to display some information about the Kafka connect cluster.
+The command will use the currently active context, `local` in this case, to
+resolve the cluster URL.
+
 ## Usage
 
 Display the help to learn about using _kcctl_:

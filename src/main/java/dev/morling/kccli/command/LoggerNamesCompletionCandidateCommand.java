@@ -38,7 +38,7 @@ public class LoggerNamesCompletionCandidateCommand implements Runnable {
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCluster())
+                .baseUri(context.getContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         ObjectNode connectorLoggers = kafkaConnectApi.getLoggers("");

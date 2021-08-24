@@ -401,12 +401,18 @@ function _picocli_kcctl_config_setcontext() {
 
   local commands=""
   local flag_opts=""
-  local arg_opts="--cluster"
+  local arg_opts="--cluster --bootstrap-servers --offset-topic"
 
   compopt +o default
 
   case ${prev_word} in
     --cluster)
+      return
+      ;;
+    --bootstrap-servers)
+      return
+      ;;
+    --offset-topic)
       return
       ;;
   esac
