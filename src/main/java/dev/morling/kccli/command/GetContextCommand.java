@@ -28,7 +28,7 @@ public class GetContextCommand implements Runnable {
 
     @Override
     public void run() {
-        String clusterUri = context.getCluster().toASCIIString();
+        String clusterUri = context.getContext().getCluster().toASCIIString();
         System.out.println("Current context is set to " + clusterUri);
     }
 }

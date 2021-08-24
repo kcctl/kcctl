@@ -45,7 +45,7 @@ public class PatchLogLevelCommand implements Callable {
     @Override
     public Object call() throws Exception {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCluster())
+                .baseUri(context.getContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         ObjectMapper mapper = new ObjectMapper();

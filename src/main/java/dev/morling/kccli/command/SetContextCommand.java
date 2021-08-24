@@ -15,20 +15,32 @@
  */
 package dev.morling.kccli.command;
 
+import java.net.URI;
+
+import dev.morling.kccli.service.Context;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 @Command(name = "set-context", description = "Set the context to cluster provided in arguments")
 public class SetContextCommand implements Runnable {
+    @Parameters(index = "0", description = "Context name")
+    String contextName;
 
-    @Option(names = { "--cluster" }, description = "URL of the Kafka Connect cluster to connect to", required = true)
+    @Option(names = { "--cluster" }, defaultValue = "http://localhost:8083", description = "URL of the Kafka Connect cluster to connect to")
     String cluster;
+
+    @Option(names = { "--bootstrap-servers" }, defaultValue = "localhost:9092", description = "Comma-separated list of Kafka broker URLs")
+    String bootstrapServers;
+
+    @Option(names = { "--offset-topic" }, description = "Name of the offset topic")
+    String offsetTopic;
 
     @Override
     public void run() {
         ConfigurationContext context = new ConfigurationContext();
-        context.setConfiguration(cluster);
-        System.out.println("Successfully set context to " + cluster);
+        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic));
+        System.out.println("Using context " + contextName);
     }
 }

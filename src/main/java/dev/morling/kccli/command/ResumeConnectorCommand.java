@@ -37,7 +37,7 @@ public class ResumeConnectorCommand implements Runnable {
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCluster())
+                .baseUri(context.getContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         kafkaConnectApi.resumeConnector(name);

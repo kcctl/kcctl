@@ -15,41 +15,82 @@
  */
 package dev.morling.kccli.util;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+
+import dev.morling.kccli.service.Configuration;
+import dev.morling.kccli.service.Context;
+
 @ApplicationScoped
 public class ConfigurationContext {
-
     private static final String CONFIG_FILE = ".kcctl";
-    private static final Path CONFIG_PATH = Path.of(System.getProperty("user.home"), CONFIG_FILE);
+    private final File configFile;
+    private final ObjectMapper objectMapper;
 
-    public void setConfiguration(String cluster) {
+    public ConfigurationContext() {
+        this(new File(System.getProperty("user.home")));
+    }
+
+    public ConfigurationContext(File configDirectory) {
+        this.configFile = new File(configDirectory, CONFIG_FILE);
+        this.objectMapper = JsonMapper
+                .builder()
+                .serializationInclusion(JsonInclude.Include.NON_NULL)
+                .configure(SerializationFeature.INDENT_OUTPUT, true)
+                .build();
+    }
+
+    public void setContext(String contextName, Context context) {
+        if (!configFile.exists()) {
+            tryWriteConfiguration(new Configuration(contextName).addConfigurationContext(contextName, context));
+
+            return;
+        }
+
+        var configuration = tryReadConfiguration();
+
+        tryWriteConfiguration(configuration.addConfigurationContext(contextName, context));
+    }
+
+    public Context getContext() {
+        if (!configFile.exists()) {
+            System.out.println("No configuration context has been defined, using http://localhost:8083 by default." +
+                    " Run 'kcctl set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>].' to create a context.");
+
+            return Context.defaultContext();
+        }
+
+        var configuration = tryReadConfiguration();
+
+        return configuration.configurationContexts().get(configuration.getCurrentContext());
+    }
+
+    private Configuration tryReadConfiguration() {
         try {
-            Files.writeString(CONFIG_PATH, "cluster=" + cluster, StandardOpenOption.TRUNCATE_EXISTING);
+            return objectMapper.readValue(configFile, Configuration.class);
         }
         catch (IOException e) {
-            throw new RuntimeException("Couldn't write configuration file ~/" + CONFIG_FILE, e);
+            throw new RuntimeException("Couldn't read configuration file ~/" + CONFIG_FILE + ". If you are using the legacy," +
+                    "property-based configuration format, please delete the old .kcctl file and create a new one by " +
+                    "running 'kcctl set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>]. ", e);
         }
     }
 
-    public URI getCluster() {
-        if (!Files.exists(CONFIG_PATH)) {
-            return URI.create("http://localhost:8083");
-        }
-
+    private void tryWriteConfiguration(Configuration configuration) {
         try {
-            String config = Files.readString(CONFIG_PATH);
-            String[] parts = config.split("=");
-            return URI.create(parts[1]);
+            objectMapper.writeValue(configFile, configuration);
         }
         catch (IOException e) {
-            throw new RuntimeException("Couldn't read configuration file ~/" + CONFIG_FILE, e);
+            throw new RuntimeException("Couldn't write configuration file " + configFile + ". If you are using the legacy," +
+                    "property-based configuration format, please delete the old .kcctl file and create a new one by " +
+                    "running 'kcctl set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>]. ", e);
         }
     }
 }

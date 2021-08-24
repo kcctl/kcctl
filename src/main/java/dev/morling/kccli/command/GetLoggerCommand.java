@@ -54,7 +54,7 @@ public class GetLoggerCommand implements Runnable {
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCluster())
+                .baseUri(context.getContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         String[][] data;

@@ -63,7 +63,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     @Override
     public Integer call() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCluster())
+                .baseUri(context.getContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         if (includeTasksConfig) {
