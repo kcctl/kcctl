@@ -35,7 +35,7 @@ To create a configuration context named `local`, with the Kafka Connect cluster 
 `http://localhost:8083`, issue the following command
 
 ```shell script
-kcctl set-context local --cluster http://localhost:8083
+kcctl config set-context local --cluster http://localhost:8083
 ```
 
 :exclamation: Note that certain commands will require additional parameters, like `bootstrap-servers` and 
