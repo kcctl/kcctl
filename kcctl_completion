@@ -261,7 +261,7 @@ function _picocli_kcctl_apply() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="--dry-run"
   local arg_opts="-f --file -n --name"
 
   compopt +o default

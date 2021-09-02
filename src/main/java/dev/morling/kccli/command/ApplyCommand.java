@@ -18,6 +18,7 @@ package dev.morling.kccli.command;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -27,11 +28,15 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dev.morling.kccli.service.ConfigInfos;
 import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.service.KafkaConnectException;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import static dev.morling.kccli.util.Colors.ANSI_RESET;
+import static dev.morling.kccli.util.Colors.ANSI_WHITE_BOLD;
 
 @Command(name = "apply", description = "Applies the given file for registering or updating a connector")
 public class ApplyCommand implements Callable<Integer> {
@@ -45,6 +50,13 @@ public class ApplyCommand implements Callable<Integer> {
     @Option(names = { "-n", "--name" }, description = "Name of the connector when not given within the file itself")
     String name;
 
+    @Option(names = { "--dry-run" }, description = "Only validates the configuration")
+    boolean dryRun;
+
+    private final static String CONFIG_EXCEPTION = "org.apache.kafka.common.config.ConfigException: ";
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @SuppressWarnings("unchecked")
     @Override
     public Integer call() throws Exception {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
@@ -56,7 +68,7 @@ public class ApplyCommand implements Callable<Integer> {
             return 1;
         }
 
-        String contents = null;
+        String contents;
         try {
             contents = Files.readString(file.toPath());
         }
@@ -64,19 +76,28 @@ public class ApplyCommand implements Callable<Integer> {
             throw new RuntimeException("Couldn't read file", e);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> config = mapper.readValue(contents, Map.class);
 
+        if (dryRun) {
+            return validateConfigs(kafkaConnectApi, config);
+        }
+        else {
+            return createOrUpdateConnector(kafkaConnectApi, contents, config);
+        }
+    }
+
+    private int createOrUpdateConnector(KafkaConnectApi kafkaConnectApi, String contents, Map<String, Object> config) throws Exception {
         try {
             if (config.containsKey("name") && config.containsKey("config")) {
-                boolean existing = kafkaConnectApi.getConnectors().contains(config.get("name"));
+                String connectorName = (String) config.get("name");
+                boolean existing = kafkaConnectApi.getConnectors().contains(connectorName);
                 if (!existing) {
                     kafkaConnectApi.createConnector(contents);
-                    System.out.println("Created connector " + config.get("name"));
+                    System.out.println("Created connector " + connectorName);
                 }
                 else {
-                    kafkaConnectApi.updateConnector((String) config.get("name"), mapper.writeValueAsString(config.get("config")));
-                    System.out.println("Updated connector " + config.get("name"));
+                    kafkaConnectApi.updateConnector(connectorName, mapper.writeValueAsString(config.get("config")));
+                    System.out.println("Updated connector " + connectorName);
                 }
             }
             else {
@@ -108,6 +129,58 @@ public class ApplyCommand implements Callable<Integer> {
             getPlugins.run();
 
             return 1;
+        }
+
+        return 0;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private int validateConfigs(KafkaConnectApi kafkaConnectApi, Map<String, Object> config) throws Exception {
+        Map<String, String> connectorConfigMap = (config.containsKey("config"))
+                ? (Map) config.get("config")
+                : (Map) config;
+
+        if (!connectorConfigMap.containsKey("connector.class")) {
+            System.out.println("The configuration must contain the 'connector.class' field.");
+            return 1;
+        }
+        // In order to start a connector, "name" is not required within "config". However, when validating a
+        // configuration it is! So injecting a placeholder to make sure this does not fail validation.
+        connectorConfigMap.putIfAbsent("name", "dummy-name");
+
+        String clazz = connectorConfigMap.get("connector.class");
+        String pluginName = clazz.substring(clazz.lastIndexOf('.') + 1);
+        try {
+            ConfigInfos configInfos = kafkaConnectApi.validateConfig(pluginName, mapper.writeValueAsString(connectorConfigMap));
+            int errs = configInfos.errorCount;
+            if (errs == 0) {
+                System.out.println("The configuration is valid!");
+            }
+            else {
+                System.out.println("The configuration is not valid! Found " + errs + " error" + ((errs != 1) ? "s" : "") + ".");
+                System.out.println(ANSI_WHITE_BOLD + "Errors" + ANSI_RESET);
+                for (ConfigInfos.ConfigInfo configInfo : configInfos.configs) {
+                    List<String> errors = configInfo.configValue.errors;
+                    if (errors != null && !errors.isEmpty()) {
+                        System.out.println("  " + configInfo.configKey.name);
+                        for (String error : errors) {
+                            System.out.println("    " + error);
+                        }
+                    }
+                }
+                return 1;
+            }
+        }
+        catch (KafkaConnectException kce) {
+            if (kce.getMessage().startsWith(CONFIG_EXCEPTION)) {
+                System.out.println("The configuration is not valid! Found 1 error.");
+                System.out.println(ANSI_WHITE_BOLD + "Errors" + ANSI_RESET);
+                System.out.println("  " + kce.getMessage().replace(CONFIG_EXCEPTION, ""));
+                return 1;
+            }
+            else {
+                throw kce;
+            }
         }
 
         return 0;
