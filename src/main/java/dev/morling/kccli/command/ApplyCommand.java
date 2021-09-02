@@ -136,11 +136,10 @@ public class ApplyCommand implements Callable<Integer> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private int validateConfigs(KafkaConnectApi kafkaConnectApi, Map<String, Object> config) throws Exception {
-        if (!config.containsKey("config")) {
-            System.out.println("The file must contain the 'config' field.");
-            return 1;
-        }
-        Map<String, String> connectorConfigMap = (Map) config.get("config");
+        Map<String, String> connectorConfigMap = (config.containsKey("config"))
+                ? (Map) config.get("config")
+                : (Map) config;
+
         if (!connectorConfigMap.containsKey("connector.class")) {
             System.out.println("The configuration must contain the 'connector.class' field.");
             return 1;
