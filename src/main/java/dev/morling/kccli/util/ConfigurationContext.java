@@ -62,7 +62,7 @@ public class ConfigurationContext {
     public Context getContext() {
         if (!configFile.exists()) {
             System.out.println("No configuration context has been defined, using http://localhost:8083 by default." +
-                    " Run 'kcctl set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>].' to create a context.");
+                    " Run 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>].' to create a context.");
 
             return Context.defaultContext();
         }
@@ -79,7 +79,7 @@ public class ConfigurationContext {
         catch (IOException e) {
             throw new RuntimeException("Couldn't read configuration file ~/" + CONFIG_FILE + ". If you are using the legacy," +
                     "property-based configuration format, please delete the old .kcctl file and create a new one by " +
-                    "running 'kcctl set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>]. ", e);
+                    "running 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>]. ", e);
         }
     }
 
@@ -90,7 +90,7 @@ public class ConfigurationContext {
         catch (IOException e) {
             throw new RuntimeException("Couldn't write configuration file " + configFile + ". If you are using the legacy," +
                     "property-based configuration format, please delete the old .kcctl file and create a new one by " +
-                    "running 'kcctl set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>]. ", e);
+                    "running 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>]. ", e);
         }
     }
 }
