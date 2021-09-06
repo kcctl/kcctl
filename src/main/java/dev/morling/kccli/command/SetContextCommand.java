@@ -40,7 +40,7 @@ public class SetContextCommand implements Runnable {
     @Override
     public void run() {
         ConfigurationContext context = new ConfigurationContext();
-        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic));
+        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, null, null));
         System.out.println("Using context " + contextName);
     }
 }
