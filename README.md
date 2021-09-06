@@ -45,6 +45,23 @@ Type `kcctl info` to display some information about the Kafka Connect cluster.
 The command will use the currently active context, `local` in this case, to
 resolve the cluster URL.
 
+## Authentication
+
+If your cluster enforces authentication, you may configure your username and password with the `username` and `password` parameters:
+```shell script
+kcctl config set-context local --cluster http://localhost:8083 --username myusername --password mypassword
+```
+:exclamation: Note that setting user name and password via CLI may store those credentials in your terminal history. To work around this, you may set the username and password directly in your `.kcctl` file:
+```json
+  "currentContext" : "local",
+  "local" : {
+    "cluster" : "http://localhost:8083",
+    "username" : "myusername",
+    "password" : "mypassword"
+  }
+```
+Currently, only basic authentication is supported.
+
 ## Usage
 
 Display the help to learn about using _kcctl_:
