@@ -37,10 +37,16 @@ public class SetContextCommand implements Runnable {
     @Option(names = { "--offset-topic" }, description = "Name of the offset topic")
     String offsetTopic;
 
+    @Option(names = { "--username" }, description = "Username for basic authentication")
+    String username;
+
+    @Option(names = { "--password" }, description = "Password for basic authentication")
+    String password;
+
     @Override
     public void run() {
         ConfigurationContext context = new ConfigurationContext();
-        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, null, null));
+        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, username, password));
         System.out.println("Using context " + contextName);
     }
 }
