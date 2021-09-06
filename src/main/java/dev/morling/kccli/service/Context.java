@@ -17,20 +17,29 @@ package dev.morling.kccli.service;
 
 import java.net.URI;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Context {
     private final URI cluster;
     private final String bootstrapServers;
     private final String offsetTopic;
+    private final String username;
+    private final String password;
 
     public Context(
                    @JsonProperty("cluster") URI cluster,
                    @JsonProperty("bootstrapServers") String bootstrapServers,
-                   @JsonProperty("offsetTopic") String offsetTopic) {
+                   @JsonProperty("offsetTopic") String offsetTopic,
+                   @JsonProperty("username") String username,
+                   @JsonProperty("password") String password) {
         this.cluster = cluster;
         this.bootstrapServers = bootstrapServers;
         this.offsetTopic = offsetTopic;
+        this.username = username;
+        this.password = password;
     }
 
     public URI getCluster() {
@@ -45,7 +54,21 @@ public class Context {
         return offsetTopic;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    @JsonIgnore
+    public boolean isUsingBasicAuthentication() {
+        return StringUtils.isNotBlank(this.getUsername()) &&
+                StringUtils.isNotBlank(this.getPassword());
+    }
+
     public static Context defaultContext() {
-        return new Context(URI.create("http://localhost:8083"), null, null);
+        return new Context(URI.create("http://localhost:8083"), null, null, null, null);
     }
 }
