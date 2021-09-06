@@ -25,6 +25,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Path("/")
 @RegisterRestClient
+@RegisterClientHeaders(value = KafkaConnectClientHeadersFactory.class)
 @RegisterProvider(value = KafkaConnectResponseExceptionMapper.class, priority = 50)
 public interface KafkaConnectApi {
 

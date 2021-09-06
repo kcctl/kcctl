@@ -63,7 +63,7 @@ class ConfigurationContextTest {
 
             new ConfigurationContext(tempDir).setContext(
                     "preprod",
-                    new Context(URI.create("http://preprod:8083"), null, null));
+                    new Context(URI.create("http://preprod:8083"), null, null, null, null));
 
             var actualConfiguration = Files.readString(configFile);
 
@@ -75,7 +75,7 @@ class ConfigurationContextTest {
     @Nested
     class GetCluster {
         @Test
-        void should_return_the_the_cluster_url_for_the_current_context() throws IOException {
+        void should_return_the_cluster_url_for_the_current_context() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile, "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\" }}");
@@ -84,15 +84,39 @@ class ConfigurationContextTest {
         }
     }
 
+    @Nested
+    class GetUsername {
+        @Test
+        void should_return_the_username_for_the_current_context() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile, "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"username\": \"mickey\" }}");
+
+            assertThat(new ConfigurationContext(tempDir).getContext().getUsername()).isEqualTo("mickey");
+        }
+    }
+
+    @Nested
+    class GetPassword {
+        @Test
+        void should_return_the_password_for_the_current_context() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile, "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\" }}");
+
+            assertThat(new ConfigurationContext(tempDir).getContext().getPassword()).isEqualTo("p@ssword");
+        }
+    }
+
     static Stream<Arguments> setConfigurationArguments() {
         return Stream.of(
                 arguments(
                         "local",
-                        new Context(URI.create("http://localhost:8083"), "localhost:9092", "connect-offsets"),
+                        new Context(URI.create("http://localhost:8083"), "localhost:9092", "connect-offsets", null, null),
                         "{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083', 'bootstrapServers': 'localhost:9092', 'offsetTopic': 'connect-offsets' }}"),
                 arguments(
                         "local",
-                        new Context(URI.create("http://localhost:8083"), null, null),
+                        new Context(URI.create("http://localhost:8083"), null, null, null, null),
                         "{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083' }}"));
     }
 }
