@@ -59,16 +59,15 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     boolean includeTasksConfig;
 
     private final Version requiredVersionForTasksConfig = new Version(2, 8);
-    private final Version requiredVersionForTopicsApi = new Version(2, 5);
 
     @Override
     public Integer call() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getContext().getCluster())
                 .build(KafkaConnectApi.class);
-        Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version);
 
         if (includeTasksConfig) {
+            Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version);
             if (!currentVersion.greaterOrEquals(requiredVersionForTasksConfig)) {
                 System.out.println("--tasks-config requires at least Kafka Connect 2.8. Current version: " + currentVersion);
                 return 1;
@@ -79,6 +78,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             ConnectorInfo connector = kafkaConnectApi.getConnector(name);
             ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
             Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(name);
+            Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(name);
 
             List<Tuple> connectorInfo = Arrays.asList(
                     new Tuple("Name", connector.name),
@@ -129,19 +129,14 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 Tuple.print(tuples);
             }
 
-            if (currentVersion.greaterOrEquals(requiredVersionForTopicsApi)) {
+            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
 
-                Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(name);
+            List<Tuple> topics = new ArrayList<>();
 
-                Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
-
-                List<Tuple> topics = new ArrayList<>();
-
-                for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
-                    topics.add(new Tuple("", "  " + topic));
-                }
-                Tuple.print(topics);
+            for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
+                topics.add(new Tuple("", "  " + topic));
             }
+            Tuple.print(topics);
         }
         catch (Exception e) {
             if (!e.getMessage().contains("not found")) {
