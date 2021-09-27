@@ -118,15 +118,16 @@ public class ApplyCommand implements Callable<Integer> {
             }
         }
         catch (KafkaConnectException kce) {
-            if (!kce.getMessage().startsWith("Failed to find any class that implements Connector")) {
-                throw kce;
+            if (kce.getMessage().startsWith("Failed to find any class that implements Connector")) {
+
+                System.out.println("Specified class isn't a valid connector type. The following connector type(s) are available:");
+
+                GetPluginsCommand getPlugins = new GetPluginsCommand();
+                getPlugins.context = context;
+                getPlugins.run();
+            } else {
+                System.out.println(kce.getMessage());
             }
-
-            System.out.println("Specified class isn't a valid connector type. The following connector type(s) are available:");
-
-            GetPluginsCommand getPlugins = new GetPluginsCommand();
-            getPlugins.context = context;
-            getPlugins.run();
 
             return 1;
         }
