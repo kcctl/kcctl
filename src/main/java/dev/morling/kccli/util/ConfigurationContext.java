@@ -70,10 +70,6 @@ public class ConfigurationContext {
 
         var configuration = tryReadConfiguration();
 
-        if(contextName.isBlank()){
-            contextName = configuration.getCurrentContext();
-        }
-
         return configuration.configurationContexts().get(contextName);
     }
 
