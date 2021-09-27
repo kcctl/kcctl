@@ -15,29 +15,21 @@
  */
 package dev.morling.kccli.command;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
-import org.eclipse.microprofile.rest.client.RestClientBuilder;
-
-import dev.morling.kccli.service.KafkaConnectApi;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
-@Command(name = "connector-name-completions", hidden = true)
-public class ConnectorNamesCompletionCandidateCommand implements Runnable {
+@Command(name = "current-context", description = "Get the current context")
+public class CurrentContextCommand implements Runnable {
 
     @Inject
     ConfigurationContext context;
 
     @Override
     public void run() {
-        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCurrentContext().getCluster())
-                .build(KafkaConnectApi.class);
 
-        List<String> connectors = kafkaConnectApi.getConnectors();
-        System.out.println(String.join(" ", connectors));
+        String clusterUri = context.getCurrentContext().getCluster().toASCIIString();
+        System.out.println("Current context '" + context.getCurrentContextName() + "' is set to " + clusterUri);
     }
 }

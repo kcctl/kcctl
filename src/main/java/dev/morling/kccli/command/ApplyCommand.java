@@ -60,7 +60,7 @@ public class ApplyCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getContext().getCluster())
+                .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         if (!file.exists()) {
