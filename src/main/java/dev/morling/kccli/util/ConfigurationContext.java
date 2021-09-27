@@ -17,10 +17,7 @@ package dev.morling.kccli.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -63,7 +60,38 @@ public class ConfigurationContext {
         tryWriteConfiguration(configuration.addConfigurationContext(contextName, context));
     }
 
-    public Context getContext() {
+    public Context getContext(String contextName) {
+        if (!configFile.exists()) {
+            System.out.println("No configuration context has been defined, using http://localhost:8083 by default." +
+                    " Run 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>].' to create a context.");
+
+            return Context.defaultContext();
+        }
+
+        var configuration = tryReadConfiguration();
+
+        if(contextName.isBlank()){
+            contextName = configuration.getCurrentContext();
+        }
+
+        return configuration.configurationContexts().get(contextName);
+    }
+
+    public Map<String, Context> getContexts() {
+        Map<String, Context> contexts = new LinkedHashMap<>();
+        if (!configFile.exists()) {
+            System.out.println("No configuration context has been defined, using http://localhost:8083 by default." +
+                    " Run 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>].' to create a context.");
+
+            return contexts;
+        }
+
+        var configuration = tryReadConfiguration();
+        return configuration.configurationContexts();
+    }
+
+    public Context getCurrentContext() {
+
         if (!configFile.exists()) {
             System.out.println("No configuration context has been defined, using http://localhost:8083 by default." +
                     " Run 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>].' to create a context.");
@@ -76,17 +104,18 @@ public class ConfigurationContext {
         return configuration.configurationContexts().get(configuration.getCurrentContext());
     }
 
-    public Map<String, Context> getContexts() {
-        Map<String, Context> contexts = new HashMap<>();
+    public String getCurrentContextName() {
+
         if (!configFile.exists()) {
             System.out.println("No configuration context has been defined, using http://localhost:8083 by default." +
                     " Run 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>].' to create a context.");
 
-            return contexts;
+            return "";
         }
 
         var configuration = tryReadConfiguration();
-        return configuration.configurationContexts();
+
+        return configuration.getCurrentContext();
     }
 
     private Configuration tryReadConfiguration() {
