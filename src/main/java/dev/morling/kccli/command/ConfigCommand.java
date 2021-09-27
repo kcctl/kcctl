@@ -17,7 +17,8 @@ package dev.morling.kccli.command;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "config", subcommands = { SetContextCommand.class, GetContextCommand.class }, description = "Sets or retrieves the configuration of this client"
+@Command(name = "config", subcommands = { SetContextCommand.class, GetContextCommand.class, GetContextsCommand.class,
+        CurrentContextCommand.class }, description = "Sets or retrieves the configuration of this client"
 
 )
 public class ConfigCommand {

@@ -80,7 +80,17 @@ class ConfigurationContextTest {
 
             Files.writeString(configFile, "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\" }}");
 
-            assertThat(new ConfigurationContext(tempDir).getContext().getCluster()).isEqualTo(URI.create("http://preprod:8083"));
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getCluster()).isEqualTo(URI.create("http://preprod:8083"));
+        }
+
+        @Test
+        void should_return_the_the_cluster_url_for_the_preprod_context() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile,
+                    "{ \"currentContext\": \"prod\", \"preprod\": { \"cluster\": \"http://preprod:8083\" }, \"prod\": { \"cluster\": \"http://prod:8083\" }}");
+
+            assertThat(new ConfigurationContext(tempDir).getContext("preprod").getCluster()).isEqualTo(URI.create("http://preprod:8083"));
         }
     }
 

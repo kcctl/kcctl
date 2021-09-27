@@ -37,7 +37,7 @@ public class PauseConnectorCommand implements Runnable {
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getContext().getCluster())
+                .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         kafkaConnectApi.pauseConnector(name);
