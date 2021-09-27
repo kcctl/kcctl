@@ -33,11 +33,11 @@ public class InfoCommand implements Runnable {
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getContext().getCluster())
+                .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         KafkaConnectInfo workerInfo = kafkaConnectApi.getWorkerInfo();
-        System.out.println("URL:               " + context.getContext().getCluster());
+        System.out.println("URL:               " + context.getCurrentContext().getCluster());
         System.out.println("Version:           " + workerInfo.version);
         System.out.println("Commit:            " + workerInfo.commit);
         System.out.println("Kafka Cluster ID:  " + workerInfo.kafka_cluster_id);

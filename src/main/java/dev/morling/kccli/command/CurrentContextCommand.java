@@ -18,7 +18,6 @@ package dev.morling.kccli.command;
 import javax.inject.Inject;
 
 import dev.morling.kccli.util.ConfigurationContext;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "current-context", description = "Get the current context")
@@ -31,6 +30,6 @@ public class CurrentContextCommand implements Runnable {
     public void run() {
 
         String clusterUri = context.getCurrentContext().getCluster().toASCIIString();
-        System.out.println("Current context '"+context.getCurrentContextName()+"' is set to " + clusterUri);
+        System.out.println("Current context '" + context.getCurrentContextName() + "' is set to " + clusterUri);
     }
 }

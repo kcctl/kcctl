@@ -61,7 +61,7 @@ public class PatchConnectorCommand implements Callable<Integer> {
     public Integer call() throws JsonProcessingException {
 
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getContext().getCluster())
+                .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         Map<String, String> connectorParameters = kafkaConnectApi.getConnectorConfig(name);

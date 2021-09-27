@@ -34,7 +34,7 @@ public class ConnectorNamesCompletionCandidateCommand implements Runnable {
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getContext().getCluster())
+                .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
         List<String> connectors = kafkaConnectApi.getConnectors();

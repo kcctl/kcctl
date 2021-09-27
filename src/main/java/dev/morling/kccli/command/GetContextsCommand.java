@@ -15,13 +15,13 @@
  */
 package dev.morling.kccli.command;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import dev.morling.kccli.service.Context;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
-
-import java.util.Map;
 
 @Command(name = "get-contexts", description = "Get all contexts")
 public class GetContextsCommand implements Runnable {
@@ -32,7 +32,7 @@ public class GetContextsCommand implements Runnable {
     @Override
     public void run() {
         Map<String, Context> contexts = configContext.getContexts();
-        contexts.forEach( (name, context) -> {
+        contexts.forEach((name, context) -> {
             String clusterUri = context.getCluster().toASCIIString();
             System.out.println(name + " is set to " + clusterUri);
         });
