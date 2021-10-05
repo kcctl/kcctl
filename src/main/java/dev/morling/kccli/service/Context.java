@@ -17,10 +17,10 @@ package dev.morling.kccli.service;
 
 import java.net.URI;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import dev.morling.kccli.util.Strings;
 
 public class Context {
     private final URI cluster;
@@ -64,8 +64,8 @@ public class Context {
 
     @JsonIgnore
     public boolean isUsingBasicAuthentication() {
-        return StringUtils.isNotBlank(this.getUsername()) &&
-                StringUtils.isNotBlank(this.getPassword());
+        return !Strings.isBlank(this.getUsername()) &&
+                !Strings.isBlank(this.getPassword());
     }
 
     public static Context defaultContext() {

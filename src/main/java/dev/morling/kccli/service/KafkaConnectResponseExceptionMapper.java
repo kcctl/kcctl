@@ -16,6 +16,7 @@
 package dev.morling.kccli.service;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
@@ -23,6 +24,10 @@ public class KafkaConnectResponseExceptionMapper implements ResponseExceptionMap
 
     @Override
     public RuntimeException toThrowable(Response response) {
+        if (response.getStatusInfo() == Status.UNAUTHORIZED) {
+            return new KafkaConnectException(response.readEntity(String.class), Status.UNAUTHORIZED.getStatusCode());
+        }
+
         ErrorResponse error = response.readEntity(ErrorResponse.class);
         return new KafkaConnectException(error);
     }
