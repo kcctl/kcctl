@@ -17,7 +17,12 @@ package dev.morling.kccli.service;
 
 public class KafkaConnectException extends RuntimeException {
 
-    private int errorCode;
+    private final int errorCode;
+
+    public KafkaConnectException(String message, int errorCode) {
+        super(message);
+        this.errorCode = errorCode;
+    }
 
     public KafkaConnectException(ErrorResponse error) {
         super(getMessage(error.message));
