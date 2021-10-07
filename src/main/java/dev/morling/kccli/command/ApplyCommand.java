@@ -125,7 +125,8 @@ public class ApplyCommand implements Callable<Integer> {
                 GetPluginsCommand getPlugins = new GetPluginsCommand();
                 getPlugins.context = context;
                 getPlugins.run();
-            } else {
+            }
+            else {
                 System.out.println(kce.getMessage());
             }
 
