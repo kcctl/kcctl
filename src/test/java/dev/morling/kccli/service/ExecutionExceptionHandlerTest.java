@@ -17,7 +17,6 @@ package dev.morling.kccli.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -75,14 +74,14 @@ class ExecutionExceptionHandlerTest {
         void should_allow_uncaught_kc_exceptions_to_bubble_up() {
             var handler = new ExecutionExceptionHandler();
             assertThrows(KafkaConnectException.class, () -> handler.handleExecutionException(
-                new KafkaConnectException("Woa", 999), null, null));
+                    new KafkaConnectException("Woa", 999), null, null));
         }
 
         @Test
         void should_allow_uncaught_exceptions_to_bubble_up() {
             var handler = new ExecutionExceptionHandler();
             assertThrows(Exception.class, () -> handler.handleExecutionException(
-                new Exception("Woa"), null, null));
+                    new Exception("Woa"), null, null));
         }
     }
 }
