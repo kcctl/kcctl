@@ -15,13 +15,17 @@
  */
 package dev.morling.kccli.command;
 
+import javax.enterprise.inject.Produces;
+
 import org.eclipse.microprofile.config.ConfigProvider;
 
+import dev.morling.kccli.service.ExecutionExceptionHandler;
+import io.quarkus.picocli.runtime.PicocliCommandLineFactory;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.IVersionProvider;
 
-@TopCommand
+@TopCommand()
 @CommandLine.Command(name = "kcctl", mixinStandardHelpOptions = true, versionProvider = VersionProviderWithConfigProvider.class, subcommands = {
         InfoCommand.class,
         ConfigCommand.class,
@@ -42,6 +46,10 @@ import picocli.CommandLine.IVersionProvider;
 )
 
 public class KcCtlCommand {
+    @Produces
+    CommandLine getCommandLineInstance(PicocliCommandLineFactory factory) {
+        return factory.create().setExecutionExceptionHandler(new ExecutionExceptionHandler());
+    }
 }
 
 class VersionProviderWithConfigProvider implements IVersionProvider {
