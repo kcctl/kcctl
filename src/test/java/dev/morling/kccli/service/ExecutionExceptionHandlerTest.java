@@ -32,6 +32,7 @@ import dev.morling.kccli.util.Colors;
 import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ExecutionExceptionHandlerTest {
@@ -59,7 +60,7 @@ class ExecutionExceptionHandlerTest {
         }
 
         @Test
-        void should_handle_unauthorized_errors() throws IOException {
+        void should_handle_unauthorized_errors() throws Exception {
             var handler = new ExecutionExceptionHandler();
             int exitCode = handler.handleExecutionException(
                     new KafkaConnectException("Unauthorized", 401), null, null);
@@ -71,25 +72,17 @@ class ExecutionExceptionHandlerTest {
         }
 
         @Test
-        void should_use_default_error_message_and_code_for_other_kc_exceptions() throws IOException {
+        void should_allow_uncaught_kc_exceptions_to_bubble_up() {
             var handler = new ExecutionExceptionHandler();
-            int exitCode = handler.handleExecutionException(
-                    new KafkaConnectException("Woa", 999), null, null);
-
-            assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
-            assertThat(fakeSystemErr.toString())
-                    .isEqualTo(errorPrintLnFormatted("An error occured."));
+            assertThrows(KafkaConnectException.class, () -> handler.handleExecutionException(
+                new KafkaConnectException("Woa", 999), null, null));
         }
 
         @Test
-        void should_use_default_error_message_and_code_for_non_kc_exceptions() throws IOException {
+        void should_use_default_error_message_and_code_for_non_kc_exceptions() {
             var handler = new ExecutionExceptionHandler();
-            int exitCode = handler.handleExecutionException(
-                    new Exception("Woa"), null, null);
-
-            assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
-            assertThat(fakeSystemErr.toString())
-                    .isEqualTo(errorPrintLnFormatted("An error occured."));
+            assertThrows(Exception.class, () -> handler.handleExecutionException(
+                new Exception("Woa"), null, null));
         }
     }
 }

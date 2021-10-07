@@ -43,8 +43,12 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
     }
 
     @Override
-    public int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult parseResult) {
+    public int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult parseResult) throws Exception {
         var exitCodeErrorMessagePair = loadMessageAndExitCode(ex);
+        if (exitCodeErrorMessagePair == null) {
+            throw ex;
+        }
+
         System.err.println(Colors.ANSI_RED + exitCodeErrorMessagePair.getErrorMessage() + Colors.ANSI_RESET);
         return exitCodeErrorMessagePair.getExitCode();
     }
@@ -60,7 +64,6 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
                 }
             }
         }
-
-        return new ExitCodeErrorMessagePair(CommandLine.ExitCode.SOFTWARE, "An error occured.");
+        return null;
     }
 }
