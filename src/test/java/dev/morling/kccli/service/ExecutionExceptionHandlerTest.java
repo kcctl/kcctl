@@ -79,7 +79,7 @@ class ExecutionExceptionHandlerTest {
         }
 
         @Test
-        void should_use_default_error_message_and_code_for_non_kc_exceptions() {
+        void should_allow_uncaught_exceptions_to_bubble_up() {
             var handler = new ExecutionExceptionHandler();
             assertThrows(Exception.class, () -> handler.handleExecutionException(
                 new Exception("Woa"), null, null));
