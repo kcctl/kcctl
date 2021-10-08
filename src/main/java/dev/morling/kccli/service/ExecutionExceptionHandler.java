@@ -60,7 +60,7 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
                 case HttpStatus.SC_UNAUTHORIZED: {
                     return new ExitCodeErrorMessagePair(
                             CommandLine.ExitCode.SOFTWARE,
-                            "Kafka Connect returned an error indicating the configured user is unauthorized.");
+                            "The configured user is unauthorized to run this command.");
                 }
             }
         }

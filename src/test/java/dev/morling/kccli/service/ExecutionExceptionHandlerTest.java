@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ExecutionExceptionHandlerTest {
+
     @TempDir
     File tempDir;
 
@@ -67,7 +68,7 @@ class ExecutionExceptionHandlerTest {
             assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
             assertThat(fakeSystemErr.toString())
                     .isEqualTo(errorPrintLnFormatted(
-                            "Kafka Connect returned an error indicating the configured user is unauthorized."));
+                            "The configured user is unauthorized to run this command."));
         }
 
         @Test
