@@ -41,7 +41,7 @@ kcctl config set-context local --cluster http://localhost:8083
 :exclamation: Note that certain commands will require additional parameters, like `bootstrap-servers` and 
 `offset-topic`.
 
-Type `kcctl info` to display some information about the Kafka connect cluster.
+Type `kcctl info` to display some information about the Kafka Connect cluster.
 The command will use the currently active context, `local` in this case, to
 resolve the cluster URL.
 
@@ -119,7 +119,7 @@ You can create a native executable using:
 ./mvnw package -Pnative
 ```
 
-You can then execute your native executable with: `./target/code-with-quarkus-1.0.0-SNAPSHOT-runner`
+You can then execute your native executable with: `./target/kc-cli-1.0.0-SNAPSHOT-runner`
 
 As above, either define an alias _kcctl_ or rename the resulting executable accordingly.
 
@@ -133,7 +133,7 @@ java -cp "target/quarkus-app/app/*:target/quarkus-app/lib/main/*:target/quarkus-
   picocli.AutoComplete -n kcctl --force dev.morling.kccli.command.KcCtlCommand
 ```
 
-Edit the completion scrpt _kcctl_completion_, replace all the quotes around generated completion invocations with back ticks, making them actual invocations of _kcctl_::
+Edit the completion script _kcctl_completion_, replace all the quotes around generated completion invocations with back ticks, making them actual invocations of _kcctl_::
 
 ```shell script
 --- local CONNECTOR_NAME_pos_param_args="kcctl connector-name-completions" # 0-0 values
@@ -149,4 +149,4 @@ Currently, three kinds of completions exist: `connector-name-completions`, `task
 
 ## License
 
-This code base is available ander the Apache License, version 2.
+This code base is available under the Apache License, version 2.
