@@ -68,7 +68,7 @@ class ConfigurationContextTest {
             var actualConfiguration = Files.readString(configFile);
 
             assertThatJson(actualConfiguration)
-                    .isEqualTo("{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083' }, 'preprod': { 'cluster': 'http://preprod:8083'}}");
+                    .isEqualTo("{ 'currentContext': 'preprod', 'local': { 'cluster': 'http://localhost:8083' }, 'preprod': { 'cluster': 'http://preprod:8083'}}");
         }
     }
 

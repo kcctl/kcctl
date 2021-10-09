@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Configuration {
-    private final String currentContext;
+    private String currentContext;
     private final Map<String, Context> configurationContexts = new LinkedHashMap<>();
 
     public Configuration(@JsonProperty("currentContext") String currentContext) {
@@ -41,6 +41,7 @@ public class Configuration {
 
     @JsonAnySetter
     public Configuration addConfigurationContext(String contextName, Context configuration) {
+        currentContext = contextName;
         configurationContexts.put(contextName, configuration);
 
         return this;
