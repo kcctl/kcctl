@@ -40,12 +40,14 @@ import picocli.CommandLine.IVersionProvider;
         CommandLine.HelpCommand.class,
         ConnectorNamesCompletionCandidateCommand.class,
         TaskNamesCompletionCandidateCommand.class,
-        LoggerNamesCompletionCandidateCommand.class
+        LoggerNamesCompletionCandidateCommand.class,
+        ContextNamesCompletionCandidateCommand.class
 }, description = "A command-line interface for Kafka Connect"
 
 )
 
 public class KcCtlCommand {
+
     @Produces
     CommandLine getCommandLineInstance(PicocliCommandLineFactory factory) {
         return factory.create().setExecutionExceptionHandler(new ExecutionExceptionHandler());
@@ -53,6 +55,8 @@ public class KcCtlCommand {
 }
 
 class VersionProviderWithConfigProvider implements IVersionProvider {
+
+    @Override
     public String[] getVersion() {
         String applicationName = ConfigProvider.getConfig().getValue("quarkus.application.name", String.class);
         String applicationVersion = ConfigProvider.getConfig().getValue("quarkus.application.version", String.class);

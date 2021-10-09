@@ -23,8 +23,9 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "set-context", description = "Set the context to cluster provided in arguments")
+@Command(name = "set-context", description = "Configures the specified context with the provided arguments")
 public class SetContextCommand implements Runnable {
+
     @Parameters(index = "0", description = "Context name")
     String contextName;
 
@@ -47,6 +48,10 @@ public class SetContextCommand implements Runnable {
     public void run() {
         ConfigurationContext context = new ConfigurationContext();
         context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, username, password));
-        System.out.println("Using context " + contextName);
+        System.out.println("Configured context " + contextName);
+
+        if (!context.getCurrentContextName().equals(contextName)) {
+            System.out.println("Run kcctl config use-context " + contextName + " for using this context");
+        }
     }
 }

@@ -86,6 +86,7 @@ Commands:
   delete    Deletes the specified connector
   help      Displays help information about the specified command
 ```
+Start by running `kcctl config set-context <name> --cluster=<Kafka Connect URI)...` for setting up a configuration context which will be used by any subsequent commands.
 
 ## Development
 

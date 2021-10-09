@@ -39,12 +39,13 @@ public class KafkaConnectClientHeadersFactory implements ClientHeadersFactory {
     public MultivaluedMap<String, String> update(MultivaluedMap<String, String> incomingHeaders,
                                                  MultivaluedMap<String, String> clientOutgoingHeaders) {
         MultivaluedMap<String, String> result = new MultivaluedHashMap<String, String>();
+        Context currentContext = context.getCurrentContext();
 
-        if (context.getContext().isUsingBasicAuthentication()) {
+        if (currentContext.isUsingBasicAuthentication()) {
             result.add("Authorization",
                     generateBasicAuthHeaderValue(
-                            context.getContext().getUsername(),
-                            context.getContext().getPassword()));
+                            currentContext.getUsername(),
+                            currentContext.getPassword()));
             return result;
         }
 
