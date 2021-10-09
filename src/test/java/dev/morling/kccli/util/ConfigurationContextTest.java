@@ -38,6 +38,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class ConfigurationContextTest {
+
     @TempDir
     File tempDir;
 
@@ -66,6 +67,29 @@ class ConfigurationContextTest {
                     new Context(URI.create("http://preprod:8083"), null, null, null, null));
 
             var actualConfiguration = Files.readString(configFile);
+
+            assertThatJson(actualConfiguration)
+                    .isEqualTo("{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083' }, 'preprod': { 'cluster': 'http://preprod:8083'}}");
+        }
+
+        @Test
+        void should_use_specified_context() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile, "{ \"currentContext\": \"local\", \"local\": { \"cluster\": \"http://localhost:8083\" }}");
+
+            new ConfigurationContext(tempDir).setContext(
+                    "preprod",
+                    new Context(URI.create("http://preprod:8083"), null, null, null, null));
+
+            var actualConfiguration = Files.readString(configFile);
+
+            assertThatJson(actualConfiguration)
+                    .isEqualTo("{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083' }, 'preprod': { 'cluster': 'http://preprod:8083'}}");
+
+            new ConfigurationContext(tempDir).setCurrentContext("preprod");
+
+            actualConfiguration = Files.readString(configFile);
 
             assertThatJson(actualConfiguration)
                     .isEqualTo("{ 'currentContext': 'preprod', 'local': { 'cluster': 'http://localhost:8083' }, 'preprod': { 'cluster': 'http://preprod:8083'}}");
@@ -102,7 +126,7 @@ class ConfigurationContextTest {
 
             Files.writeString(configFile, "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"username\": \"mickey\" }}");
 
-            assertThat(new ConfigurationContext(tempDir).getContext().getUsername()).isEqualTo("mickey");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getUsername()).isEqualTo("mickey");
         }
     }
 
@@ -114,7 +138,7 @@ class ConfigurationContextTest {
 
             Files.writeString(configFile, "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\" }}");
 
-            assertThat(new ConfigurationContext(tempDir).getContext().getPassword()).isEqualTo("p@ssword");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getPassword()).isEqualTo("p@ssword");
         }
     }
 

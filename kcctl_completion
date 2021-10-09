@@ -127,31 +127,35 @@ function _complete_kcctl() {
   local cmds9=(delete)
   local cmds10=(help)
   local cmds11=(config set-context)
-  local cmds12=(config get-context)
-  local cmds13=(get plugins)
-  local cmds14=(get connectors)
-  local cmds15=(get loggers)
-  local cmds16=(get logger)
-  local cmds17=(describe connector)
-  local cmds18=(patch logger)
-  local cmds19=(patch connector)
-  local cmds20=(restart connector)
-  local cmds21=(restart task)
-  local cmds22=(pause connector)
-  local cmds23=(resume connector)
+  local cmds12=(config get-contexts)
+  local cmds13=(config current-context)
+  local cmds14=(config use-context)
+  local cmds15=(get plugins)
+  local cmds16=(get connectors)
+  local cmds17=(get loggers)
+  local cmds18=(get logger)
+  local cmds19=(describe connector)
+  local cmds20=(patch logger)
+  local cmds21=(patch connector)
+  local cmds22=(restart connector)
+  local cmds23=(restart task)
+  local cmds24=(pause connector)
+  local cmds25=(resume connector)
 
-  if CompWordsContainsArray "${cmds23[@]}"; then _picocli_kcctl_resume_connector; return $?; fi
-  if CompWordsContainsArray "${cmds22[@]}"; then _picocli_kcctl_pause_connector; return $?; fi
-  if CompWordsContainsArray "${cmds21[@]}"; then _picocli_kcctl_restart_task; return $?; fi
-  if CompWordsContainsArray "${cmds20[@]}"; then _picocli_kcctl_restart_connector; return $?; fi
-  if CompWordsContainsArray "${cmds19[@]}"; then _picocli_kcctl_patch_connector; return $?; fi
-  if CompWordsContainsArray "${cmds18[@]}"; then _picocli_kcctl_patch_logger; return $?; fi
-  if CompWordsContainsArray "${cmds17[@]}"; then _picocli_kcctl_describe_connector; return $?; fi
-  if CompWordsContainsArray "${cmds16[@]}"; then _picocli_kcctl_get_logger; return $?; fi
-  if CompWordsContainsArray "${cmds15[@]}"; then _picocli_kcctl_get_loggers; return $?; fi
-  if CompWordsContainsArray "${cmds14[@]}"; then _picocli_kcctl_get_connectors; return $?; fi
-  if CompWordsContainsArray "${cmds13[@]}"; then _picocli_kcctl_get_plugins; return $?; fi
-  if CompWordsContainsArray "${cmds12[@]}"; then _picocli_kcctl_config_getcontext; return $?; fi
+  if CompWordsContainsArray "${cmds25[@]}"; then _picocli_kcctl_resume_connector; return $?; fi
+  if CompWordsContainsArray "${cmds24[@]}"; then _picocli_kcctl_pause_connector; return $?; fi
+  if CompWordsContainsArray "${cmds23[@]}"; then _picocli_kcctl_restart_task; return $?; fi
+  if CompWordsContainsArray "${cmds22[@]}"; then _picocli_kcctl_restart_connector; return $?; fi
+  if CompWordsContainsArray "${cmds21[@]}"; then _picocli_kcctl_patch_connector; return $?; fi
+  if CompWordsContainsArray "${cmds20[@]}"; then _picocli_kcctl_patch_logger; return $?; fi
+  if CompWordsContainsArray "${cmds19[@]}"; then _picocli_kcctl_describe_connector; return $?; fi
+  if CompWordsContainsArray "${cmds18[@]}"; then _picocli_kcctl_get_logger; return $?; fi
+  if CompWordsContainsArray "${cmds17[@]}"; then _picocli_kcctl_get_loggers; return $?; fi
+  if CompWordsContainsArray "${cmds16[@]}"; then _picocli_kcctl_get_connectors; return $?; fi
+  if CompWordsContainsArray "${cmds15[@]}"; then _picocli_kcctl_get_plugins; return $?; fi
+  if CompWordsContainsArray "${cmds14[@]}"; then _picocli_kcctl_config_usecontext; return $?; fi
+  if CompWordsContainsArray "${cmds13[@]}"; then _picocli_kcctl_config_currentcontext; return $?; fi
+  if CompWordsContainsArray "${cmds12[@]}"; then _picocli_kcctl_config_getcontexts; return $?; fi
   if CompWordsContainsArray "${cmds11[@]}"; then _picocli_kcctl_config_setcontext; return $?; fi
   if CompWordsContainsArray "${cmds10[@]}"; then _picocli_kcctl_help; return $?; fi
   if CompWordsContainsArray "${cmds9[@]}"; then _picocli_kcctl_delete; return $?; fi
@@ -208,7 +212,7 @@ function _picocli_kcctl_config() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="set-context get-context"
+  local commands="set-context get-contexts current-context use-context"
   local flag_opts=""
   local arg_opts=""
 
@@ -431,8 +435,8 @@ function _picocli_kcctl_config_setcontext() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `get-context` subcommand.
-function _picocli_kcctl_config_getcontext() {
+# Generates completions for the options and subcommands of the `get-contexts` subcommand.
+function _picocli_kcctl_config_getcontexts() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
@@ -444,6 +448,46 @@ function _picocli_kcctl_config_getcontext() {
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
   else
     local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `current-context` subcommand.
+function _picocli_kcctl_config_currentcontext() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `use-context` subcommand.
+function _picocli_kcctl_config_usecontext() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+  local contextName_pos_param_args=`kcctl context-name-completions` # 0-0 values
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    local currIndex
+    currIndex=$(currentPositionalIndex "use-context" "${arg_opts}" "${flag_opts}")
+    if (( currIndex >= 0 && currIndex <= 0 )); then
+      positionals=$( compgen -W "$contextName_pos_param_args" -- "${curr_word}" )
+    fi
     COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
   fi
 }

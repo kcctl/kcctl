@@ -19,6 +19,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.github.freva.asciitable.AsciiTable;
+import com.github.freva.asciitable.Column;
+import com.github.freva.asciitable.HorizontalAlign;
+
 import dev.morling.kccli.service.Context;
 import dev.morling.kccli.util.ConfigurationContext;
 import picocli.CommandLine.Command;
@@ -32,9 +36,20 @@ public class GetContextsCommand implements Runnable {
     @Override
     public void run() {
         Map<String, Context> contexts = configContext.getContexts();
-        contexts.forEach((name, context) -> {
-            String clusterUri = context.getCluster().toASCIIString();
-            System.out.println(name + " is set to " + clusterUri);
-        });
+        String current = configContext.getCurrentContextName();
+
+        String[][] data = contexts.entrySet()
+                .stream()
+                .map(e -> new String[]{ e.getKey() + (e.getKey().equals(current) ? "*" : ""), e.getValue().getCluster().toASCIIString() })
+                .toArray(size -> new String[size][]);
+
+        String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
+                new Column[]{
+                        new Column().header("NAME").dataAlign(HorizontalAlign.LEFT),
+                        new Column().header("KAFKA CONNECT URI").dataAlign(HorizontalAlign.LEFT)
+                },
+                data);
+
+        System.out.println(table);
     }
 }

@@ -13,13 +13,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package dev.morling.kccli.command;
+package dev.morling.kccli.completion;
 
-import picocli.CommandLine.Command;
+import java.util.Arrays;
+import java.util.Iterator;
 
-@Command(name = "config", subcommands = { SetContextCommand.class, GetContextsCommand.class,
-        CurrentContextCommand.class, UseContextCommand.class }, description = "Sets or retrieves the configuration of this client"
+public class ContextNameCompletions implements Iterable<String> {
 
-)
-public class ConfigCommand {
+    @Override
+    public Iterator<String> iterator() {
+        return Arrays.asList("kcctl", "context-name-completions").iterator();
+    }
+
 }
