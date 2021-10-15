@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.moditect.kcctl.completion.ConnectorNameCompletions;
 import org.moditect.kcctl.service.KafkaConnectApi;
+import org.moditect.kcctl.service.KafkaConnectException;
 import org.moditect.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine.Command;
@@ -36,11 +37,15 @@ public class DeleteConnectorCommand implements Runnable {
 
     @Override
     public void run() {
+
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
-
-        kafkaConnectApi.deleteConnector(name);
-        System.out.println("Deleted connector " + name);
+        try {
+            kafkaConnectApi.deleteConnector(name);
+            System.out.println("Deleted connector " + name);
+        } catch (KafkaConnectException kafkaConnectException) {
+            System.out.println(kafkaConnectException.getMessage());
+        }
     }
 }
