@@ -137,7 +137,7 @@ You can create a native executable using:
 ./mvnw package -Pnative
 ```
 
-You can then execute your native executable with: `./target/kc-cli-1.0.0-SNAPSHOT-runner`
+You can then execute your native executable with: `./target/kcctl-1.0.0-SNAPSHOT-runner`
 
 As above, either define an alias _kcctl_ or rename the resulting executable accordingly.
 
