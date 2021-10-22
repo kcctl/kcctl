@@ -50,8 +50,8 @@ jobs:
       - name: 'Set up Graal'
         uses: DeLaGuardo/setup-graalvm@5.0
         with:
-          graalvm: '21.2.0'
-          java: 'java11'
+          graalvm: '21.3.0'
+          java: 'java17'
 
       - name: 'Install native-image component'
         run: |
@@ -95,7 +95,7 @@ jobs:
       - name: 'Set up Java'
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 17
           distribution: 'zulu'
 
       - name: 'Cache Maven packages'
