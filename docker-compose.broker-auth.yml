@@ -1,0 +1,63 @@
+#
+#  Copyright 2021 The original authors
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+version: "2"
+services:
+  zookeeper:
+    image: debezium/zookeeper:1.7
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+    #volumes:
+    #  - ./broker-auth:/kafka/config/broker-auth
+    #environment:
+    #  - KAFKA_OPTS=-Djava.security.auth.login.config=/kafka/config/broker-auth/zk.jaas.config
+  kafka:
+    image: debezium/kafka:1.7
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+    volumes:
+      - ./broker-auth:/kafka/config/broker-auth
+    environment:
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_SECURITY_INTER_BROKER_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_LISTENERS=SASL_PLAINTEXT://0.0.0.0:9092
+      - KAFKA_ADVERTISED_LISTENERS=SASL_PLAINTEXT://kafka:9092
+      - KAFKA_OPTS=-Djava.security.auth.login.config=/kafka/config/broker-auth/jaas.config
+      - KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND=true
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+  connect:
+    image: debezium/connect-base:1.7
+    hostname: connect
+    ports:
+      - 8083:8083
+    depends_on:
+      - kafka
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+      - CONNECT_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - CONNECT_SASL_MECHANISM=PLAIN
+      - CONNECT_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"admin-secret\" user_admin=\"admin-secret\";
