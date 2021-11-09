@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -63,7 +64,7 @@ class ConfigurationContextTest {
 
             new ConfigurationContext(tempDir).setContext(
                     "preprod",
-                    new Context(URI.create("http://preprod:8083"), null, null, null, null));
+                    new Context(URI.create("http://preprod:8083"), null, null, null, null, null));
 
             var actualConfiguration = Files.readString(configFile);
 
@@ -79,7 +80,7 @@ class ConfigurationContextTest {
 
             new ConfigurationContext(tempDir).setContext(
                     "preprod",
-                    new Context(URI.create("http://preprod:8083"), null, null, null, null));
+                    new Context(URI.create("http://preprod:8083"), null, null, null, null, null));
 
             var actualConfiguration = Files.readString(configFile);
 
@@ -141,15 +142,63 @@ class ConfigurationContextTest {
         }
     }
 
+    @Nested
+    class GetAdminClientConfig {
+        @Test
+        void should_return_a_map_of_the_admin_client_config() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile,
+                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"adminClientConfig\": { \"sasl.username\": \"myuser\", \"sasl.password\": \"mypassword\" } }}");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+                    .isEqualTo(new HashMap<String, Object>() {
+                        {
+                            this.put("sasl.password", "mypassword");
+                            this.put("sasl.username", "myuser");
+                        }
+                    });
+        }
+
+        @Test
+        void should_return_an_empty_map_of_the_admin_client_config() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile,
+                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"adminClientConfig\": { } }}");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+                    .isEqualTo(new HashMap<String, Object>());
+        }
+
+        @Test
+        void should_return_a_null_map_of_the_admin_client_config() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile,
+                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"adminClientConfig\": null }}");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+                    .isNull();
+        }
+
+        @Test
+        void should_return_a_null_map_of_the_admin_client_config_when_missing() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile,
+                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\" }}");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+                    .isNull();
+        }        
+    }
+
     static Stream<Arguments> setConfigurationArguments() {
         return Stream.of(
                 arguments(
                         "local",
-                        new Context(URI.create("http://localhost:8083"), "localhost:9092", "connect-offsets", null, null),
+                        new Context(URI.create("http://localhost:8083"), "localhost:9092", "connect-offsets", null, null, null),
                         "{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083', 'bootstrapServers': 'localhost:9092', 'offsetTopic': 'connect-offsets' }}"),
                 arguments(
                         "local",
-                        new Context(URI.create("http://localhost:8083"), null, null, null, null),
+                        new Context(URI.create("http://localhost:8083"), null, null, null, null, null),
                         "{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083' }}"));
     }
 }
