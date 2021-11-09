@@ -16,16 +16,20 @@
 package org.moditect.kcctl.command;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import org.moditect.kcctl.service.Context;
 import org.moditect.kcctl.util.ConfigurationContext;
+import org.moditect.kcctl.util.Strings;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "set-context", description = "Configures the specified context with the provided arguments")
-public class SetContextCommand implements Runnable {
+public class SetContextCommand implements Callable<Integer> {
 
     @Parameters(index = "0", description = "Context name")
     String contextName;
@@ -45,14 +49,34 @@ public class SetContextCommand implements Runnable {
     @Option(names = { "--password" }, description = "Password for basic authentication")
     String password;
 
+    @Option(names = { "--admin-client-config" }, description = "Configuration for admin client")
+    String adminClientConfig;
+
     @Override
-    public void run() {
+    public Integer call() {
         ConfigurationContext context = new ConfigurationContext();
-        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, username, password));
+
+        Properties adminClientConfigProps;
+        try {
+            adminClientConfigProps = Strings.toProperties(adminClientConfig);
+        }
+        catch (Exception exception) {
+            System.out.println("The provided admin client configuration is not valid!");
+            return 1;
+        }
+
+        final var adminClientConfigMap = new HashMap<String, Object>();
+        for (final String name : adminClientConfigProps.stringPropertyNames()) {
+            adminClientConfigMap.put(name, adminClientConfigProps.getProperty(name));
+        }
+
+        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, username, password, adminClientConfigMap));
         System.out.println("Configured context " + contextName);
 
         if (!context.getCurrentContextName().equals(contextName)) {
             System.out.println("Run kcctl config use-context " + contextName + " for using this context");
         }
+
+        return 0;
     }
 }

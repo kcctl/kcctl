@@ -16,6 +16,7 @@
 package org.moditect.kcctl.service;
 
 import java.net.URI;
+import java.util.Map;
 
 import org.moditect.kcctl.util.Strings;
 
@@ -28,18 +29,21 @@ public class Context {
     private final String offsetTopic;
     private final String username;
     private final String password;
+    private final Map<String, Object> adminClientConfig;
 
     public Context(
                    @JsonProperty("cluster") URI cluster,
                    @JsonProperty("bootstrapServers") String bootstrapServers,
                    @JsonProperty("offsetTopic") String offsetTopic,
                    @JsonProperty("username") String username,
-                   @JsonProperty("password") String password) {
+                   @JsonProperty("password") String password,
+                   @JsonProperty("adminClientConfig") Map<String, Object> adminClientConfig) {
         this.cluster = cluster;
         this.bootstrapServers = bootstrapServers;
         this.offsetTopic = offsetTopic;
         this.username = username;
         this.password = password;
+        this.adminClientConfig = adminClientConfig;
     }
 
     public URI getCluster() {
@@ -62,6 +66,10 @@ public class Context {
         return password;
     }
 
+    public Map<String, Object> getAdminClientConfig() {
+        return this.adminClientConfig;
+    }
+
     @JsonIgnore
     public boolean isUsingBasicAuthentication() {
         return !Strings.isBlank(this.getUsername()) &&
@@ -69,6 +77,6 @@ public class Context {
     }
 
     public static Context defaultContext() {
-        return new Context(URI.create("http://localhost:8083"), null, null, null, null);
+        return new Context(URI.create("http://localhost:8083"), null, null, null, null, null);
     }
 }
