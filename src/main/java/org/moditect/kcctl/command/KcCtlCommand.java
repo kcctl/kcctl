@@ -29,6 +29,7 @@ import picocli.CommandLine.IVersionProvider;
 @CommandLine.Command(name = "kcctl", mixinStandardHelpOptions = true, versionProvider = VersionProviderWithConfigProvider.class, subcommands = {
         InfoCommand.class,
         ConfigCommand.class,
+        CompactionCommand.class,
         GetCommand.class,
         DescribeCommand.class,
         ApplyCommand.class,
