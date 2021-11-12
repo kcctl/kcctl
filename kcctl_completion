@@ -405,7 +405,7 @@ function _picocli_kcctl_config_setcontext() {
 
   local commands=""
   local flag_opts=""
-  local arg_opts="--cluster --bootstrap-servers --offset-topic --username --password"
+  local arg_opts="--cluster --bootstrap-servers --offset-topic --username --password -o --client-config -f --client-config-file"
 
   compopt +o default
 
@@ -423,6 +423,12 @@ function _picocli_kcctl_config_setcontext() {
       return
       ;;
     --password)
+      return
+      ;;
+    -o|--client-config)
+      return
+      ;;
+    -f|--client-config-file)
       return
       ;;
   esac

@@ -31,14 +31,14 @@ It is recommended to install the bash/zsh completion script _kcctl_completion_:
 Before you can start using _kcctl_ you need to create a configuration context.
 A configuration context is a set of configuration parameters, grouped
 by a name.
-To create a configuration context named `local`, with the Kafka Connect cluster URL set to 
+To create a configuration context named `local`, with the Kafka Connect cluster URL set to
 `http://localhost:8083`, issue the following command
 
 ```shell script
 kcctl config set-context local --cluster http://localhost:8083
 ```
 
-:exclamation: Note that certain commands will require additional parameters, like `bootstrap-servers` and 
+:exclamation: Note that certain commands will require additional parameters, like `bootstrap-servers` and
 `offset-topic`.
 
 Type `kcctl info` to display some information about the Kafka Connect cluster.
@@ -48,10 +48,13 @@ resolve the cluster URL.
 ## Authentication
 
 If your cluster enforces authentication, you may configure your username and password with the `username` and `password` parameters:
+
 ```shell script
 kcctl config set-context local --cluster http://localhost:8083 --username myusername --password mypassword
 ```
+
 :exclamation: Note that setting user name and password via CLI may store those credentials in your terminal history. To work around this, you may set the username and password directly in your `.kcctl` file:
+
 ```json
   "currentContext" : "local",
   "local" : {
@@ -60,6 +63,7 @@ kcctl config set-context local --cluster http://localhost:8083 --username myuser
     "password" : "mypassword"
   }
 ```
+
 Currently, only basic authentication is supported.
 
 ## Usage
@@ -86,6 +90,7 @@ Commands:
   delete    Deletes the specified connector
   help      Displays help information about the specified command
 ```
+
 Start by running `kcctl config set-context <name> --cluster=<Kafka Connect URI)...` for setting up a configuration context which will be used by any subsequent commands.
 
 ## Development
@@ -148,7 +153,7 @@ Then recreate the completion script:
 
 ```shell script
 java -cp "target/quarkus-app/app/*:target/quarkus-app/lib/main/*:target/quarkus-app/quarkus-run.jar" \
-  picocli.AutoComplete -n kcctl --force dev.morling.kccli.command.KcCtlCommand
+  picocli.AutoComplete -n kcctl --force org.moditect.kcctl.command.KcCtlCommand
 ```
 
 Edit the completion script _kcctl_completion_, replace all the quotes around generated completion invocations with back ticks, making them actual invocations of _kcctl_::
