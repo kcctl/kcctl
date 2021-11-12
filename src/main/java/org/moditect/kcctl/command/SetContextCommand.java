@@ -15,6 +15,9 @@
  */
 package org.moditect.kcctl.command;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Properties;
@@ -49,24 +52,36 @@ public class SetContextCommand implements Callable<Integer> {
     @Option(names = { "--password" }, description = "Password for basic authentication")
     String password;
 
-    @Option(names = { "--client-config" }, description = "Configuration for admin client")
-    String clientConfig;
+    @Option(names = { "-o", "--client-config" }, description = "Configuration for client")
+    String[] clientConfigs;
+
+    @Option(names = { "-f", "--client-config-file" }, description = "Configuration file for client")
+    String clientConfigFile;
 
     @Override
-    public Integer call() {
+    public Integer call() throws FileNotFoundException, IOException {
         ConfigurationContext context = new ConfigurationContext();
 
-        Properties clientConfigProps;
-        try {
-            clientConfigProps = Strings.toProperties(clientConfig);
+        Properties clientConfigProps = new Properties();
+
+        if (!Strings.isBlank(clientConfigFile)) {
+            final String expandedPath = clientConfigFile.replaceFirst("^~", System.getProperty("user.home"));
+            clientConfigProps.load(new FileReader(expandedPath));
         }
-        catch (Exception exception) {
-            System.out.println("The provided admin client configuration is not valid!");
-            return 1;
+
+        for (final String clientConfigString : this.clientConfigs) {
+            try {
+                clientConfigProps.putAll(Strings.toProperties(clientConfigString));
+            }
+            catch (Exception exception) {
+                System.out.println("The provided client configuration is not valid!");
+                return 1;
+            }
         }
 
         final var clientConfigMap = new HashMap<String, Object>();
         for (final String name : clientConfigProps.stringPropertyNames()) {
+            System.out.println("[" + name + "]: " + clientConfigProps.getProperty(name));
             clientConfigMap.put(name, clientConfigProps.getProperty(name));
         }
 

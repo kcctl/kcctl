@@ -145,7 +145,7 @@ class ConfigurationContextTest {
     @Nested
     class GetclientConfig {
         @Test
-        void should_return_a_map_of_the_admin_client_config() throws IOException {
+        void should_return_a_map_of_the_client_config() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile,
@@ -160,7 +160,7 @@ class ConfigurationContextTest {
         }
 
         @Test
-        void should_return_an_empty_map_of_the_admin_client_config() throws IOException {
+        void should_return_an_empty_map_of_the_client_config() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile,
@@ -170,7 +170,7 @@ class ConfigurationContextTest {
         }
 
         @Test
-        void should_return_a_null_map_of_the_admin_client_config() throws IOException {
+        void should_return_a_null_map_of_the_client_config() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile,
@@ -180,7 +180,7 @@ class ConfigurationContextTest {
         }
 
         @Test
-        void should_return_a_null_map_of_the_admin_client_config_when_missing() throws IOException {
+        void should_return_a_null_map_of_the_client_config_when_missing() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile,
