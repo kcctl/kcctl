@@ -140,7 +140,8 @@ public class ConfigurationContext {
         catch (IOException e) {
             throw new RuntimeException("Couldn't read configuration file ~/" + CONFIG_FILE + ". If you are using the legacy," +
                     "property-based configuration format, please delete the old .kcctl file and create a new one by " +
-                    "running 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>] [--admin-client-config=<config_string>]. ", e);
+                    "running 'kcctl config set-context <context_name> --cluster=<cluster_url> [--bootstrap-servers=<broker_urls>] [--offset-topic=<offset_topic>] [--admin-client-config=<config_string>]. ",
+                    e);
         }
     }
 

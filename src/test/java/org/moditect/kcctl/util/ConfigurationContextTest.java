@@ -143,14 +143,14 @@ class ConfigurationContextTest {
     }
 
     @Nested
-    class GetAdminClientConfig {
+    class GetclientConfig {
         @Test
         void should_return_a_map_of_the_admin_client_config() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile,
-                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"adminClientConfig\": { \"sasl.username\": \"myuser\", \"sasl.password\": \"mypassword\" } }}");
-            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"clientConfig\": { \"sasl.username\": \"myuser\", \"sasl.password\": \"mypassword\" } }}");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getClientConfig())
                     .isEqualTo(new HashMap<String, Object>() {
                         {
                             this.put("sasl.password", "mypassword");
@@ -164,8 +164,8 @@ class ConfigurationContextTest {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile,
-                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"adminClientConfig\": { } }}");
-            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"clientConfig\": { } }}");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getClientConfig())
                     .isEqualTo(new HashMap<String, Object>());
         }
 
@@ -174,8 +174,8 @@ class ConfigurationContextTest {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
             Files.writeString(configFile,
-                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"adminClientConfig\": null }}");
-            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+                    "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\", \"clientConfig\": null }}");
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getClientConfig())
                     .isNull();
         }
 
@@ -185,9 +185,9 @@ class ConfigurationContextTest {
 
             Files.writeString(configFile,
                     "{ \"currentContext\": \"preprod\", \"preprod\": { \"cluster\": \"http://preprod:8083\", \"password\": \"p@ssword\" }}");
-            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getAdminClientConfig())
+            assertThat(new ConfigurationContext(tempDir).getCurrentContext().getClientConfig())
                     .isNull();
-        }        
+        }
     }
 
     static Stream<Arguments> setConfigurationArguments() {
