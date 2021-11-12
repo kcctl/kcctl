@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -65,23 +66,24 @@ public class SetContextCommand implements Callable<Integer> {
         Properties clientConfigProps = new Properties();
 
         if (!Strings.isBlank(clientConfigFile)) {
-            final String expandedPath = clientConfigFile.replaceFirst("^~", System.getProperty("user.home"));
+            final String expandedPath = Paths.get(clientConfigFile).toAbsolutePath().toString();
             clientConfigProps.load(new FileReader(expandedPath));
         }
 
-        for (final String clientConfigString : this.clientConfigs) {
-            try {
-                clientConfigProps.putAll(Strings.toProperties(clientConfigString));
-            }
-            catch (Exception exception) {
-                System.out.println("The provided client configuration is not valid!");
-                return 1;
+        if (this.clientConfigs != null) {
+            for (final String clientConfigString : this.clientConfigs) {
+                try {
+                    clientConfigProps.putAll(Strings.toProperties(clientConfigString));
+                }
+                catch (Exception exception) {
+                    System.out.println("The provided client configuration is not valid!");
+                    return 1;
+                }
             }
         }
 
         final var clientConfigMap = new HashMap<String, Object>();
         for (final String name : clientConfigProps.stringPropertyNames()) {
-            System.out.println("[" + name + "]: " + clientConfigProps.getProperty(name));
             clientConfigMap.put(name, clientConfigProps.getProperty(name));
         }
 
@@ -94,4 +96,5 @@ public class SetContextCommand implements Callable<Integer> {
 
         return 0;
     }
+
 }
