@@ -29,7 +29,7 @@ public class Context {
     private final String offsetTopic;
     private final String username;
     private final String password;
-    private final Map<String, Object> adminClientConfig;
+    private final Map<String, Object> clientConfig;
 
     public Context(
                    @JsonProperty("cluster") URI cluster,
@@ -37,13 +37,13 @@ public class Context {
                    @JsonProperty("offsetTopic") String offsetTopic,
                    @JsonProperty("username") String username,
                    @JsonProperty("password") String password,
-                   @JsonProperty("adminClientConfig") Map<String, Object> adminClientConfig) {
+                   @JsonProperty("clientConfig") Map<String, Object> clientConfig) {
         this.cluster = cluster;
         this.bootstrapServers = bootstrapServers;
         this.offsetTopic = offsetTopic;
         this.username = username;
         this.password = password;
-        this.adminClientConfig = adminClientConfig;
+        this.clientConfig = clientConfig;
     }
 
     public URI getCluster() {
@@ -66,8 +66,8 @@ public class Context {
         return password;
     }
 
-    public Map<String, Object> getAdminClientConfig() {
-        return this.adminClientConfig;
+    public Map<String, Object> getClientConfig() {
+        return this.clientConfig;
     }
 
     @JsonIgnore

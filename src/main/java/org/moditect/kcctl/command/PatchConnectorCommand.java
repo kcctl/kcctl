@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -58,7 +59,7 @@ public class PatchConnectorCommand implements Callable<Integer> {
     List<String> removeParameters;
 
     @Override
-    public Integer call() throws JsonProcessingException {
+    public Integer call() throws JsonProcessingException, InterruptedException, ExecutionException {
 
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())

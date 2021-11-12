@@ -49,28 +49,28 @@ public class SetContextCommand implements Callable<Integer> {
     @Option(names = { "--password" }, description = "Password for basic authentication")
     String password;
 
-    @Option(names = { "--admin-client-config" }, description = "Configuration for admin client")
-    String adminClientConfig;
+    @Option(names = { "--client-config" }, description = "Configuration for admin client")
+    String clientConfig;
 
     @Override
     public Integer call() {
         ConfigurationContext context = new ConfigurationContext();
 
-        Properties adminClientConfigProps;
+        Properties clientConfigProps;
         try {
-            adminClientConfigProps = Strings.toProperties(adminClientConfig);
+            clientConfigProps = Strings.toProperties(clientConfig);
         }
         catch (Exception exception) {
             System.out.println("The provided admin client configuration is not valid!");
             return 1;
         }
 
-        final var adminClientConfigMap = new HashMap<String, Object>();
-        for (final String name : adminClientConfigProps.stringPropertyNames()) {
-            adminClientConfigMap.put(name, adminClientConfigProps.getProperty(name));
+        final var clientConfigMap = new HashMap<String, Object>();
+        for (final String name : clientConfigProps.stringPropertyNames()) {
+            clientConfigMap.put(name, clientConfigProps.getProperty(name));
         }
 
-        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, username, password, adminClientConfigMap));
+        context.setContext(contextName, new Context(URI.create(cluster), bootstrapServers, offsetTopic, username, password, clientConfigMap));
         System.out.println("Configured context " + contextName);
 
         if (!context.getCurrentContextName().equals(contextName)) {
