@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.util;
+package org.kcctl.util;
 
 public class Colors {
 

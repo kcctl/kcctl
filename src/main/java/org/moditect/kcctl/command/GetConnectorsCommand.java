@@ -13,17 +13,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
-import org.moditect.kcctl.service.ConnectorStatusInfo;
-import org.moditect.kcctl.service.KafkaConnectApi;
-import org.moditect.kcctl.service.TaskState;
-import org.moditect.kcctl.util.ConfigurationContext;
+import org.kcctl.service.ConnectorStatusInfo;
+import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.service.TaskState;
+import org.kcctl.util.ConfigurationContext;
 
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -31,9 +31,9 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 import picocli.CommandLine.Command;
 
-import static org.moditect.kcctl.util.Colors.ANSI_GREEN;
-import static org.moditect.kcctl.util.Colors.ANSI_RED;
-import static org.moditect.kcctl.util.Colors.ANSI_RESET;
+import static org.kcctl.util.Colors.ANSI_GREEN;
+import static org.kcctl.util.Colors.ANSI_RED;
+import static org.kcctl.util.Colors.ANSI_RESET;
 
 @Command(name = "connectors", description = "Displays information about deployed connectors")
 public class GetConnectorsCommand implements Runnable {

@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -21,8 +21,8 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
-import org.moditect.kcctl.service.KafkaConnectApi;
-import org.moditect.kcctl.util.ConfigurationContext;
+import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.util.ConfigurationContext;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,11 +32,11 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 import picocli.CommandLine;
 
-import static org.moditect.kcctl.util.Colors.ANSI_CYAN;
-import static org.moditect.kcctl.util.Colors.ANSI_GREEN;
-import static org.moditect.kcctl.util.Colors.ANSI_RED;
-import static org.moditect.kcctl.util.Colors.ANSI_RESET;
-import static org.moditect.kcctl.util.Colors.ANSI_YELLOW;
+import static org.kcctl.util.Colors.ANSI_CYAN;
+import static org.kcctl.util.Colors.ANSI_GREEN;
+import static org.kcctl.util.Colors.ANSI_RED;
+import static org.kcctl.util.Colors.ANSI_RESET;
+import static org.kcctl.util.Colors.ANSI_YELLOW;
 
 @CommandLine.Command(name = "loggers", description = "Displays information about all configured loggers")
 public class GetLoggersCommand implements Runnable {

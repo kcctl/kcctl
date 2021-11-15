@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.service;
+package org.kcctl.service;
 
 import java.util.List;
 import java.util.Map;

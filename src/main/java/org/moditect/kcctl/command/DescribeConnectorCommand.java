@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,25 +26,25 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
-import org.moditect.kcctl.completion.ConnectorNameCompletions;
-import org.moditect.kcctl.service.ConnectorInfo;
-import org.moditect.kcctl.service.ConnectorStatusInfo;
-import org.moditect.kcctl.service.KafkaConnectApi;
-import org.moditect.kcctl.service.TaskState;
-import org.moditect.kcctl.service.TopicsInfo;
-import org.moditect.kcctl.util.ConfigurationContext;
-import org.moditect.kcctl.util.Tuple;
-import org.moditect.kcctl.util.Version;
+import org.kcctl.completion.ConnectorNameCompletions;
+import org.kcctl.service.ConnectorInfo;
+import org.kcctl.service.ConnectorStatusInfo;
+import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.service.TaskState;
+import org.kcctl.service.TopicsInfo;
+import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Tuple;
+import org.kcctl.util.Version;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import static org.moditect.kcctl.util.Colors.ANSI_GREEN;
-import static org.moditect.kcctl.util.Colors.ANSI_RED;
-import static org.moditect.kcctl.util.Colors.ANSI_RESET;
-import static org.moditect.kcctl.util.Colors.ANSI_WHITE_BOLD;
-import static org.moditect.kcctl.util.Colors.ANSI_YELLOW;
+import static org.kcctl.util.Colors.ANSI_GREEN;
+import static org.kcctl.util.Colors.ANSI_RED;
+import static org.kcctl.util.Colors.ANSI_RESET;
+import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
+import static org.kcctl.util.Colors.ANSI_YELLOW;
 
 @Command(name = "connector", description = "Displays information about a given connector")
 public class DescribeConnectorCommand implements Callable<Integer> {

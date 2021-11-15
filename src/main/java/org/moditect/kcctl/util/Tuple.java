@@ -13,12 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.util;
+package org.kcctl.util;
 
 import java.util.List;
 
-import static org.moditect.kcctl.util.Colors.ANSI_RESET;
-import static org.moditect.kcctl.util.Colors.ANSI_WHITE_BOLD;
+import static org.kcctl.util.Colors.ANSI_RESET;
+import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 
 public class Tuple {
 

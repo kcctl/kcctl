@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,10 +25,10 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
-import org.moditect.kcctl.completion.ConnectorNameCompletions;
-import org.moditect.kcctl.service.KafkaConnectApi;
-import org.moditect.kcctl.service.KafkaConnectException;
-import org.moditect.kcctl.util.ConfigurationContext;
+import org.kcctl.completion.ConnectorNameCompletions;
+import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.service.KafkaConnectException;
+import org.kcctl.util.ConfigurationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

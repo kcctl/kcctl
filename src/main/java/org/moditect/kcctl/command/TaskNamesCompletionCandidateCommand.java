@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,10 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
-import org.moditect.kcctl.service.ConnectorStatusInfo;
-import org.moditect.kcctl.service.KafkaConnectApi;
-import org.moditect.kcctl.service.TaskState;
-import org.moditect.kcctl.util.ConfigurationContext;
+import org.kcctl.service.ConnectorStatusInfo;
+import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.service.TaskState;
+import org.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine.Command;
 

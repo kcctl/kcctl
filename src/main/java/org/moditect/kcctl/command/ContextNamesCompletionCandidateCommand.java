@@ -13,13 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.moditect.kcctl.util.ConfigurationContext;
+import org.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine.Command;
 

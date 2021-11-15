@@ -153,7 +153,7 @@ Then recreate the completion script:
 
 ```shell script
 java -cp "target/quarkus-app/app/*:target/quarkus-app/lib/main/*:target/quarkus-app/quarkus-run.jar" \
-  picocli.AutoComplete -n kcctl --force org.moditect.kcctl.command.KcCtlCommand
+  picocli.AutoComplete -n kcctl --force org.kcctl.command.KcCtlCommand
 ```
 
 Edit the completion script _kcctl_completion_, replace all the quotes around generated completion invocations with back ticks, making them actual invocations of _kcctl_::
