@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.service;
+package org.kcctl.service;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -21,7 +21,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
-import org.moditect.kcctl.util.ConfigurationContext;
+import org.kcctl.util.ConfigurationContext;
 
 public class KafkaConnectClientHeadersFactory implements ClientHeadersFactory {
 

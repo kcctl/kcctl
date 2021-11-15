@@ -13,12 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import javax.enterprise.inject.Produces;
 
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.moditect.kcctl.service.ExecutionExceptionHandler;
+import org.kcctl.service.ExecutionExceptionHandler;
 
 import io.quarkus.picocli.runtime.PicocliCommandLineFactory;
 import io.quarkus.picocli.runtime.annotations.TopCommand;

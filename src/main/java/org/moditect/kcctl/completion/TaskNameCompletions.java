@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.completion;
+package org.kcctl.completion;
 
 import java.util.Arrays;
 import java.util.Iterator;

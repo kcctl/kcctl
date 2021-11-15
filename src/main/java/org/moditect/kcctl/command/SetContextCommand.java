@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import org.moditect.kcctl.service.Context;
-import org.moditect.kcctl.util.ConfigurationContext;
-import org.moditect.kcctl.util.Strings;
+import org.kcctl.service.Context;
+import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Strings;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

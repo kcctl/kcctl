@@ -13,12 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.command;
+package org.kcctl.command;
 
 import javax.inject.Inject;
 
-import org.moditect.kcctl.service.Context;
-import org.moditect.kcctl.util.ConfigurationContext;
+import org.kcctl.service.Context;
+import org.kcctl.util.ConfigurationContext;
 
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;

@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.moditect.kcctl.util;
+package org.kcctl.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.moditect.kcctl.service.Context;
+import org.kcctl.service.Context;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ class ConfigurationContextTest {
 
     @Nested
     class SetConfiguration {
-        @MethodSource("org.moditect.kcctl.util.ConfigurationContextTest#setConfigurationArguments")
+        @MethodSource("org.kcctl.util.ConfigurationContextTest#setConfigurationArguments")
         @ParameterizedTest
         void should_create_a_new_configuration_when_no_configuration_exists(String contextName, Context context, String expectedConfiguration) throws IOException {
             new ConfigurationContext(tempDir).setContext(
