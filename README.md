@@ -1,5 +1,7 @@
 # 🧸 kcctl – Your Cuddly CLI for Apache Kafka Connect
 
+_It's Casey. Casey Cuddle._
+
 This project is a command-line client for [Kafka Connect](https://kafka.apache.org/documentation/#connect).
 Relying on the idioms and semantics of _kubectl_,
 it allows you to register and examine connectors, delete them, restart them, etc.
