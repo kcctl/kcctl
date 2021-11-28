@@ -23,12 +23,21 @@ import org.kcctl.service.KafkaConnectInfo;
 import org.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Spec;
 
 @Command(name = "info", description = "Displays information about the Kafka Connect cluster")
 public class InfoCommand implements Runnable {
 
+    private final ConfigurationContext context;
+
+    @Spec
+    CommandSpec spec;
+
     @Inject
-    ConfigurationContext context;
+    public InfoCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -37,9 +46,9 @@ public class InfoCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         KafkaConnectInfo workerInfo = kafkaConnectApi.getWorkerInfo();
-        System.out.println("URL:               " + context.getCurrentContext().getCluster());
-        System.out.println("Version:           " + workerInfo.version);
-        System.out.println("Commit:            " + workerInfo.commit);
-        System.out.println("Kafka Cluster ID:  " + workerInfo.kafka_cluster_id);
+        spec.commandLine().getOut().println("URL:               " + context.getCurrentContext().getCluster());
+        spec.commandLine().getOut().println("Version:           " + workerInfo.version);
+        spec.commandLine().getOut().println("Commit:            " + workerInfo.commit);
+        spec.commandLine().getOut().println("Kafka Cluster ID:  " + workerInfo.kafka_cluster_id);
     }
 }
