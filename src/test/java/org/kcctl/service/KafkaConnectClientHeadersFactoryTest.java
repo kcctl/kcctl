@@ -39,8 +39,16 @@ class KafkaConnectClientHeadersFactoryTest {
         void should_inject_authorization_header_for_basic_auth() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
-            Files.writeString(configFile,
-                    "{ \"currentContext\": \"local\", \"local\": { \"cluster\": \"http://localhost:8083\", \"username\": \"someuser\", \"password\": \"somepassword\" }}");
+            Files.writeString(configFile, """
+                    {
+                      "currentContext": "local",
+                      "local": {
+                        "cluster" : "http://localhost:8083",
+                        "username" : "someuser",
+                        "password" : "somepassword"
+                      }
+                    }"
+                    """);
 
             var configurationContext = new ConfigurationContext(tempDir);
             var factory = new KafkaConnectClientHeadersFactory(configurationContext);
@@ -53,7 +61,14 @@ class KafkaConnectClientHeadersFactoryTest {
         void should_return_empty_map_when_no_changes() throws IOException {
             var configFile = tempDir.toPath().resolve(".kcctl");
 
-            Files.writeString(configFile, "{ \"currentContext\": \"local\", \"local\": { \"cluster\": \"http://localhost:8083\" }}");
+            Files.writeString(configFile, """
+                    {
+                      "currentContext": "local",
+                      "local" : {
+                         "cluster": "http://localhost:8083"
+                      }
+                    }
+                    """);
 
             var configurationContext = new ConfigurationContext(tempDir);
             var factory = new KafkaConnectClientHeadersFactory(configurationContext);
