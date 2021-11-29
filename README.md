@@ -97,9 +97,9 @@ Start by running `kcctl config set-context <name> --cluster=<Kafka Connect URI).
 
 ## Development
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project uses [Quarkus](https://quarkus.io/), the Supersonic Subatomic Java Framework.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+To build the project, make sure to have Java 17 and GraalVM 21.3 or newer installed.
 
 ### Running the application in dev mode
 
