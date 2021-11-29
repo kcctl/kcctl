@@ -15,18 +15,22 @@
  */
 package org.kcctl.command;
 
+import java.util.concurrent.Callable;
+
 import javax.inject.Inject;
 
+import org.apache.http.HttpStatus;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.service.KafkaConnectException;
 import org.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "delete", description = "Deletes the specified connector")
-public class DeleteConnectorCommand implements Runnable {
+public class DeleteConnectorCommand implements Callable<Integer> {
 
     @Inject
     ConfigurationContext context;
@@ -35,12 +39,26 @@ public class DeleteConnectorCommand implements Runnable {
     String name;
 
     @Override
-    public void run() {
+    public Integer call() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        kafkaConnectApi.deleteConnector(name);
+        try {
+            kafkaConnectApi.deleteConnector(name);
+        }
+        catch (KafkaConnectException kce) {
+            if (kce.getErrorCode() == HttpStatus.SC_NOT_FOUND) {
+                System.out.println(kce.getMessage());
+            }
+            else {
+                System.out.println(kce);
+            }
+            return 1;
+        }
+
         System.out.println("Deleted connector " + name);
+
+        return 0;
     }
 }
