@@ -84,7 +84,7 @@ Commands:
   get       Displays information about connector plug-ins, connectors, and
               loggers
   describe  Displays detailed information about the specified resource
-  apply     Applies the given file for registering or updating a connector
+  apply     Applies the given file or the stdin content for registering or updating a connector
   patch     Modifies the configuration of a connector or logger
   restart   Restarts a connector or task
   pause     Pauses a connector
