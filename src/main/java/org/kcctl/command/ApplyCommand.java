@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
@@ -38,13 +39,13 @@ import picocli.CommandLine.Option;
 import static org.kcctl.util.Colors.ANSI_RESET;
 import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 
-@Command(name = "apply", description = "Applies the given file for registering or updating a connector")
+@Command(name = "apply", description = "Applies the given file or the stdin content for registering or updating a connector")
 public class ApplyCommand implements Callable<Integer> {
 
     @Inject
     ConfigurationContext context;
 
-    @Option(names = { "-f", "--file" }, description = "Name of the file to apply", required = true)
+    @Option(names = { "-f", "--file" }, description = "Name of the file to apply or '-' to read from stdin", required = true)
     File file;
 
     @Option(names = { "-n", "--name" }, description = "Name of the connector when not given within the file itself")
@@ -63,17 +64,21 @@ public class ApplyCommand implements Callable<Integer> {
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        if (!file.exists()) {
+        String contents;
+        if (file.getName().equals("-")) {
+            contents = readFromStdin();
+        }
+        else if (!file.exists()) {
             System.out.println("Given file does not exist: " + file.toPath().toAbsolutePath());
             return 1;
         }
-
-        String contents;
-        try {
-            contents = Files.readString(file.toPath());
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Couldn't read file", e);
+        else {
+            try {
+                contents = Files.readString(file.toPath());
+            }
+            catch (IOException e) {
+                throw new RuntimeException("Couldn't read file", e);
+            }
         }
 
         Map<String, Object> config = mapper.readValue(contents, Map.class);
@@ -84,6 +89,15 @@ public class ApplyCommand implements Callable<Integer> {
         else {
             return createOrUpdateConnector(kafkaConnectApi, contents, config);
         }
+    }
+
+    private String readFromStdin() {
+        Scanner sc = new Scanner(System.in);
+        StringBuilder buffer = new StringBuilder();
+        while (sc.hasNextLine())
+            buffer.append(sc.nextLine());
+        sc.close();
+        return buffer.toString();
     }
 
     private int createOrUpdateConnector(KafkaConnectApi kafkaConnectApi, String contents, Map<String, Object> config) throws Exception {
