@@ -32,7 +32,7 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "plugins", description = "Displays information about available connector plug-ins")
+@Command(name = "plugins", description = "Displays information about available connectorName plug-ins")
 public class GetPluginsCommand implements Runnable {
 
     @Inject

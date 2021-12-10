@@ -22,7 +22,7 @@ public class ConnectorNameCompletions implements Iterable<String> {
 
     @Override
     public Iterator<String> iterator() {
-        return Arrays.asList("kcctl", "connector-name-completions").iterator();
+        return Arrays.asList("kcctl", "connectorName-name-completions").iterator();
     }
 
 }

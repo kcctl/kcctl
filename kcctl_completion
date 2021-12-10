@@ -134,13 +134,13 @@ function _complete_kcctl() {
   local cmds16=(get connectors)
   local cmds17=(get loggers)
   local cmds18=(get logger)
-  local cmds19=(describe connector)
+  local cmds19=(describe connectorName)
   local cmds20=(patch logger)
-  local cmds21=(patch connector)
-  local cmds22=(restart connector)
+  local cmds21=(patch connectorName)
+  local cmds22=(restart connectorName)
   local cmds23=(restart task)
-  local cmds24=(pause connector)
-  local cmds25=(resume connector)
+  local cmds24=(pause connectorName)
+  local cmds25=(resume connectorName)
 
   if CompWordsContainsArray "${cmds25[@]}"; then _picocli_kcctl_resume_connector; return $?; fi
   if CompWordsContainsArray "${cmds24[@]}"; then _picocli_kcctl_pause_connector; return $?; fi
@@ -365,7 +365,7 @@ function _picocli_kcctl_delete() {
   local commands=""
   local flag_opts=""
   local arg_opts=""
-  local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+  local CONNECTOR_NAME_pos_param_args=`kcctl connectorName-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -572,7 +572,7 @@ function _picocli_kcctl_get_logger() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `connector` subcommand.
+# Generates completions for the options and subcommands of the `connectorName` subcommand.
 function _picocli_kcctl_describe_connector() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
@@ -580,7 +580,7 @@ function _picocli_kcctl_describe_connector() {
   local commands=""
   local flag_opts="--tasks-config"
   local arg_opts=""
-  local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+  local CONNECTOR_NAME_pos_param_args=`kcctl connectorName-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -629,7 +629,7 @@ function _picocli_kcctl_patch_logger() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `connector` subcommand.
+# Generates completions for the options and subcommands of the `connectorName` subcommand.
 function _picocli_kcctl_patch_connector() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
@@ -649,7 +649,7 @@ function _picocli_kcctl_patch_connector() {
       return
       ;;
   esac
-  local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+  local CONNECTOR_NAME_pos_param_args=`kcctl connectorName-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -664,7 +664,7 @@ function _picocli_kcctl_patch_connector() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `connector` subcommand.
+# Generates completions for the options and subcommands of the `connectorName` subcommand.
 function _picocli_kcctl_restart_connector() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
@@ -672,7 +672,7 @@ function _picocli_kcctl_restart_connector() {
   local commands=""
   local flag_opts=""
   local arg_opts=""
-  local NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+  local NAME_pos_param_args=`kcctl connectorName-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -710,7 +710,7 @@ function _picocli_kcctl_restart_task() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `connector` subcommand.
+# Generates completions for the options and subcommands of the `connectorName` subcommand.
 function _picocli_kcctl_pause_connector() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
@@ -718,7 +718,7 @@ function _picocli_kcctl_pause_connector() {
   local commands=""
   local flag_opts=""
   local arg_opts=""
-  local NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+  local NAME_pos_param_args=`kcctl connectorName-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -733,7 +733,7 @@ function _picocli_kcctl_pause_connector() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `connector` subcommand.
+# Generates completions for the options and subcommands of the `connectorName` subcommand.
 function _picocli_kcctl_resume_connector() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
@@ -741,7 +741,7 @@ function _picocli_kcctl_resume_connector() {
   local commands=""
   local flag_opts=""
   local arg_opts=""
-  local NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
+  local NAME_pos_param_args=`kcctl connectorName-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )

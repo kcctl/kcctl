@@ -38,7 +38,7 @@ import picocli.CommandLine.Option;
 import static org.kcctl.util.Colors.ANSI_RESET;
 import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 
-@Command(name = "apply", description = "Applies the given file for registering or updating a connector")
+@Command(name = "apply", description = "Applies the given file for registering or updating a connectorName")
 public class ApplyCommand implements Callable<Integer> {
 
     @Inject
@@ -47,7 +47,7 @@ public class ApplyCommand implements Callable<Integer> {
     @Option(names = { "-f", "--file" }, description = "Name of the file to apply", required = true)
     File file;
 
-    @Option(names = { "-n", "--name" }, description = "Name of the connector when not given within the file itself")
+    @Option(names = { "-n", "--name" }, description = "Name of the connectorName when not given within the file itself")
     String name;
 
     @Option(names = { "--dry-run" }, description = "Only validates the configuration")
@@ -93,11 +93,11 @@ public class ApplyCommand implements Callable<Integer> {
                 boolean existing = kafkaConnectApi.getConnectors().contains(connectorName);
                 if (!existing) {
                     kafkaConnectApi.createConnector(contents);
-                    System.out.println("Created connector " + connectorName);
+                    System.out.println("Created connectorName " + connectorName);
                 }
                 else {
                     kafkaConnectApi.updateConnector(connectorName, mapper.writeValueAsString(config.get("config")));
-                    System.out.println("Updated connector " + connectorName);
+                    System.out.println("Updated connectorName " + connectorName);
                 }
             }
             else {
@@ -110,17 +110,17 @@ public class ApplyCommand implements Callable<Integer> {
                 kafkaConnectApi.updateConnector(name, contents);
 
                 if (!existing) {
-                    System.out.println("Created connector " + name);
+                    System.out.println("Created connectorName " + name);
                 }
                 else {
-                    System.out.println("Updated connector " + name);
+                    System.out.println("Updated connectorName " + name);
                 }
             }
         }
         catch (KafkaConnectException kce) {
             if (kce.getMessage().startsWith("Failed to find any class that implements Connector")) {
 
-                System.out.println("Specified class isn't a valid connector type. The following connector type(s) are available:");
+                System.out.println("Specified class isn't a valid connectorName type. The following connectorName type(s) are available:");
 
                 GetPluginsCommand getPlugins = new GetPluginsCommand();
                 getPlugins.context = context;
@@ -142,15 +142,15 @@ public class ApplyCommand implements Callable<Integer> {
                 ? (Map) config.get("config")
                 : (Map) config;
 
-        if (!connectorConfigMap.containsKey("connector.class")) {
-            System.out.println("The configuration must contain the 'connector.class' field.");
+        if (!connectorConfigMap.containsKey("connectorName.class")) {
+            System.out.println("The configuration must contain the 'connectorName.class' field.");
             return 1;
         }
-        // In order to start a connector, "name" is not required within "config". However, when validating a
+        // In order to start a connectorName, "name" is not required within "config". However, when validating a
         // configuration it is! So injecting a placeholder to make sure this does not fail validation.
         connectorConfigMap.putIfAbsent("name", "dummy-name");
 
-        String clazz = connectorConfigMap.get("connector.class");
+        String clazz = connectorConfigMap.get("connectorName.class");
         String pluginName = clazz.substring(clazz.lastIndexOf('.') + 1);
         try {
             ConfigInfos configInfos = kafkaConnectApi.validateConfig(pluginName, mapper.writeValueAsString(connectorConfigMap));

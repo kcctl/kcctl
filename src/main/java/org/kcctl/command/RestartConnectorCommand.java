@@ -25,13 +25,13 @@ import org.kcctl.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "connector", description = "Restarts the specified connector")
+@Command(name = "connectorName", description = "Restarts the specified connectorName")
 public class RestartConnectorCommand implements Runnable {
 
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "NAME", description = "Name of the connector (e.g. 'my-connector')", completionCandidates = ConnectorNameCompletions.class)
+    @Parameters(paramLabel = "NAME", description = "Name of the connectorName (e.g. 'my-connectorName')", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
     @Override
@@ -41,6 +41,6 @@ public class RestartConnectorCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         kafkaConnectApi.restartConnector(name);
-        System.out.println("Restarted connector " + name);
+        System.out.println("Restarted connectorName " + name);
     }
 }

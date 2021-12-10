@@ -40,7 +40,7 @@ import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
-@Command(name = "connector", description = "Patches the specified connector with the given configuration parameters")
+@Command(name = "connectorName", description = "Patches the specified connectorName with the given configuration parameters")
 public class PatchConnectorCommand implements Callable<Integer> {
 
     @Spec
@@ -49,7 +49,7 @@ public class PatchConnectorCommand implements Callable<Integer> {
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
+    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connectorName", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
     @Option(names = { "-s", "--set" }, description = "Set the following configuration parameter")
@@ -89,7 +89,7 @@ public class PatchConnectorCommand implements Callable<Integer> {
         describeConnectorCommand.name = name;
         describeConnectorCommand.includeTasksConfig = false;
 
-        System.out.println("New connector configuration:");
+        System.out.println("New connectorName configuration:");
 
         Instant start = Instant.now();
 

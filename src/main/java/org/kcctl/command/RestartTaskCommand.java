@@ -25,13 +25,13 @@ import org.kcctl.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "task", description = "Restarts the specified connector or task")
+@Command(name = "task", description = "Restarts the specified connectorName or task")
 public class RestartTaskCommand implements Runnable {
 
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "NAME", description = "Name of the task (e.g. 'my-connector/0')", completionCandidates = TaskNameCompletions.class)
+    @Parameters(paramLabel = "NAME", description = "Name of the task (e.g. 'my-connectorName/0')", completionCandidates = TaskNameCompletions.class)
     String name;
 
     @Override
@@ -42,7 +42,7 @@ public class RestartTaskCommand implements Runnable {
 
         String[] parts = name.split("\\/");
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Invalid connector/task name, expecting format 'connector-name/task-id");
+            throw new IllegalArgumentException("Invalid connectorName/task name, expecting format 'connectorName-name/task-id");
         }
 
         kafkaConnectApi.restartTask(parts[0], parts[1]);

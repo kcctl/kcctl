@@ -46,13 +46,13 @@ import static org.kcctl.util.Colors.ANSI_RESET;
 import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 import static org.kcctl.util.Colors.ANSI_YELLOW;
 
-@Command(name = "connector", description = "Displays information about a given connector")
+@Command(name = "connectorName", description = "Displays information about a given connectorName")
 public class DescribeConnectorCommand implements Callable<Integer> {
 
     @Inject
     ConfigurationContext context;
 
-    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
+    @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connectorName", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
@@ -149,7 +149,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 throw e;
             }
 
-            System.out.println("Connector " + name + " not found. The following connector(s) are available:");
+            System.out.println("Connector " + name + " not found. The following connectorName(s) are available:");
 
             GetConnectorsCommand getConnectors = new GetConnectorsCommand();
             getConnectors.context = context;

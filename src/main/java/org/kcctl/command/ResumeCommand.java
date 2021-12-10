@@ -17,6 +17,6 @@ package org.kcctl.command;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "resume", subcommands = { ResumeConnectorCommand.class }, description = "Resumes a connector")
+@Command(name = "resume", subcommands = { ResumeConnectorCommand.class }, description = "Resumes a connectorName")
 public class ResumeCommand {
 }

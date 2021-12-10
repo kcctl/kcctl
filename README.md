@@ -79,15 +79,15 @@ A command-line interface for Kafka Connect
 Commands:
   info      Displays information about the Kafka Connect cluster
   config    Sets or retrieves the configuration of this client
-  get       Displays information about connector plug-ins, connectors, and
+  get       Displays information about connectorName plug-ins, connectors, and
               loggers
   describe  Displays detailed information about the specified resource
-  apply     Applies the given file for registering or updating a connector
-  patch     Modifies the configuration of a connector or logger
-  restart   Restarts a connector or task
-  pause     Pauses a connector
-  resume    Resumes a connector
-  delete    Deletes the specified connector
+  apply     Applies the given file for registering or updating a connectorName
+  patch     Modifies the configuration of a connectorName or logger
+  restart   Restarts a connectorName or task
+  pause     Pauses a connectorName
+  resume    Resumes a connectorName
+  delete    Deletes the specified connectorName
   help      Displays help information about the specified command
 ```
 
@@ -160,7 +160,7 @@ Edit the completion script _kcctl_completion_, replace all the quotes around gen
 
 ```shell script
 --- local CONNECTOR_NAME_pos_param_args="kcctl connector-name-completions" # 0-0 values
-+++ local CONNECTOR_NAME_pos_param_args=`kcctl connector-name-completions` # 0-0 values
++++ local CONNECTOR_NAME_pos_param_args=`kcctl connectorName-name-completions` # 0-0 values
 ```
 
 Currently, three kinds of completions exist: `connector-name-completions`, `task-name-completions`, and `logger-name-completions`.

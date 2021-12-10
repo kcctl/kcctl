@@ -15,9 +15,19 @@
  */
 package org.kcctl.command;
 
+import org.kcctl.util.ConfigurationContext;
 import picocli.CommandLine.Command;
 
+import javax.inject.Inject;
+
 @Command(name = "get", subcommands = { GetPluginsCommand.class, GetConnectorsCommand.class, GetLoggersCommand.class,
-        GetLoggerCommand.class }, description = "Displays information about connector plug-ins, connectors, and loggers")
-public class GetCommand {
+        GetLoggerCommand.class, OffsetsCommand.class }, description = "Displays information about connectorName plug-ins, connectors, and loggers")
+public class GetCommand implements Runnable {
+    @Inject
+    ConfigurationContext context;
+
+    @Override
+    public void run() {
+        
+    }
 }

@@ -25,7 +25,7 @@ import org.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "connector-name-completions", hidden = true)
+@Command(name = "connectorName-name-completions", hidden = true)
 public class ConnectorNamesCompletionCandidateCommand implements Runnable {
 
     @Inject
