@@ -427,6 +427,11 @@
                         <platform>linux-x86_64</platform>
                       </artifact>
                       <artifact>
+                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.zip</path>
+                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-x86_64.zip</transform>
+                        <platform>linux-x86_64</platform>
+                      </artifact>
+                      <artifact>
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip</path>
                         <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-windows-x86_64.zip</transform>
                         <platform>windows-x86_64</platform>
