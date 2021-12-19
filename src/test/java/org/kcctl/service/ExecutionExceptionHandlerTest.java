@@ -18,6 +18,7 @@ package org.kcctl.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
+import java.net.ConnectException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.kcctl.util.Colors;
+import org.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine;
 
@@ -61,7 +63,7 @@ class ExecutionExceptionHandlerTest {
 
         @Test
         void should_handle_unauthorized_errors() throws Exception {
-            var handler = new ExecutionExceptionHandler();
+            var handler = new ExecutionExceptionHandler(new ConfigurationContext().getCurrentContext());
             int exitCode = handler.handleExecutionException(
                     new KafkaConnectException("Unauthorized", 401), null, null);
 
@@ -73,16 +75,28 @@ class ExecutionExceptionHandlerTest {
 
         @Test
         void should_allow_uncaught_kc_exceptions_to_bubble_up() {
-            var handler = new ExecutionExceptionHandler();
+            var handler = new ExecutionExceptionHandler(new ConfigurationContext().getCurrentContext());
             assertThrows(KafkaConnectException.class, () -> handler.handleExecutionException(
                     new KafkaConnectException("Woa", 999), null, null));
         }
 
         @Test
         void should_allow_uncaught_exceptions_to_bubble_up() {
-            var handler = new ExecutionExceptionHandler();
+            var handler = new ExecutionExceptionHandler(new ConfigurationContext().getCurrentContext());
             assertThrows(Exception.class, () -> handler.handleExecutionException(
                     new Exception("Woa"), null, null));
+        }
+
+        @Test
+        void should_handle_connect_exception() throws Exception {
+            var handler = new ExecutionExceptionHandler(new ConfigurationContext().getCurrentContext());
+            int exitCode = handler.handleExecutionException(
+                    new ConnectException(), null, null);
+
+            assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
+            assertThat(fakeSystemErr.toString())
+                    .isEqualTo(errorPrintLnFormatted(
+                            "Couldn't connect to Kafka Connect API at http://localhost:8083."));
         }
     }
 }

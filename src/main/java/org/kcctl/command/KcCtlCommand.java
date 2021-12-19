@@ -16,9 +16,11 @@
 package org.kcctl.command;
 
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.kcctl.service.ExecutionExceptionHandler;
+import org.kcctl.util.ConfigurationContext;
 
 import io.quarkus.picocli.runtime.PicocliCommandLineFactory;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
@@ -48,9 +50,12 @@ import picocli.CommandLine.IVersionProvider;
 
 public class KcCtlCommand {
 
+    @Inject
+    ConfigurationContext context;
+
     @Produces
     CommandLine getCommandLineInstance(PicocliCommandLineFactory factory) {
-        return factory.create().setExecutionExceptionHandler(new ExecutionExceptionHandler());
+        return factory.create().setExecutionExceptionHandler(new ExecutionExceptionHandler(context.getCurrentContext()));
     }
 }
 

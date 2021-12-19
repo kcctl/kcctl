@@ -15,6 +15,8 @@
  */
 package org.kcctl.service;
 
+import java.net.ConnectException;
+
 import org.apache.http.HttpStatus;
 import org.kcctl.util.Colors;
 
@@ -24,22 +26,13 @@ import picocli.CommandLine.ParseResult;
 
 public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
 
-    public static class ExitCodeErrorMessagePair {
-        private int exitCode;
-        private String errorMessage;
+    public record ExitCodeErrorMessagePair(int exitCode, String errorMessage) {
+    }
 
-        public ExitCodeErrorMessagePair(int exitCode, String errorMessage) {
-            this.exitCode = exitCode;
-            this.errorMessage = errorMessage;
-        }
+    private final Context context;
 
-        public int getExitCode() {
-            return this.exitCode;
-        }
-
-        public String getErrorMessage() {
-            return this.errorMessage;
-        }
+    public ExecutionExceptionHandler(Context context) {
+        this.context = context;
     }
 
     @Override
@@ -49,11 +42,19 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
             throw ex;
         }
 
-        System.err.println(Colors.ANSI_RED + exitCodeErrorMessagePair.getErrorMessage() + Colors.ANSI_RESET);
-        return exitCodeErrorMessagePair.getExitCode();
+        System.err.println(Colors.ANSI_RED + exitCodeErrorMessagePair.errorMessage() + Colors.ANSI_RESET);
+        return exitCodeErrorMessagePair.exitCode();
     }
 
-    public static ExitCodeErrorMessagePair loadMessageAndExitCode(Exception ex) {
+    private ExitCodeErrorMessagePair loadMessageAndExitCode(Exception ex) {
+        Throwable rootCause = getRootCause(ex);
+
+        if (rootCause instanceof ConnectException) {
+            return new ExitCodeErrorMessagePair(
+                    CommandLine.ExitCode.SOFTWARE,
+                    "Couldn't connect to Kafka Connect API at %s.".formatted(context.getCluster()));
+        }
+
         if (ex instanceof KafkaConnectException) {
             var kafkaConnectException = (KafkaConnectException) ex;
             switch (kafkaConnectException.getErrorCode()) {
@@ -64,6 +65,17 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
                 }
             }
         }
+
         return null;
+    }
+
+    private static Throwable getRootCause(Throwable ex) {
+        Throwable parent;
+
+        while ((parent = ex.getCause()) != null) {
+            ex = parent;
+        }
+
+        return ex;
     }
 }
