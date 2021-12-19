@@ -413,7 +413,7 @@
                 </project>
                 <packagers>
                   <sdkman>
-                    <active>ALWAYS</active>
+                    <active>RELEASE</active>
                   </sdkman>
                 </packagers>
                 <distributions>
