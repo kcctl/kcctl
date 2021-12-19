@@ -411,13 +411,15 @@
                     <label>{{ projectVersionNumber }}-early-access</label>
                   </snapshot>
                 </project>
+                <packagers>
+                  <sdkman>
+                    <active>ALWAYS</active>
+                  </sdkman>
+                </packagers>
                 <distributions>
                   <kcctl>
                     <name>kcctl</name>
                     <type>NATIVE_IMAGE</type>
-                    <sdkman>
-                      <active>ALWAYS</active>
-                    </sdkman>
                     <artifacts>
                       <artifact>
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz</path>
