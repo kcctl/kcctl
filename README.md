@@ -11,7 +11,21 @@ You can see what _kcctl_ is about in this short video:
 
 ## Installation
 
-You can obtain early access binaries of _kcctl_ (x86) for Linux, macOS, and Windows from [here](https://github.com/kcctl/kcctl/releases).
+The latest stable release of _kcctl_ (x86) for Linux, macOS, and Windows can be retrieved via [SDKMan](https://sdkman.io/sdks#kcctl):
+
+```shell script
+sdk install kcctl
+```
+
+It is recommended to install the bash/zsh completion script _kcctl_completion_:
+
+```shell script
+wget https://raw.githubusercontent.com/kcctl/kcctl/main/kcctl_completion
+. kcctl_completion
+```
+
+
+Alternatively, you can obtain early access binaries from [here](https://github.com/kcctl/kcctl/releases).
 This is a rolling release, new binaries are published upon each commit pushed to the kcctl repository.
 
 Note: on macOS, you need to remove the quarantine flag after downloading, as the distribution currently is not signed:
@@ -20,19 +34,13 @@ Note: on macOS, you need to remove the quarantine flag after downloading, as the
 xattr -r -d com.apple.quarantine path /to/kcctl-1.0.0-SNAPSHOT-osx-x86_64/
 ```
 
-We're planning to publish _kcctl_ binaries via [SDKMAN!](https://sdkman.io/) soon, too.
-
-It is recommended to install the bash/zsh completion script _kcctl_completion_:
-
-```shell script
-. kcctl_completion
-```
-
 ## Quickstart
 
 Before you can start using _kcctl_ you need to create a configuration context.
 A configuration context is a set of configuration parameters, grouped
-by a name.
+by a name, describing one particular Kafka Connect environment.
+All subsequent commands will be executed using the currently active context.
+
 To create a configuration context named `local`, with the Kafka Connect cluster URL set to
 `http://localhost:8083`, issue the following command
 
@@ -46,27 +54,6 @@ kcctl config set-context local --cluster http://localhost:8083
 Type `kcctl info` to display some information about the Kafka Connect cluster.
 The command will use the currently active context, `local` in this case, to
 resolve the cluster URL.
-
-## Authentication
-
-If your cluster enforces authentication, you may configure your username and password with the `username` and `password` parameters:
-
-```shell script
-kcctl config set-context local --cluster http://localhost:8083 --username myusername --password mypassword
-```
-
-:exclamation: Note that setting user name and password via CLI may store those credentials in your terminal history. To work around this, you may set the username and password directly in your `.kcctl` file:
-
-```json
-  "currentContext" : "local",
-  "local" : {
-    "cluster" : "http://localhost:8083",
-    "username" : "myusername",
-    "password" : "mypassword"
-  }
-```
-
-Currently, only basic authentication is supported.
 
 ## Usage
 
@@ -94,6 +81,27 @@ Commands:
 ```
 
 Start by running `kcctl config set-context <name> --cluster=<Kafka Connect URI)...` for setting up a configuration context which will be used by any subsequent commands.
+
+## Authentication
+
+If your cluster enforces authentication, you may configure your username and password with the `username` and `password` parameters:
+
+```shell script
+kcctl config set-context local --cluster http://localhost:8083 --username myusername --password mypassword
+```
+
+:exclamation: Note that setting user name and password via CLI may store those credentials in your terminal history. To work around this, you may set the username and password directly in your `.kcctl` file:
+
+```json
+  "currentContext" : "local",
+  "local" : {
+    "cluster" : "http://localhost:8083",
+    "username" : "myusername",
+    "password" : "mypassword"
+  }
+```
+
+Currently, only basic authentication is supported.
 
 ## Development
 
