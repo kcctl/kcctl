@@ -24,7 +24,6 @@ wget https://raw.githubusercontent.com/kcctl/kcctl/main/kcctl_completion
 . kcctl_completion
 ```
 
-
 Alternatively, you can obtain early access binaries from [here](https://github.com/kcctl/kcctl/releases).
 This is a rolling release, new binaries are published upon each commit pushed to the kcctl repository.
 
@@ -34,7 +33,9 @@ Note: on macOS, you need to remove the quarantine flag after downloading, as the
 xattr -r -d com.apple.quarantine path /to/kcctl-1.0.0-SNAPSHOT-osx-x86_64/
 ```
 
-## Quickstart
+## Usage
+
+### Quickstart
 
 Before you can start using _kcctl_ you need to create a configuration context.
 A configuration context is a set of configuration parameters, grouped
@@ -55,7 +56,7 @@ Type `kcctl info` to display some information about the Kafka Connect cluster.
 The command will use the currently active context, `local` in this case, to
 resolve the cluster URL.
 
-## Usage
+### Available Commands
 
 Display the help to learn about using _kcctl_:
 
@@ -80,9 +81,7 @@ Commands:
   help      Displays help information about the specified command
 ```
 
-Start by running `kcctl config set-context <name> --cluster=<Kafka Connect URI)...` for setting up a configuration context which will be used by any subsequent commands.
-
-## Authentication
+### Authentication
 
 If your cluster enforces authentication, you may configure your username and password with the `username` and `password` parameters:
 
@@ -109,7 +108,7 @@ This project uses [Quarkus](https://quarkus.io/), the Supersonic Subatomic Java 
 
 To build the project, make sure to have Java 17 and GraalVM 21.3 or newer installed.
 
-### Running the application in dev mode
+### Running the Application in Dev Mode
 
 You can run your application in dev mode that enables live coding using:
 
@@ -126,7 +125,7 @@ To seed the command line arguments, pass the `-Dquarkus.args` option:
 In dev mode, remote debuggers can connect to the running application on port 5005.
 In order to wait for a debugger to connect, pass the `-Dsuspend` option.
 
-### Packaging and running the application
+### Packaging and Running the Application
 
 The application can be packaged using:
 
@@ -144,7 +143,7 @@ You should define an alias _kcctl_:
 alias kcctl="java -jar target/quarkus-app/quarkus-run.jar"
 ```
 
-### Creating a native executable
+### Creating a Native Executable
 
 You can create a native executable using:
 
