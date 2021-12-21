@@ -412,6 +412,10 @@
                   </snapshot>
                 </project>
                 <packagers>
+                  <brew>
+                    <active>RELEASE</active>
+                    <multiPlatform>true</multiPlatform>
+                  </brew>
                   <sdkman>
                     <active>RELEASE</active>
                   </sdkman>
