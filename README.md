@@ -17,6 +17,12 @@ The latest stable release of _kcctl_ (x86) for Linux, macOS, and Windows can be 
 sdk install kcctl
 ```
 
+You may also use [Homebrew](https://brew.sh/) to install _kcctl_ on Linux and macOs, by configuring our tap
+
+```shell script
+brew install kcctl/tap/kcctl
+```
+
 It is recommended to install the bash/zsh completion script _kcctl_completion_:
 
 ```shell script
