@@ -38,7 +38,7 @@ public class UseContextCommand implements Runnable {
             boolean success = context.setCurrentContext(contextName);
 
             if (success) {
-                System.out.println("Using context " + contextName);
+                System.out.println("Using context '" + contextName + "'");
             }
             else {
                 System.out.println("Couldn't change context; create a context named " + contextName + " first");
