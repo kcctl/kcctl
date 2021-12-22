@@ -414,10 +414,12 @@
                 <packagers>
                   <brew>
                     <active>RELEASE</active>
+                    <continueOnError>true</continueOnError>
                     <multiPlatform>true</multiPlatform>
                   </brew>
                   <sdkman>
                     <active>RELEASE</active>
+                    <continueOnError>true</continueOnError>
                   </sdkman>
                 </packagers>
                 <distributions>
