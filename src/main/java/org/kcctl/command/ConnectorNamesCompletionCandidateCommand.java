@@ -24,12 +24,21 @@ import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Spec;
 
 @Command(name = "connector-name-completions", hidden = true)
 public class ConnectorNamesCompletionCandidateCommand implements Runnable {
 
+    private final ConfigurationContext context;
+
+    @Spec
+    private CommandSpec spec;
+
     @Inject
-    ConfigurationContext context;
+    public ConnectorNamesCompletionCandidateCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -38,6 +47,6 @@ public class ConnectorNamesCompletionCandidateCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         List<String> connectors = kafkaConnectApi.getConnectors();
-        System.out.println(String.join(" ", connectors));
+        spec.commandLine().getOut().println(String.join(" ", connectors));
     }
 }
