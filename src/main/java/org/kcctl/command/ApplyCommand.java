@@ -15,6 +15,9 @@
  */
 package org.kcctl.command;
 
+import static org.kcctl.util.Colors.ANSI_RESET;
+import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,16 +37,12 @@ import org.kcctl.util.ConfigurationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
-
-import static org.kcctl.util.Colors.ANSI_RESET;
-import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
+import picocli.CommandLine.Spec;
 
 @Command(name = "apply", description = "Applies the given file or the stdin content for registering or updating a connector")
 public class ApplyCommand implements Callable<Integer> {
-
-    @Inject
-    ConfigurationContext context;
 
     @Option(names = { "-f", "--file" }, description = "Name of the file to apply or '-' to read from stdin", required = true)
     File file;
@@ -54,8 +53,17 @@ public class ApplyCommand implements Callable<Integer> {
     @Option(names = { "--dry-run" }, description = "Only validates the configuration")
     boolean dryRun;
 
+    @Spec
+    CommandSpec spec;
+
     private final static String CONFIG_EXCEPTION = "org.apache.kafka.common.config.ConfigException: ";
+    private final ConfigurationContext context;
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @Inject
+    public ApplyCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -69,7 +77,7 @@ public class ApplyCommand implements Callable<Integer> {
             contents = readFromStdin();
         }
         else if (!file.exists()) {
-            System.out.println("Given file does not exist: " + file.toPath().toAbsolutePath());
+            spec.commandLine().getOut().println("Given file does not exist: " + file.toPath().toAbsolutePath());
             return 1;
         }
         else {
@@ -107,16 +115,16 @@ public class ApplyCommand implements Callable<Integer> {
                 boolean existing = kafkaConnectApi.getConnectors().contains(connectorName);
                 if (!existing) {
                     kafkaConnectApi.createConnector(contents);
-                    System.out.println("Created connector " + connectorName);
+                    spec.commandLine().getOut().println("Created connector " + connectorName);
                 }
                 else {
                     kafkaConnectApi.updateConnector(connectorName, mapper.writeValueAsString(config.get("config")));
-                    System.out.println("Updated connector " + connectorName);
+                    spec.commandLine().getOut().println("Updated connector " + connectorName);
                 }
             }
             else {
                 if (name == null) {
-                    System.out.println("Connector name must be specified either via --name or in the given file");
+                    spec.commandLine().getOut().println("Connector name must be specified either via --name or in the given file");
                     return 1;
                 }
 
@@ -124,24 +132,23 @@ public class ApplyCommand implements Callable<Integer> {
                 kafkaConnectApi.updateConnector(name, contents);
 
                 if (!existing) {
-                    System.out.println("Created connector " + name);
+                    spec.commandLine().getOut().println("Created connector " + name);
                 }
                 else {
-                    System.out.println("Updated connector " + name);
+                    spec.commandLine().getOut().println("Updated connector " + name);
                 }
             }
         }
         catch (KafkaConnectException kce) {
             if (kce.getMessage().startsWith("Failed to find any class that implements Connector")) {
 
-                System.out.println("Specified class isn't a valid connector type. The following connector type(s) are available:");
+                spec.commandLine().getOut().println("Specified class isn't a valid connector type. The following connector type(s) are available:");
 
-                GetPluginsCommand getPlugins = new GetPluginsCommand();
-                getPlugins.context = context;
+                GetPluginsCommand getPlugins = new GetPluginsCommand(context);
                 getPlugins.run();
             }
             else {
-                System.out.println(kce.getMessage());
+                spec.commandLine().getOut().println(kce.getMessage());
             }
 
             return 1;
@@ -157,7 +164,7 @@ public class ApplyCommand implements Callable<Integer> {
                 : (Map) config;
 
         if (!connectorConfigMap.containsKey("connector.class")) {
-            System.out.println("The configuration must contain the 'connector.class' field.");
+            spec.commandLine().getOut().println("The configuration must contain the 'connector.class' field.");
             return 1;
         }
         // In order to start a connector, "name" is not required within "config". However, when validating a
@@ -170,17 +177,17 @@ public class ApplyCommand implements Callable<Integer> {
             ConfigInfos configInfos = kafkaConnectApi.validateConfig(pluginName, mapper.writeValueAsString(connectorConfigMap));
             int errs = configInfos.errorCount;
             if (errs == 0) {
-                System.out.println("The configuration is valid!");
+                spec.commandLine().getOut().println("The configuration is valid!");
             }
             else {
-                System.out.println("The configuration is not valid! Found " + errs + " error" + ((errs != 1) ? "s" : "") + ".");
-                System.out.println(ANSI_WHITE_BOLD + "Errors" + ANSI_RESET);
+                spec.commandLine().getOut().println("The configuration is not valid! Found " + errs + " error" + ((errs != 1) ? "s" : "") + ".");
+                spec.commandLine().getOut().println(ANSI_WHITE_BOLD + "Errors" + ANSI_RESET);
                 for (ConfigInfos.ConfigInfo configInfo : configInfos.configs) {
                     List<String> errors = configInfo.configValue.errors;
                     if (errors != null && !errors.isEmpty()) {
-                        System.out.println("  " + configInfo.configKey.name);
+                        spec.commandLine().getOut().println("  " + configInfo.configKey.name);
                         for (String error : errors) {
-                            System.out.println("    " + error);
+                            spec.commandLine().getOut().println("    " + error);
                         }
                     }
                 }
@@ -189,9 +196,9 @@ public class ApplyCommand implements Callable<Integer> {
         }
         catch (KafkaConnectException kce) {
             if (kce.getMessage().startsWith(CONFIG_EXCEPTION)) {
-                System.out.println("The configuration is not valid! Found 1 error.");
-                System.out.println(ANSI_WHITE_BOLD + "Errors" + ANSI_RESET);
-                System.out.println("  " + kce.getMessage().replace(CONFIG_EXCEPTION, ""));
+                spec.commandLine().getOut().println("The configuration is not valid! Found 1 error.");
+                spec.commandLine().getOut().println(ANSI_WHITE_BOLD + "Errors" + ANSI_RESET);
+                spec.commandLine().getOut().println("  " + kce.getMessage().replace(CONFIG_EXCEPTION, ""));
                 return 1;
             }
             else {
