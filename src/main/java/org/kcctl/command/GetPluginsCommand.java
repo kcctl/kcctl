@@ -16,7 +16,6 @@
 package org.kcctl.command;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,13 +29,21 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "plugins", description = "Displays information about available connector plug-ins")
 public class GetPluginsCommand implements Runnable {
 
+    private final ConfigurationContext context;
+
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
     @Inject
-    ConfigurationContext context;
+    public GetPluginsCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -45,13 +52,13 @@ public class GetPluginsCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         List<ConnectorPlugin> connectorPlugins = kafkaConnectApi.getConnectorPlugins();
-        Collections.sort(connectorPlugins, (c1, c2) -> -c1.type.compareTo(c2.type));
+        connectorPlugins.sort((c1, c2) -> -c1.type.compareTo(c2.type));
 
-        System.out.println();
-        System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
+        spec.commandLine().getOut().println();
+        spec.commandLine().getOut().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
                 new Column().header("TYPE").dataAlign(HorizontalAlign.LEFT).with(plugin -> plugin.type),
                 new Column().header(" CLASS").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.clazz),
                 new Column().header(" VERSION").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.version))));
-        System.out.println();
+        spec.commandLine().getOut().println();
     }
 }
