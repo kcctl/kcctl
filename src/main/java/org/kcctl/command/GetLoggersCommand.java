@@ -41,8 +41,15 @@ import static org.kcctl.util.Colors.ANSI_YELLOW;
 @CommandLine.Command(name = "loggers", description = "Displays information about all configured loggers")
 public class GetLoggersCommand implements Runnable {
 
+    private final ConfigurationContext context;
+
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
     @Inject
-    ConfigurationContext context;
+    public GetLoggersCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -65,14 +72,14 @@ public class GetLoggersCommand implements Runnable {
             }
             i++;
         }
-        System.out.println();
+        spec.commandLine().getOut().println();
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
                 new Column[]{
                         new Column().header("LOGGER").dataAlign(HorizontalAlign.LEFT),
                         new Column().header(" LEVEL").dataAlign(HorizontalAlign.LEFT)
                 },
                 data);
-        System.out.println(table.replace("ERROR", ANSI_RED + "ERROR" + ANSI_RESET)
+        spec.commandLine().getOut().println(table.replace("ERROR", ANSI_RED + "ERROR" + ANSI_RESET)
                 .replace("WARN", ANSI_RED + "WARN" + ANSI_RESET)
                 .replace("FATAL", ANSI_RED + "FATAL" + ANSI_RESET)
                 .replace("DEBUG", ANSI_YELLOW + "DEBUG" + ANSI_RESET)
