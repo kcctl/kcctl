@@ -22,17 +22,25 @@ import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "connector", description = "Pauses the specified connector")
 public class PauseConnectorCommand implements Runnable {
 
-    @Inject
-    ConfigurationContext context;
-
     @Parameters(paramLabel = "NAME", description = "Name of the connector (e.g. 'my-connector')", completionCandidates = ConnectorNameCompletions.class)
     String name;
+
+    @CommandLine.Spec
+    private CommandLine.Model.CommandSpec spec;
+
+    private final ConfigurationContext context;
+
+    @Inject
+    public PauseConnectorCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -41,6 +49,6 @@ public class PauseConnectorCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         kafkaConnectApi.pauseConnector(name);
-        System.out.println("Paused connector " + name);
+        spec.commandLine().getOut().println("Paused connector " + name);
     }
 }
