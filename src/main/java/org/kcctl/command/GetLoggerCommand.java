@@ -18,8 +18,6 @@ package org.kcctl.command;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.LoggerNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
@@ -43,13 +41,19 @@ import static org.kcctl.util.Colors.ANSI_YELLOW;
 @CommandLine.Command(name = "logger", description = "Displays information about a specific logger")
 public class GetLoggerCommand implements Runnable {
 
-    private static final String DEFAULT_PATH = "ALL";
-
-    @Inject
-    ConfigurationContext context;
-
     @Parameters(paramLabel = "LOGGER NAME", description = "Name of the logger", completionCandidates = LoggerNameCompletions.class)
     String path;
+
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
+    private static final String DEFAULT_PATH = "ALL";
+
+    private final ConfigurationContext context;
+
+    public GetLoggerCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -84,14 +88,14 @@ public class GetLoggerCommand implements Runnable {
                     connectorLoggers.findValue("level").textValue()
             };
         }
-        System.out.println();
+        spec.commandLine().getOut().println();
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
                 new Column[]{
                         new Column().header("LOGGER").dataAlign(HorizontalAlign.LEFT),
                         new Column().header(" LEVEL").dataAlign(HorizontalAlign.LEFT)
                 },
                 data);
-        System.out.println(table.replace("ERROR", ANSI_RED + "ERROR" + ANSI_RESET)
+        spec.commandLine().getOut().println(table.replace("ERROR", ANSI_RED + "ERROR" + ANSI_RESET)
                 .replace("WARN", ANSI_RED + "WARN" + ANSI_RESET)
                 .replace("FATAL", ANSI_RED + "FATAL" + ANSI_RESET)
                 .replace("DEBUG", ANSI_YELLOW + "DEBUG" + ANSI_RESET)
