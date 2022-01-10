@@ -22,17 +22,25 @@ import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "delete", description = "Deletes the specified connector")
 public class DeleteConnectorCommand implements Runnable {
 
-    @Inject
-    ConfigurationContext context;
-
     @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
     String name;
+
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
+    private final ConfigurationContext context;
+
+    @Inject
+    public DeleteConnectorCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -41,6 +49,6 @@ public class DeleteConnectorCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         kafkaConnectApi.deleteConnector(name);
-        System.out.println("Deleted connector " + name);
+        spec.commandLine().getOut().println("Deleted connector " + name);
     }
 }
