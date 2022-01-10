@@ -29,6 +29,7 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 import static org.kcctl.util.Colors.ANSI_GREEN;
@@ -38,8 +39,15 @@ import static org.kcctl.util.Colors.ANSI_RESET;
 @Command(name = "connectors", description = "Displays information about deployed connectors")
 public class GetConnectorsCommand implements Runnable {
 
+    private final ConfigurationContext context;
+
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
     @Inject
-    ConfigurationContext context;
+    public GetConnectorsCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -61,7 +69,7 @@ public class GetConnectorsCommand implements Runnable {
             i++;
         }
 
-        System.out.println();
+        spec.commandLine().getOut().println();
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
                 new Column[]{
                         new Column().header("NAME").dataAlign(HorizontalAlign.LEFT),
@@ -71,8 +79,8 @@ public class GetConnectorsCommand implements Runnable {
                 },
                 data);
 
-        System.out.println(table.replace("RUNNING", ANSI_GREEN + "RUNNING" + ANSI_RESET).replace("FAILED", ANSI_RED + "FAILED" + ANSI_RESET));
-        System.out.println();
+        spec.commandLine().getOut().println(table.replace("RUNNING", ANSI_GREEN + "RUNNING" + ANSI_RESET).replace("FAILED", ANSI_RED + "FAILED" + ANSI_RESET));
+        spec.commandLine().getOut().println();
     }
 
     private String toString(List<TaskState> tasks) {
@@ -87,7 +95,7 @@ public class GetConnectorsCommand implements Runnable {
                 sb.append(", ");
             }
 
-            sb.append(taskState.id + ": " + taskState.state);
+            sb.append(taskState.id).append(": ").append(taskState.state);
         }
 
         return sb.toString();
