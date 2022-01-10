@@ -28,12 +28,22 @@ import org.kcctl.util.ConfigurationContext;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
+
+import static picocli.CommandLine.*;
 
 @Command(name = "logger-name-completions", hidden = true)
 public class LoggerNamesCompletionCandidateCommand implements Runnable {
 
+    @Spec
+    private CommandSpec spec;
+
+    private final ConfigurationContext context;
+
     @Inject
-    ConfigurationContext context;
+    public LoggerNamesCompletionCandidateCommand(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -46,6 +56,6 @@ public class LoggerNamesCompletionCandidateCommand implements Runnable {
         List<String> loggers = new ArrayList<>();
         fieldNames.forEachRemaining(loggers::add);
 
-        System.out.println(String.join(" ", loggers));
+        spec.commandLine().getOut().println(String.join(" ", loggers));
     }
 }
