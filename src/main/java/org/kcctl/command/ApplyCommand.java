@@ -15,9 +15,6 @@
  */
 package org.kcctl.command;
 
-import static org.kcctl.util.Colors.ANSI_RESET;
-import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,6 +37,9 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
+
+import static org.kcctl.util.Colors.ANSI_RESET;
+import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 
 @Command(name = "apply", description = "Applies the given file or the stdin content for registering or updating a connector")
 public class ApplyCommand implements Callable<Integer> {

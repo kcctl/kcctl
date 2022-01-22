@@ -19,7 +19,8 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.kcctl.IntegrationTest;
-import org.kcctl.support.*;
+import org.kcctl.support.InjectCommandContext;
+import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import picocli.CommandLine;
@@ -41,7 +42,7 @@ class InfoCommandTest extends IntegrationTest {
                 .map(String::trim)
                 .contains(
                         "URL:               " + kafkaConnect.getTarget(),
-                        "Version:           2.8.1",
-                        "Commit:            839b886f9b732b15");
+                        "Version:           3.0.0",
+                        "Commit:            8cb0a5e9d3441962");
     }
 }
