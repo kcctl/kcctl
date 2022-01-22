@@ -19,15 +19,18 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.kcctl.IntegrationTest;
+import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
 import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @QuarkusTest
+@TestProfile(IntegrationTestProfile.class)
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class InfoCommandTest extends IntegrationTest {
 

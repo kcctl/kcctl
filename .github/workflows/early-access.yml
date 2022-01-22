@@ -65,7 +65,12 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: 'Build Native Image'
-        run: ./mvnw -B --file pom.xml -Pnative package
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            ./mvnw -B --file pom.xml -Pnative package -Dquarkus.test.profile.tags="basic"
+          else
+            ./mvnw -B --file pom.xml -Pnative package
+          fi
 
       - name: 'Create distribution'
         run: ./mvnw -B --file pom.xml -Pdist package -DskipTests

@@ -17,11 +17,13 @@ package org.kcctl.command;
 
 import java.nio.file.Paths;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Test;
 import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
-import org.kcctl.support.*;
+import org.kcctl.support.InjectCommandContext;
+import org.kcctl.support.KcctlCommandContext;
 
 import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
