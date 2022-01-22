@@ -60,6 +60,17 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>io.debezium</groupId>
+        <artifactId>debezium-core</artifactId>
+        <version>1.8.0.Final</version>
+        <type>test-jar</type>
+      </dependency>
+      <dependency>
+        <groupId>io.debezium</groupId>
+        <artifactId>debezium-api</artifactId>
+        <version>1.8.0.Final</version>
+      </dependency>
+      <dependency>
         <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>${quarkus.platform.artifact-id}</artifactId>
         <version>${quarkus.platform.version}</version>
@@ -107,13 +118,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>io.debezium</groupId>
-      <artifactId>debezium-core</artifactId>
-      <version>1.8.0.Final</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>io.debezium</groupId>
       <artifactId>debezium-testing-testcontainers</artifactId>
@@ -178,7 +182,7 @@
             <groups>java.,javax.,org.,com.</groups>
             <removeUnused>true</removeUnused>
             <staticAfter>true</staticAfter>
-            <compliance>17</compliance>
+            <compliance>${java.version}</compliance>
             <!-- <staticGroups>java.,javax.,org.w3c.,org.xml.,junit.</staticGroups> -->
           </configuration>
         </plugin>

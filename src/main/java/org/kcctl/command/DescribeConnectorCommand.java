@@ -36,6 +36,7 @@ import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Tuple;
 import org.kcctl.util.Version;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -48,6 +49,9 @@ import static org.kcctl.util.Colors.ANSI_YELLOW;
 
 @Command(name = "connector", description = "Displays information about a given connector")
 public class DescribeConnectorCommand implements Callable<Integer> {
+
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
 
     @Inject
     ConfigurationContext context;
@@ -149,10 +153,9 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 throw e;
             }
 
-            System.out.println("Connector " + name + " not found. The following connector(s) are available:");
+            spec.commandLine().getOut().println("Connector " + name + " not found. The following connector(s) are available:");
 
-            GetConnectorsCommand getConnectors = new GetConnectorsCommand();
-            getConnectors.context = context;
+            GetConnectorsCommand getConnectors = new GetConnectorsCommand(context);
             getConnectors.run();
 
             return 1;

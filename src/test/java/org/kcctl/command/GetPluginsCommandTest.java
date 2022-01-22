@@ -42,17 +42,17 @@ class GetPluginsCommandTest extends IntegrationTest {
                 .map(String::trim)
                 .containsExactly(
                         "TYPE     CLASS                                                       VERSION",
-                        "source   io.debezium.connector.db2.Db2Connector                      1.7.1.Final",
-                        "source   io.debezium.connector.mongodb.MongoDbConnector              1.7.1.Final",
-                        "source   io.debezium.connector.mysql.MySqlConnector                  1.7.1.Final",
-                        "source   io.debezium.connector.oracle.OracleConnector                1.7.1.Final",
-                        "source   io.debezium.connector.postgresql.PostgresConnector          1.7.1.Final",
-                        "source   io.debezium.connector.sqlserver.SqlServerConnector          1.7.1.Final",
-                        "source   io.debezium.connector.vitess.VitessConnector                1.7.1.Final",
-                        "source   org.apache.kafka.connect.file.FileStreamSourceConnector     2.8.1",
+                        "source   io.debezium.connector.db2.Db2Connector                      1.8.0.Final",
+                        "source   io.debezium.connector.mongodb.MongoDbConnector              1.8.0.Final",
+                        "source   io.debezium.connector.mysql.MySqlConnector                  1.8.0.Final",
+                        "source   io.debezium.connector.oracle.OracleConnector                1.8.0.Final",
+                        "source   io.debezium.connector.postgresql.PostgresConnector          1.8.0.Final",
+                        "source   io.debezium.connector.sqlserver.SqlServerConnector          1.8.0.Final",
+                        "source   io.debezium.connector.vitess.VitessConnector                1.8.0.Final",
+                        "source   org.apache.kafka.connect.file.FileStreamSourceConnector     3.0.0",
                         "source   org.apache.kafka.connect.mirror.MirrorCheckpointConnector   1",
                         "source   org.apache.kafka.connect.mirror.MirrorHeartbeatConnector    1",
                         "source   org.apache.kafka.connect.mirror.MirrorSourceConnector       1",
-                        "sink     org.apache.kafka.connect.file.FileStreamSinkConnector       2.8.1");
+                        "sink     org.apache.kafka.connect.file.FileStreamSinkConnector       3.0.0");
     }
 }
