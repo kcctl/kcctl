@@ -113,6 +113,19 @@ Currently, only basic authentication is supported.
 This project uses [Quarkus](https://quarkus.io/), the Supersonic Subatomic Java Framework.
 
 To build the project, make sure to have Java 17 and GraalVM 21.3 or newer installed.
+Docker must be installed in order to execute the integration tests (via Testcontainers).
+The following build commands are commonly used:
+
+```shell script
+# Build and run all the tests
+./mvnw clean verify
+
+# Build and skip integration tests
+./mvnw clean verify -Dquarkus.test.profile.tags="basic"
+
+# Format sources
+./mvnw process-sources
+```
 
 ### Running the Application in Dev Mode
 
