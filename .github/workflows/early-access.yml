@@ -64,13 +64,13 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: 'Build Native Image'
-        run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            ./mvnw -B --file pom.xml -Pnative package -Dquarkus.test.profile.tags="basic"
-          else
-            ./mvnw -B --file pom.xml -Pnative package
-          fi
+      - name: 'Build Native Image (Linux, Windows)'
+        if: ${{ runner.os == 'Linux' || runner.os == 'Windows' }}
+        run: ./mvnw -B --file pom.xml -Pnative package
+
+      - name: 'Build Native Image (macOS)'
+        if: ${{ runner.os == 'macOS' }}
+        run: ./mvnw -B --file pom.xml -Pnative package -Dquarkus.test.profile.tags="basic"
 
       - name: 'Create distribution'
         run: ./mvnw -B --file pom.xml -Pdist package -DskipTests
