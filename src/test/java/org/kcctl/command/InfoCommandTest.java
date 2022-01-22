@@ -15,39 +15,33 @@
  */
 package org.kcctl.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.kcctl.IntegrationTest;
+import org.kcctl.support.*;
+
+import io.quarkus.test.junit.QuarkusTest;
 import picocli.CommandLine;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @QuarkusTest
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class InfoCommandTest extends IntegrationTest {
 
-    InfoCommand infoCommand;
-
-    @BeforeEach
-    public void setup() {
-        infoCommand = new InfoCommand(configurationContext);
-    }
+    @InjectCommandContext
+    KcctlCommandContext<InfoCommand> context;
 
     @Test
     public void should_print_info() {
-        CommandLine commandLine = new CommandLine(infoCommand);
-
-        StringWriter output = new StringWriter();
-        commandLine.setOut(new PrintWriter(output));
-
-        int exitCode = commandLine.execute();
+        int exitCode = context.commandLine().execute();
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(output.toString()).contains("Version:           2.8.1");
+        assertThat(context.output().toString().trim().lines())
+                .map(String::trim)
+                .contains(
+                        "URL:               " + kafkaConnect.getTarget(),
+                        "Version:           2.8.1",
+                        "Commit:            839b886f9b732b15");
     }
 }

@@ -110,18 +110,37 @@
     <dependency>
       <groupId>io.debezium</groupId>
       <artifactId>debezium-core</artifactId>
-      <version>1.6.1.Final</version>
+      <version>1.8.0.Final</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.debezium</groupId>
       <artifactId>debezium-testing-testcontainers</artifactId>
-      <version>1.6.1.Final</version>
+      <version>1.8.0.Final</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>kafka</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.9.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp-urlconnection</artifactId>
+      <version>4.9.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okio</groupId>
+      <artifactId>okio</artifactId>
+      <version>2.8.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -159,6 +178,7 @@
             <groups>java.,javax.,org.,com.</groups>
             <removeUnused>true</removeUnused>
             <staticAfter>true</staticAfter>
+            <compliance>17</compliance>
             <!-- <staticGroups>java.,javax.,org.w3c.,org.xml.,junit.</staticGroups> -->
           </configuration>
         </plugin>
