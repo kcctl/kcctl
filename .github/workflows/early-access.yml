@@ -70,7 +70,7 @@ jobs:
 
       - name: 'Build Native Image (macOS, Windows)'
         if: ${{ runner.os == 'macOS' || runner.os == 'Windows' }}
-        run: ./mvnw -B --file pom.xml -Pnative -Dquarkus.test.profile.tags=basic package
+        run: ./mvnw -B --file pom.xml -Pnative package "-Dquarkus.test.profile.tags=basic"
 
       - name: 'Create distribution'
         run: ./mvnw -B --file pom.xml -Pdist package -DskipTests
