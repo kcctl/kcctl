@@ -22,25 +22,51 @@ import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "connector", description = "Restarts the specified connector")
 public class RestartConnectorCommand implements Runnable {
 
-    @Inject
-    ConfigurationContext context;
-
     @Parameters(paramLabel = "NAME", description = "Name of the connector (e.g. 'my-connector')", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
+    @CommandLine.Option(names = { "-t", "--tasks" }, description = "Restart tasks either all or just failed")
+    String withTasks;
+
+    @CommandLine.Spec
+    private CommandLine.Model.CommandSpec spec;
+
+    private final ConfigurationContext context;
+
+    @Inject
+    public RestartConnectorCommand(ConfigurationContext context) {
+        this.context = context;
+    }
+
     @Override
     public void run() {
+        String withTasksMessage = "";
+        String includeTasks = "false";
+        String onlyFailed = "false";
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        kafkaConnectApi.restartConnector(name);
-        System.out.println("Restarted connector " + name);
+        if (withTasks != null) {
+            withTasksMessage = String.format(" with %s tasks", withTasks);
+            includeTasks = "true";
+            onlyFailed = withTasks.equals("failed") ? "true" : "false";
+        }
+
+        try {
+            kafkaConnectApi.restartConnector(name, includeTasks, onlyFailed);
+            spec.commandLine().getOut().println("Restarted connector " + name + withTasksMessage);
+        }
+        catch (Exception exception) {
+            spec.commandLine().getOut().println(exception.getMessage());
+        }
+
     }
 }

@@ -18,12 +18,7 @@ package org.kcctl.service;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
@@ -63,6 +58,10 @@ public interface KafkaConnectApi {
     @POST
     @Path("/connectors/{name}/restart")
     void restartConnector(@PathParam("name") String name);
+
+    @POST
+    @Path("/connectors/{name}/restart")
+    void restartConnector(@PathParam("name") String name, @QueryParam("includeTasks") String includeTasks, @QueryParam("onlyFailed") String onlyFailed);
 
     @PUT
     @Path("/connectors/{name}/pause")
