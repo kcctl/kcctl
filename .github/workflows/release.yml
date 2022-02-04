@@ -77,11 +77,10 @@ jobs:
   # Build native executable per runner
   build:
     needs: [ version ]
-    name: 'Build with Graal ${{ matrix.version }} on ${{ matrix.os }}'
+    name: 'Build with Graal on ${{ matrix.os }}'
     strategy:
       fail-fast: true
       matrix:
-        version: ['21.3.0', '21.3.0', '21.3.0']
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
 
@@ -106,7 +105,7 @@ jobs:
 
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: ${{ matrix.version }}
+          version: '21.3.0'
           java-version: '17'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
