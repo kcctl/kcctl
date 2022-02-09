@@ -32,8 +32,8 @@ public class RestartConnectorCommand implements Runnable {
     @Parameters(paramLabel = "NAME", description = "Name of the connector (e.g. 'my-connector')", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
-    @CommandLine.Option(names = { "-t", "--tasks" }, description = "Restart tasks either all or just failed")
-    String withTasks;
+    @CommandLine.Option(names = { "-wt", "--withTasks" }, description = "Restart tasks either all or just failed")
+    WithTasks withTasks;
 
     @CommandLine.Spec
     private CommandLine.Model.CommandSpec spec;
@@ -57,7 +57,7 @@ public class RestartConnectorCommand implements Runnable {
         if (withTasks != null) {
             withTasksMessage = String.format(" with %s tasks", withTasks);
             includeTasks = "true";
-            onlyFailed = withTasks.equals("failed") ? "true" : "false";
+            onlyFailed = withTasks.equals(WithTasks.FAILED) ? "true" : "false";
         }
 
         try {
@@ -68,5 +68,10 @@ public class RestartConnectorCommand implements Runnable {
             spec.commandLine().getOut().println(exception.getMessage());
         }
 
+    }
+
+    public enum WithTasks {
+        ALL,
+        FAILED
     }
 }
