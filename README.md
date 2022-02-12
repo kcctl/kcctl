@@ -184,7 +184,7 @@ java -cp "target/quarkus-app/app/*:target/quarkus-app/lib/main/*:target/quarkus-
   picocli.AutoComplete -n kcctl --force org.kcctl.command.KcCtlCommand
 ```
 
-Edit the completion script _kcctl_completion_, replace all the quotes around generated completion invocations with back ticks, making them actual invocations of _kcctl_::
+Edit the completion script _kcctl\_completion_, replace all the quotes around generated completion invocations with back ticks, making them actual invocations of _kcctl_:
 
 ```shell script
 --- local CONNECTOR_NAME_pos_param_args="kcctl connector-name-completions" # 0-0 values
