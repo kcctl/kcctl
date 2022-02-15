@@ -32,7 +32,7 @@ public class RestartConnectorCommand implements Runnable {
     @Parameters(paramLabel = "NAME", description = "Name of the connector (e.g. 'my-connector')", completionCandidates = ConnectorNameCompletions.class)
     String name;
 
-    @CommandLine.Option(names = { "-wt", "--withTasks" }, description = "Restart tasks either all or just failed")
+    @CommandLine.Option(names = { "-wt", "--with-tasks" }, description = "Also restart tasks; either ALL or FAILED")
     WithTasks withTasks;
 
     @CommandLine.Spec
