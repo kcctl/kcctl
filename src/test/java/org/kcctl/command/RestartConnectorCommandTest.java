@@ -52,7 +52,7 @@ class RestartConnectorCommandTest extends IntegrationTest {
     public void should_restart_connector_with_all_tasks() {
         registerTestConnector("test1");
 
-        int exitCode = context.commandLine().execute("test1", "--withTasks=ALL");
+        int exitCode = context.commandLine().execute("test1", "--with-tasks=ALL");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString().trim()).isEqualTo("Restarted connector test1 with ALL tasks");
     }
@@ -61,7 +61,7 @@ class RestartConnectorCommandTest extends IntegrationTest {
     public void should_restart_connector_with_faild_tasks() {
         registerTestConnector("test1");
 
-        int exitCode = context.commandLine().execute("test1", "--withTasks=FAILED");
+        int exitCode = context.commandLine().execute("test1", "--with-tasks=FAILED");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString().trim()).isEqualTo("Restarted connector test1 with FAILED tasks");
     }
