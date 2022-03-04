@@ -15,6 +15,7 @@
  */
 package org.kcctl.command;
 
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
@@ -25,16 +26,19 @@ import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.KafkaConnectException;
 import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Connectors;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "delete", description = "Deletes the specified connector")
+@Command(name = "delete", description = "Deletes specified connectors")
 public class DeleteConnectorCommand implements Callable<Integer> {
+    @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use CONNECTOR NAME(s) as regexp pattern(s) to apply on all connectors")
+    boolean regexpMode = false;
 
     @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
-    String name;
+    Set<String> names = Set.of();
 
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
@@ -46,6 +50,11 @@ public class DeleteConnectorCommand implements Callable<Integer> {
         this.context = context;
     }
 
+    // Hack : Picocli currently require an empty constructor to generate the completion file
+    public DeleteConnectorCommand() {
+        context = new ConfigurationContext();
+    }
+
     @Override
     public Integer call() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
@@ -53,7 +62,11 @@ public class DeleteConnectorCommand implements Callable<Integer> {
                 .build(KafkaConnectApi.class);
 
         try {
-            kafkaConnectApi.deleteConnector(name);
+            Set<String> selectedConnector = Connectors.getSelectedConnectors(kafkaConnectApi, names, regexpMode);
+            for (String connectorToDelete : selectedConnector) {
+                kafkaConnectApi.deleteConnector(connectorToDelete);
+                spec.commandLine().getOut().println("Deleted connector " + connectorToDelete);
+            }
         }
         catch (KafkaConnectException kce) {
             if (kce.getErrorCode() == HttpStatus.SC_NOT_FOUND) {
@@ -64,8 +77,6 @@ public class DeleteConnectorCommand implements Callable<Integer> {
             }
             return 1;
         }
-
-        spec.commandLine().getOut().println("Deleted connector " + name);
 
         return 0;
     }

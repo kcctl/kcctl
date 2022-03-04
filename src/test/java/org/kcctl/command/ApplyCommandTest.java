@@ -15,6 +15,10 @@
  */
 package org.kcctl.command;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -41,9 +45,28 @@ class ApplyCommandTest extends IntegrationTest {
     KcctlCommandContext<ApplyCommand> context;
 
     @Test
-    public void should_create_connector() {
+    public void should_create_two_connectors() {
         var path = Paths.get("src", "test", "resources", "local-file-source.json");
-        int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
+        var path2 = Paths.get("src", "test", "resources", "local-file-source-2.json");
+        int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString(), "-f", path2.toAbsolutePath().toString());
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString()).contains("Created connector local-file-source", "Created connector local-file-source-2");
+
+        kafkaConnect.ensureConnectorRegistered("local-file-source");
+        kafkaConnect.ensureConnectorRegistered("local-file-source-2");
+        kafkaConnect.ensureConnectorState("local-file-source", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("local-file-source-2", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("local-file-source", 0, Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("local-file-source-2", 0, Connector.State.RUNNING);
+    }
+
+    @Test
+    public void should_create_connector_from_stdin() throws IOException {
+        var path = Paths.get("src", "test", "resources", "local-file-source.json");
+        InputStream fakeIn = new ByteArrayInputStream(Files.readAllBytes(path));
+        System.setIn(fakeIn);
+
+        int exitCode = context.commandLine().execute("-f", "-");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString().trim()).isEqualTo("Created connector local-file-source");
 
@@ -71,4 +94,33 @@ class ApplyCommandTest extends IntegrationTest {
         kafkaConnect.ensureConnectorState("local-file-source", Connector.State.RUNNING);
         kafkaConnect.ensureConnectorTaskState("local-file-source", 0, Connector.State.RUNNING);
     }
+
+    @Test
+    public void do_not_allow_n_with_multiple_f() {
+        int exitCode = context.commandLine().execute("-f", "test", "-f", "test2", "-n", "test name");
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.USAGE);
+    }
+
+    @Test
+    public void dont_apply_if_files_wrong() {
+        var path = Paths.get("src", "test", "resources", "local-file-source.json");
+        var wrongPath = Paths.get("src", "test", "resources", "dont_exists.json");
+
+        int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString(), "-f", wrongPath.toAbsolutePath().toString());
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.USAGE);
+        assertThat(context.output().toString()).doesNotContain("Created connector");
+    }
+
+    @Test
+    public void fail_on_first_error() {
+        var pathBad = Paths.get("src", "test", "resources", "local-file-source-bad.json");
+        var path = Paths.get("src", "test", "resources", "local-file-source.json");
+
+        int exitCode = context.commandLine().execute("-f", pathBad.toAbsolutePath().toString(), "-f", path.toAbsolutePath().toString());
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
+        assertThat(context.output().toString()).doesNotContain("Created connector");
+    }
+
 }

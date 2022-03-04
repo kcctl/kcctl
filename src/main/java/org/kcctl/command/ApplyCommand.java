@@ -16,11 +16,8 @@
 package org.kcctl.command;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
@@ -31,8 +28,10 @@ import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.KafkaConnectException;
 import org.kcctl.util.ConfigurationContext;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
@@ -41,11 +40,26 @@ import picocli.CommandLine.Spec;
 import static org.kcctl.util.Colors.ANSI_RESET;
 import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 
-@Command(name = "apply", description = "Applies the given file or the stdin content for registering or updating a connector")
+@Command(name = "apply", description = "Applies the given files or the stdin content for registering or updating connectors")
 public class ApplyCommand implements Callable<Integer> {
+    private record ApplyConnector(String contents, Map<String, Object> config) {
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        public Map<String, String> configMap() {
+            return config.containsKey("config") ? (Map) config.get("config") : (Map) config;
+        }
+        String name() {
+            return (String) config.get("name");
+        }
+        boolean isNamed() {
+            return config.containsKey("name") && config.containsKey("config");
+        }
+    }
 
-    @Option(names = { "-f", "--file" }, description = "Name of the file to apply or '-' to read from stdin", required = true)
-    File file;
+    // Hack : workaround. Should be `List<ApplyConnector>` instead of List.
+    // But Graalvm seems to have difficulty building a native binary with ApplyConnector type record in class fields
+    @Option(names = { "-f",
+            "--file" }, description = "Name of the file to apply or '-' to read from stdin. You can specify -f multiple times, if the connector names are in the files", required = true, converter = ApplyConnectorConverter.class)
+    List applyConnectors;
 
     @Option(names = { "-n", "--name" }, description = "Name of the connector when not given within the file itself")
     String name;
@@ -56,69 +70,107 @@ public class ApplyCommand implements Callable<Integer> {
     @Spec
     CommandSpec spec;
 
+    private static final ObjectMapper mapper = new ObjectMapper();
     private final static String CONFIG_EXCEPTION = "org.apache.kafka.common.config.ConfigException: ";
     private final ConfigurationContext context;
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @Inject
     public ApplyCommand(ConfigurationContext context) {
         this.context = context;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Integer call() throws Exception {
-        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCurrentContext().getCluster())
-                .build(KafkaConnectApi.class);
-
-        String contents;
-        if (file.getName().equals("-")) {
-            contents = readFromStdin();
-        }
-        else if (!file.exists()) {
-            spec.commandLine().getOut().println("Given file does not exist: " + file.toPath().toAbsolutePath());
-            return 1;
-        }
-        else {
-            try {
-                contents = Files.readString(file.toPath());
-            }
-            catch (IOException e) {
-                throw new RuntimeException("Couldn't read file", e);
-            }
-        }
-
-        Map<String, Object> config = mapper.readValue(contents, Map.class);
-
-        if (dryRun) {
-            return validateConfigs(kafkaConnectApi, config);
-        }
-        else {
-            return createOrUpdateConnector(kafkaConnectApi, contents, config);
-        }
+    // Hack : Picocli currently require an empty constructor to generate the completion file
+    public ApplyCommand() {
+        context = new ConfigurationContext();
     }
 
-    private String readFromStdin() {
+    private static String readFromStdin() {
         Scanner sc = new Scanner(System.in);
         StringBuilder buffer = new StringBuilder();
         while (sc.hasNextLine())
             buffer.append(sc.nextLine());
         sc.close();
+
         return buffer.toString();
     }
 
-    private int createOrUpdateConnector(KafkaConnectApi kafkaConnectApi, String contents, Map<String, Object> config) throws Exception {
+    static class ApplyConnectorConverter implements CommandLine.ITypeConverter<ApplyConnector> {
+        @SuppressWarnings("unchecked")
+        public ApplyConnector convert(String filename) {
+            File file = new File(filename);
+            String contents;
+            Map<String, Object> config;
+            if (file.getName().equals("-")) {
+                contents = readFromStdin();
+            }
+            else if (!file.exists()) {
+                throw new CommandLine.TypeConversionException("Given file does not exist: " + file.toPath().toAbsolutePath());
+            }
+            else {
+                try {
+                    contents = Files.readString(file.toPath());
+                }
+                catch (Exception e) {
+                    throw new RuntimeException("Couldn't read file", e);
+                }
+            }
+
+            try {
+                config = mapper.readValue(contents, Map.class);
+            }
+            catch (JsonProcessingException e) {
+                throw new RuntimeException("Can't parse Json content", e);
+            }
+
+            return new ApplyConnector(contents, config);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Integer call() throws Exception {
+
+        validate();
+
+        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
+                .baseUri(context.getCurrentContext().getCluster())
+                .build(KafkaConnectApi.class);
+
+        for (ApplyConnector applyConnector : (List<ApplyConnector>) applyConnectors) {
+            int returnCode = applyOrValidateConnector(kafkaConnectApi, applyConnector);
+            if (returnCode > 0)
+                return returnCode;
+        }
+
+        return 0;
+    }
+
+    private void validate() {
+        if (applyConnectors.size() > 1 && name != null)
+            throw new CommandLine.ParameterException(spec.commandLine(),
+                    "It is not possible to use -n when -f is given multiple times. Please provide the connector names in the connector configuration files.");
+    }
+
+    private int applyOrValidateConnector(KafkaConnectApi kafkaConnectApi, ApplyConnector applyConnector) throws Exception {
+        if (dryRun) {
+            return validateConfigs(kafkaConnectApi, applyConnector);
+        }
+        else {
+            return createOrUpdateConnector(kafkaConnectApi, applyConnector);
+        }
+    }
+
+    private int createOrUpdateConnector(KafkaConnectApi kafkaConnectApi, ApplyConnector applyConnector) throws Exception {
         try {
-            if (config.containsKey("name") && config.containsKey("config")) {
-                String connectorName = (String) config.get("name");
+            if (applyConnector.isNamed()) {
+                String connectorName = applyConnector.name();
                 boolean existing = kafkaConnectApi.getConnectors().contains(connectorName);
                 if (!existing) {
-                    kafkaConnectApi.createConnector(contents);
+                    kafkaConnectApi.createConnector(applyConnector.contents);
                     spec.commandLine().getOut().println("Created connector " + connectorName);
                 }
                 else {
-                    kafkaConnectApi.updateConnector(connectorName, mapper.writeValueAsString(config.get("config")));
+                    kafkaConnectApi.updateConnector(connectorName, mapper.writeValueAsString(applyConnector.configMap()));
                     spec.commandLine().getOut().println("Updated connector " + connectorName);
                 }
             }
@@ -129,7 +181,7 @@ public class ApplyCommand implements Callable<Integer> {
                 }
 
                 boolean existing = kafkaConnectApi.getConnectors().contains(name);
-                kafkaConnectApi.updateConnector(name, contents);
+                kafkaConnectApi.updateConnector(name, applyConnector.contents);
 
                 if (!existing) {
                     spec.commandLine().getOut().println("Created connector " + name);
@@ -157,11 +209,8 @@ public class ApplyCommand implements Callable<Integer> {
         return 0;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private int validateConfigs(KafkaConnectApi kafkaConnectApi, Map<String, Object> config) throws Exception {
-        Map<String, String> connectorConfigMap = (config.containsKey("config"))
-                ? (Map) config.get("config")
-                : (Map) config;
+    private int validateConfigs(KafkaConnectApi kafkaConnectApi, ApplyConnector applyConnector) throws Exception {
+        Map<String, String> connectorConfigMap = applyConnector.configMap();
 
         if (!connectorConfigMap.containsKey("connector.class")) {
             spec.commandLine().getOut().println("The configuration must contain the 'connector.class' field.");

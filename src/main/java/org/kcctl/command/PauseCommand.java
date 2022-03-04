@@ -17,6 +17,6 @@ package org.kcctl.command;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "pause", subcommands = { PauseConnectorCommand.class }, description = "Pauses a connector")
+@Command(name = "pause", subcommands = { PauseConnectorCommand.class }, description = "Pauses connectors")
 public class PauseCommand {
 }

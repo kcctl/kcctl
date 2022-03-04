@@ -15,11 +15,7 @@
  */
 package org.kcctl.command;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
@@ -33,6 +29,7 @@ import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.TaskState;
 import org.kcctl.service.TopicsInfo;
 import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Connectors;
 import org.kcctl.util.Tuple;
 import org.kcctl.util.Version;
 
@@ -47,20 +44,32 @@ import static org.kcctl.util.Colors.ANSI_RESET;
 import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 import static org.kcctl.util.Colors.ANSI_YELLOW;
 
-@Command(name = "connector", description = "Displays information about a given connector")
+@Command(name = "connector", aliases = "connectors", description = "Displays information about given connectors")
 public class DescribeConnectorCommand implements Callable<Integer> {
 
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 
-    @Inject
-    ConfigurationContext context;
-
     @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
-    String name;
+    Set<String> names = Set.of();
+
+    @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use CONNECTOR NAME(s) as regexp pattern(s) to use on all connectors")
+    boolean regexpMode = false;
 
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
     boolean includeTasksConfig;
+
+    private final ConfigurationContext context;
+
+    @Inject
+    public DescribeConnectorCommand(ConfigurationContext context) {
+        this.context = context;
+    }
+
+    // Hack : Picocli currently require an empty constructor to generate the completion file
+    public DescribeConnectorCommand() {
+        context = new ConfigurationContext();
+    }
 
     private final Version requiredVersionForTasksConfig = new Version(2, 8);
     private final Version requiredVersionForTopicsApi = new Version(2, 5);
@@ -80,10 +89,21 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             }
         }
 
+        Set<String> selectedConnector = Connectors.getSelectedConnectors(kafkaConnectApi, names, regexpMode);
+        for (String connectorToDescribe : selectedConnector) {
+            int returnCode = describe(kafkaConnectApi, connectorToDescribe, currentVersion);
+            if (returnCode > 0)
+                return returnCode;
+        }
+
+        return 0;
+    }
+
+    private int describe(KafkaConnectApi kafkaConnectApi, String connectorToDescribe, Version currentVersion) {
         try {
-            ConnectorInfo connector = kafkaConnectApi.getConnector(name);
-            ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
-            Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(name);
+            ConnectorInfo connector = kafkaConnectApi.getConnector(connectorToDescribe);
+            ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(connectorToDescribe);
+            Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(connectorToDescribe);
 
             List<Tuple> connectorInfo = Arrays.asList(
                     new Tuple("Name", connector.name),
@@ -107,7 +127,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
             Map<String, Map<String, String>> tasksConfigs;
             if (includeTasksConfig) {
-                tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(name);
+                tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(connectorToDescribe);
             }
             else {
                 tasksConfigs = Collections.emptyMap();
@@ -123,7 +143,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 if (includeTasksConfig) {
                     tuples.add(new Tuple("    Config", ""));
 
-                    for (Entry<String, String> taskConfig : tasksConfigs.get(name + "-" + task.id).entrySet()) {
+                    for (Entry<String, String> taskConfig : tasksConfigs.get(connectorToDescribe + "-" + task.id).entrySet()) {
                         tuples.add(new Tuple("      " + taskConfig.getKey(), taskConfig.getValue()));
                     }
                 }
@@ -136,7 +156,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
             if (currentVersion.greaterOrEquals(requiredVersionForTopicsApi)) {
 
-                Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(name);
+                Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(connectorToDescribe);
 
                 Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
 
@@ -153,7 +173,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 throw e;
             }
 
-            spec.commandLine().getOut().println("Connector " + name + " not found. The following connector(s) are available:");
+            spec.commandLine().getOut().println("Connector " + connectorToDescribe + " not found. The following connector(s) are available:");
 
             GetConnectorsCommand getConnectors = new GetConnectorsCommand(context);
             getConnectors.run();

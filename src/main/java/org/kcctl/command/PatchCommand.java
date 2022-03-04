@@ -17,6 +17,7 @@ package org.kcctl.command;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "patch", subcommands = { PatchLogLevelCommand.class, PatchConnectorCommand.class }, description = "Modifies the configuration of a connector or logger")
+@Command(name = "patch", subcommands = { PatchLogLevelCommand.class,
+        PatchConnectorCommand.class }, description = "Modifies the configuration of some connectors or a logger")
 public class PatchCommand {
 }

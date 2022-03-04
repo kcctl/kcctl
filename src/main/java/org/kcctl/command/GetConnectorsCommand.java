@@ -49,6 +49,11 @@ public class GetConnectorsCommand implements Runnable {
         this.context = context;
     }
 
+    // Hack : Picocli currently require an empty constructor to generate the completion file
+    public GetConnectorsCommand() {
+        context = new ConfigurationContext();
+    }
+
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()

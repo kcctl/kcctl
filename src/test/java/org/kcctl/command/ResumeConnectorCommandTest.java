@@ -23,6 +23,7 @@ import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 
+import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import picocli.CommandLine;
@@ -32,25 +33,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 @QuarkusTest
 @TestProfile(IntegrationTestProfile.class)
 @DisplayNameGeneration(ReplaceUnderscores.class)
-class DeleteConnectorCommandTest extends IntegrationTest {
+class ResumeConnectorCommandTest extends IntegrationTest {
 
     @InjectCommandContext
-    KcctlCommandContext<DeleteConnectorCommand> context;
+    KcctlCommandContext<ResumeConnectorCommand> context;
 
     @Test
-    public void should_delete_connector() {
+    public void should_resume_connector() {
         registerTestConnector("test1");
         registerTestConnector("test2");
         registerTestConnector("test3");
 
         int exitCode = context.commandLine().execute("test1", "test2");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString()).contains("Deleted connector test1", "Deleted connector test2");
-        assertThat(context.output().toString()).doesNotContain("Deleted connector test3");
+        assertThat(context.output().toString()).contains("Resumed connector test1", "Resumed connector test2");
+        assertThat(context.output().toString()).doesNotContain("Resumed connector test3");
+
+        kafkaConnect.ensureConnectorState("test1", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("test2", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("test3", Connector.State.RUNNING);
     }
 
     @Test
-    public void should_delete_connector_with_regexp() {
+    public void should_resume_connector_with_regexp() {
         registerTestConnector("match-1-test");
         registerTestConnector("match-2-test");
         registerTestConnector("nomatch-3-test");
@@ -58,22 +63,28 @@ class DeleteConnectorCommandTest extends IntegrationTest {
         int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test");
 
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString()).contains("Deleted connector match-1-test", "Deleted connector match-2-test");
-        assertThat(context.output().toString()).doesNotContain("Deleted connector nomatch-3-test");
+        assertThat(context.output().toString()).contains("Resumed connector match-1-test", "Resumed connector match-2-test");
+        assertThat(context.output().toString()).doesNotContain("Resumed connector nomatch-3-test");
+
+        kafkaConnect.ensureConnectorState("match-1-test", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("match-2-test", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("nomatch-3-test", Connector.State.RUNNING);
     }
 
     @Test
-    public void should_delete_only_once() {
+    public void should_resume_only_once() {
         registerTestConnector("test1");
 
         int exitCode = context.commandLine().execute("test1", "test1", "test1");
 
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString()).containsOnlyOnce("Deleted connector test1");
+        assertThat(context.output().toString()).containsOnlyOnce("Resumed connector test1");
+
+        kafkaConnect.ensureConnectorState("test1", Connector.State.RUNNING);
     }
 
     @Test
-    public void should_delete_only_once_with_regexp() {
+    public void should_resume_only_once_with_regexp() {
         registerTestConnector("match-1-test");
         registerTestConnector("match-2-test");
         registerTestConnector("nomatch-3-test");
@@ -81,8 +92,12 @@ class DeleteConnectorCommandTest extends IntegrationTest {
         int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
 
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString()).containsOnlyOnce("Deleted connector match-1-test");
-        assertThat(context.output().toString()).containsOnlyOnce("Deleted connector match-2-test");
-        assertThat(context.output().toString()).doesNotContain("Deleted connector nomatch-3-test");
+        assertThat(context.output().toString()).containsOnlyOnce("Resumed connector match-1-test");
+        assertThat(context.output().toString()).containsOnlyOnce("Resumed connector match-2-test");
+        assertThat(context.output().toString()).doesNotContain("Resumed connector nomatch-3-test");
+
+        kafkaConnect.ensureConnectorState("match-1-test", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("match-2-test", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("nomatch-3-test", Connector.State.RUNNING);
     }
 }
