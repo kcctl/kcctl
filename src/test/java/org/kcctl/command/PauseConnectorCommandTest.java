@@ -42,12 +42,62 @@ class PauseConnectorCommandTest extends IntegrationTest {
     public void should_pause_connector() {
         registerTestConnector("test1");
         registerTestConnector("test2");
+        registerTestConnector("test3");
 
-        int exitCode = context.commandLine().execute("test1");
+        int exitCode = context.commandLine().execute("test1", "test2");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString().trim()).isEqualTo("Paused connector test1");
+        assertThat(context.output().toString()).contains("Paused connector test1", "Paused connector test2");
+        assertThat(context.output().toString()).doesNotContain("Paused connector test3");
 
         kafkaConnect.ensureConnectorState("test1", Connector.State.PAUSED);
-        kafkaConnect.ensureConnectorState("test2", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("test2", Connector.State.PAUSED);
+        kafkaConnect.ensureConnectorState("test3", Connector.State.RUNNING);
+    }
+
+    @Test
+    public void should_pause_connector_with_regexp() {
+        registerTestConnector("match-1-test");
+        registerTestConnector("match-2-test");
+        registerTestConnector("nomatch-3-test");
+
+        int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test");
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString()).contains("Paused connector match-1-test", "Paused connector match-2-test");
+        assertThat(context.output().toString()).doesNotContain("Paused connector nomatch-3-test");
+
+        kafkaConnect.ensureConnectorState("match-1-test", Connector.State.PAUSED);
+        kafkaConnect.ensureConnectorState("match-2-test", Connector.State.PAUSED);
+        kafkaConnect.ensureConnectorState("nomatch-3-test", Connector.State.RUNNING);
+    }
+
+    @Test
+    public void should_pause_only_once() {
+        registerTestConnector("test1");
+
+        int exitCode = context.commandLine().execute("test1", "test1", "test1");
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString()).containsOnlyOnce("Paused connector test1");
+
+        kafkaConnect.ensureConnectorState("test1", Connector.State.PAUSED);
+    }
+
+    @Test
+    public void should_pause_only_once_with_regexp() {
+        registerTestConnector("match-1-test");
+        registerTestConnector("match-2-test");
+        registerTestConnector("nomatch-3-test");
+
+        int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString()).containsOnlyOnce("Paused connector match-1-test");
+        assertThat(context.output().toString()).containsOnlyOnce("Paused connector match-2-test");
+        assertThat(context.output().toString()).doesNotContain("Paused connector nomatch-3-test");
+
+        kafkaConnect.ensureConnectorState("match-1-test", Connector.State.PAUSED);
+        kafkaConnect.ensureConnectorState("match-2-test", Connector.State.PAUSED);
+        kafkaConnect.ensureConnectorState("nomatch-3-test", Connector.State.RUNNING);
     }
 }

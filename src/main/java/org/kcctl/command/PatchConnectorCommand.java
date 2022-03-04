@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -29,6 +30,7 @@ import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.KafkaConnectException;
 import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Connectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,23 +42,35 @@ import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
-@Command(name = "connector", description = "Patches the specified connector with the given configuration parameters")
+@Command(name = "connector", aliases = "connectors", description = "Patches the specified connector(s) with the given configuration parameters")
 public class PatchConnectorCommand implements Callable<Integer> {
 
     @Spec
     CommandSpec commandSpec;
 
-    @Inject
-    ConfigurationContext context;
-
     @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
-    String name;
+    Set<String> names;
+
+    @Option(names = { "-e", "--reg-exp" }, description = "use CONNECTOR NAME(s) as regexp pattern(s) to use on all connectors")
+    boolean regexpMode = false;
 
     @Option(names = { "-s", "--set" }, description = "Set the following configuration parameter")
     Map<String, String> setParameters;
 
     @Option(names = { "-r", "--remove" }, description = "Remove the following configuration parameter")
     List<String> removeParameters;
+
+    private final ConfigurationContext context;
+
+    @Inject
+    public PatchConnectorCommand(ConfigurationContext context) {
+        this.context = context;
+    }
+
+    // Hack : Picocli currently require an empty constructor to generate the completion file
+    public PatchConnectorCommand() {
+        context = new ConfigurationContext();
+    }
 
     @Override
     public Integer call() throws JsonProcessingException, InterruptedException, ExecutionException {
@@ -65,7 +79,18 @@ public class PatchConnectorCommand implements Callable<Integer> {
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        Map<String, String> connectorParameters = kafkaConnectApi.getConnectorConfig(name);
+        Set<String> selectedConnector = Connectors.getSelectedConnectors(kafkaConnectApi, names, regexpMode);
+        for (String connectorToPatch : selectedConnector) {
+            int returnCode = patch(kafkaConnectApi, connectorToPatch);
+            if (returnCode > 0)
+                return returnCode;
+        }
+
+        return 0;
+    }
+
+    private int patch(KafkaConnectApi kafkaConnectApi, String conectorToPatch) throws JsonProcessingException {
+        Map<String, String> connectorParameters = kafkaConnectApi.getConnectorConfig(conectorToPatch);
 
         if (setParameters == null && removeParameters == null) {
 
@@ -82,11 +107,10 @@ public class PatchConnectorCommand implements Callable<Integer> {
         }
 
         String connectorParametersString = new ObjectMapper().writeValueAsString(connectorParameters);
-        kafkaConnectApi.updateConnector(name, connectorParametersString);
+        kafkaConnectApi.updateConnector(conectorToPatch, connectorParametersString);
 
-        DescribeConnectorCommand describeConnectorCommand = new DescribeConnectorCommand();
-        describeConnectorCommand.context = context;
-        describeConnectorCommand.name = name;
+        DescribeConnectorCommand describeConnectorCommand = new DescribeConnectorCommand(context);
+        describeConnectorCommand.names = Set.of(conectorToPatch);
         describeConnectorCommand.includeTasksConfig = false;
 
         System.out.println("New connector configuration:");
@@ -113,5 +137,6 @@ public class PatchConnectorCommand implements Callable<Integer> {
         }
 
         return 0;
+
     }
 }

@@ -77,13 +77,14 @@ Commands:
   config    Sets or retrieves the configuration of this client
   get       Displays information about connector plug-ins, connectors, and
               loggers
-  describe  Displays detailed information about the specified resource
-  apply     Applies the given file or the stdin content for registering or updating a connector
-  patch     Modifies the configuration of a connector or logger
-  restart   Restarts a connector or task
-  pause     Pauses a connector
-  resume    Resumes a connector
-  delete    Deletes the specified connector
+  describe  Displays detailed information about the specified resources
+  apply     Applies the given files or the stdin content for registering or
+              updating connectors
+  patch     Modifies the configuration of some connectors or a logger
+  restart   Restarts some connectors or a task
+  pause     Pauses connectors
+  resume    Resumes connectors
+  delete    Deletes specified connectors
   help      Displays help information about the specified command
 ```
 

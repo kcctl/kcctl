@@ -1,0 +1,9 @@
+{
+	"name": "local-file-source-2",
+	"config": {
+		"connector.class": "FileStreamSource",
+		"tasks.max": 1,
+		"file": "/tmp/test-2",
+		"topic": "local-file-source-test-2"
+	}
+}
