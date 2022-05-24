@@ -116,7 +116,11 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             // Config
             List<Tuple> config = new ArrayList<>();
 
-            for (Entry<String, String> configEntry : connectorConfig.entrySet()) {
+            // Sort connector config
+            Map<String, String> sortedConnectorConfig = new TreeMap<>(Comparator.comparing(x -> x));
+            sortedConnectorConfig.putAll(connectorConfig);
+
+            for (Entry<String, String> configEntry : sortedConnectorConfig.entrySet()) {
                 config.add(new Tuple("  " + configEntry.getKey(), configEntry.getValue()));
             }
 
