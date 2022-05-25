@@ -68,7 +68,7 @@
       <dependency>
         <groupId>io.debezium</groupId>
         <artifactId>debezium-api</artifactId>
-        <version>1.8.1.Final</version>
+        <version>1.9.2.Final</version>
       </dependency>
       <dependency>
         <groupId>${quarkus.platform.group-id}</groupId>
@@ -237,7 +237,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.10.0</version>
+          <version>3.12.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
