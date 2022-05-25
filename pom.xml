@@ -33,7 +33,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-    <quarkus.platform.version>2.7.2.Final</quarkus.platform.version>
+    <quarkus.platform.version>2.9.2.Final</quarkus.platform.version>
     <artifactsDir>target</artifactsDir>
   </properties>
 
@@ -177,7 +177,7 @@
         <plugin>
           <groupId>net.revelc.code</groupId>
           <artifactId>impsort-maven-plugin</artifactId>
-          <version>1.6.2</version>
+          <version>1.7.0</version>
           <configuration>
             <groups>java.,javax.,org.,com.</groups>
             <removeUnused>true</removeUnused>
