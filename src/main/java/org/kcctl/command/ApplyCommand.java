@@ -70,6 +70,9 @@ public class ApplyCommand implements Callable<Integer> {
     @Spec
     CommandSpec spec;
 
+    @Option(names = { "-ca", "--config-parameters" }, description = "Pass parameters to config for sensitive data")
+    String configParameters;
+
     private static final ObjectMapper mapper = new ObjectMapper();
     private final static String CONFIG_EXCEPTION = "org.apache.kafka.common.config.ConfigException: ";
     private final ConfigurationContext context;
@@ -162,11 +165,38 @@ public class ApplyCommand implements Callable<Integer> {
 
     private int createOrUpdateConnector(KafkaConnectApi kafkaConnectApi, ApplyConnector applyConnector) throws Exception {
         try {
+            String contents = applyConnector.contents;
+            
+            if (configParameters != null) {
+                String[] parameters = configParameters.split(" ");
+                Map<String, Object> replacementMap = applyConnector.config;
+
+                if (applyConnector.config.containsKey("config")) {
+                    replacementMap = (Map)applyConnector.config.get("config");
+                }
+
+                for (int i = 0; i < parameters.length; i++) {
+                    String replaceValue = "\\$#" + Integer.toString(i + 1);
+
+                    contents = contents.replaceAll(replaceValue, parameters[i]);
+
+                    for (java.util.Map.Entry<String, Object> entry : replacementMap.entrySet()) {
+                        Object value = entry.getValue();
+        
+                        if (value.getClass() == String.class) {
+                            replacementMap.put(entry.getKey(), value.toString().replaceAll(replaceValue, parameters[i]));
+                        }
+                    }
+                }
+
+                applyConnector.config.put("config", replacementMap);
+            }
+
             if (applyConnector.isNamed()) {
                 String connectorName = applyConnector.name();
                 boolean existing = kafkaConnectApi.getConnectors().contains(connectorName);
                 if (!existing) {
-                    kafkaConnectApi.createConnector(applyConnector.contents);
+                    kafkaConnectApi.createConnector(contents);
                     spec.commandLine().getOut().println("Created connector " + connectorName);
                 }
                 else {
@@ -181,7 +211,7 @@ public class ApplyCommand implements Callable<Integer> {
                 }
 
                 boolean existing = kafkaConnectApi.getConnectors().contains(name);
-                kafkaConnectApi.updateConnector(name, applyConnector.contents);
+                kafkaConnectApi.updateConnector(name, contents);
 
                 if (!existing) {
                     spec.commandLine().getOut().println("Created connector " + name);

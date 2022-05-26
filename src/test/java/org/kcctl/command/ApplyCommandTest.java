@@ -123,4 +123,59 @@ class ApplyCommandTest extends IntegrationTest {
         assertThat(context.output().toString()).doesNotContain("Created connector");
     }
 
+    @Test
+    public void should_create_connector_successfuly_with_parametric_json_from_stdin() throws IOException {
+        var path = Paths.get("src", "test", "resources", "local-file-source-parameters.json");
+        InputStream fakeIn = new ByteArrayInputStream(Files.readAllBytes(path));
+        System.setIn(fakeIn);
+
+        String expectedTopicName = "my-topic";
+        String expectedFilePath = "/tmp/test-2";
+        String expectedPassword = "pass";
+        String parameter = expectedTopicName + " " + expectedFilePath + " " + expectedPassword;
+
+        int exitCode = context.commandLine().execute("-f", "-", "-ca", parameter);
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString().trim()).isEqualTo("Created connector local-file-source-parameters");
+
+        kafkaConnect.ensureConnectorRegistered("local-file-source-parameters");
+        kafkaConnect.ensureConnectorState("local-file-source-parameters", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("local-file-source-parameters", 0, Connector.State.RUNNING);
+        
+        String actualTopicName = kafkaConnect.getConnectorConfigProperty("local-file-source-parameters", "topic");
+        String actualFilePath = kafkaConnect.getConnectorConfigProperty("local-file-source-parameters", "file");
+        String actualPassword = kafkaConnect.getConnectorConfigProperty("local-file-source-parameters", "dbpassword");
+
+        assertThat(actualTopicName).isEqualTo(expectedTopicName);
+        assertThat(actualFilePath).isEqualTo(expectedFilePath);
+        assertThat(actualPassword).isEqualTo(expectedPassword);
+    }
+
+    @Test
+    public void should_update_connector_successfuly_with_parametric_json() throws IOException {
+        var path = Paths.get("src", "test", "resources", "local-file-source-parameters.json");
+
+        String expectedTopicName = "my-topic";
+        String expectedFilePath = "/tmp/test-2";
+        String expectedPassword = "pass";
+        String parameter = expectedTopicName + " " + expectedFilePath + " " + expectedPassword;
+
+        int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString(), "-ca", parameter);
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString().trim()).isEqualTo("Created connector local-file-source-parameters");
+
+        String expectedUpdateTopicName = "my-topic3";
+        parameter = expectedUpdateTopicName + " " + expectedFilePath + " " + expectedPassword;
+
+        exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString(), "-ca", parameter);
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+
+        kafkaConnect.ensureConnectorRegistered("local-file-source-parameters");
+        kafkaConnect.ensureConnectorState("local-file-source-parameters", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("local-file-source-parameters", 0, Connector.State.RUNNING);
+
+        String actualUpdateTopicName = kafkaConnect.getConnectorConfigProperty("local-file-source-parameters", "topic");
+
+        assertThat(actualUpdateTopicName).isEqualTo(expectedUpdateTopicName);
+    }
 }

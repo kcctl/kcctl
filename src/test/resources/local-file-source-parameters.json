@@ -1,0 +1,10 @@
+{
+    "name": "local-file-source-parameters",
+    "config": {
+        "connector.class": "FileStreamSource",
+		"tasks.max": 1,
+        "topic": "$#1",
+        "file": "$#2",
+        "dbpassword": "$#3"
+    }
+}
