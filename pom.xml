@@ -68,7 +68,7 @@
       <dependency>
         <groupId>io.debezium</groupId>
         <artifactId>debezium-api</artifactId>
-        <version>1.9.2.Final</version>
+        <version>1.9.4.Final</version>
       </dependency>
       <dependency>
         <groupId>${quarkus.platform.group-id}</groupId>
