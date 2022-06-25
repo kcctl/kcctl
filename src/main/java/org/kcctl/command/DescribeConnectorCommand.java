@@ -179,7 +179,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
             spec.commandLine().getOut().println("Connector " + connectorToDescribe + " not found. The following connector(s) are available:");
 
-            GetConnectorsCommand getConnectors = new GetConnectorsCommand(context);
+            GetConnectorsCommand getConnectors = new GetConnectorsCommand(context, spec);
             getConnectors.run();
 
             return 1;
