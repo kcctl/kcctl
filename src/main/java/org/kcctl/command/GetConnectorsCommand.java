@@ -54,6 +54,12 @@ public class GetConnectorsCommand implements Runnable {
         context = new ConfigurationContext();
     }
 
+    // Invoke by describe connector command when connector not found
+    public GetConnectorsCommand(ConfigurationContext context, CommandLine.Model.CommandSpec spec) {
+        this.context = context;
+        this.spec = spec;
+    }
+
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
