@@ -139,21 +139,21 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
             // Tasks
             for (TaskState task : connectorStatus.tasks) {
-                Tuple.print(Arrays.asList(new Tuple("  " + task.id, "")));
+                Tuple.print(Arrays.asList(new Tuple("  " + task.id(), "")));
                 List<Tuple> tuples = new ArrayList<>();
-                tuples.add(new Tuple("    State", colorizeState(task.state)));
-                tuples.add(new Tuple("    Worker ID", task.worker_id));
+                tuples.add(new Tuple("    State", colorizeState(task.state())));
+                tuples.add(new Tuple("    Worker ID", task.worker_id()));
 
                 if (includeTasksConfig) {
                     tuples.add(new Tuple("    Config", ""));
 
-                    for (Entry<String, String> taskConfig : tasksConfigs.get(connectorToDescribe + "-" + task.id).entrySet()) {
+                    for (Entry<String, String> taskConfig : tasksConfigs.get(connectorToDescribe + "-" + task.id()).entrySet()) {
                         tuples.add(new Tuple("      " + taskConfig.getKey(), taskConfig.getValue()));
                     }
                 }
 
-                if (task.state.equals("FAILED")) {
-                    tuples.add(new Tuple("    Trace", task.trace.replaceAll("Caused by", "      Caused by")));
+                if (task.state().equals("FAILED")) {
+                    tuples.add(new Tuple("    Trace", task.trace().replaceAll("Caused by", "      Caused by")));
                 }
                 Tuple.print(tuples);
             }

@@ -15,10 +15,6 @@
  */
 package org.kcctl.service;
 
-public class TaskState {
-
-    public int id;
-    public String state;
-    public String worker_id;
-    public String trace;
+public record TaskState(int id,
+    String state, String worker_id, String trace) {
 }
