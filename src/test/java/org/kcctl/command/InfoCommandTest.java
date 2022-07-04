@@ -45,7 +45,7 @@ class InfoCommandTest extends IntegrationTest {
                 .map(String::trim)
                 .contains(
                         "URL:               " + kafkaConnect.getTarget(),
-                        "Version:           3.0.0",
-                        "Commit:            8cb0a5e9d3441962");
+                        "Version:           3.1.0",
+                        "Commit:            37edeed0777bacb3");
     }
 }

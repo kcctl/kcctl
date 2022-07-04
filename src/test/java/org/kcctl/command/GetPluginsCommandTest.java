@@ -23,6 +23,7 @@ import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 
+import io.debezium.util.ContainerImageVersions;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import picocli.CommandLine;
@@ -39,23 +40,25 @@ class GetPluginsCommandTest extends IntegrationTest {
 
     @Test
     public void should_print_info() {
+        String debeziumVersion = ContainerImageVersions.getStableVersion("debezium/connect");
+
         int exitCode = context.commandLine().execute();
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString().trim().lines())
                 .map(String::trim)
                 .containsExactly(
                         "TYPE     CLASS                                                       VERSION",
-                        "source   io.debezium.connector.db2.Db2Connector                      1.8.0.Final",
-                        "source   io.debezium.connector.mongodb.MongoDbConnector              1.8.0.Final",
-                        "source   io.debezium.connector.mysql.MySqlConnector                  1.8.0.Final",
-                        "source   io.debezium.connector.oracle.OracleConnector                1.8.0.Final",
-                        "source   io.debezium.connector.postgresql.PostgresConnector          1.8.0.Final",
-                        "source   io.debezium.connector.sqlserver.SqlServerConnector          1.8.0.Final",
-                        "source   io.debezium.connector.vitess.VitessConnector                1.8.0.Final",
-                        "source   org.apache.kafka.connect.file.FileStreamSourceConnector     3.0.0",
+                        "source   io.debezium.connector.db2.Db2Connector                      " + debeziumVersion,
+                        "source   io.debezium.connector.mongodb.MongoDbConnector              " + debeziumVersion,
+                        "source   io.debezium.connector.mysql.MySqlConnector                  " + debeziumVersion,
+                        "source   io.debezium.connector.oracle.OracleConnector                " + debeziumVersion,
+                        "source   io.debezium.connector.postgresql.PostgresConnector          " + debeziumVersion,
+                        "source   io.debezium.connector.sqlserver.SqlServerConnector          " + debeziumVersion,
+                        "source   io.debezium.connector.vitess.VitessConnector                " + debeziumVersion,
+                        "source   org.apache.kafka.connect.file.FileStreamSourceConnector     3.1.0",
                         "source   org.apache.kafka.connect.mirror.MirrorCheckpointConnector   1",
                         "source   org.apache.kafka.connect.mirror.MirrorHeartbeatConnector    1",
                         "source   org.apache.kafka.connect.mirror.MirrorSourceConnector       1",
-                        "sink     org.apache.kafka.connect.file.FileStreamSinkConnector       3.0.0");
+                        "sink     org.apache.kafka.connect.file.FileStreamSinkConnector       3.1.0");
     }
 }

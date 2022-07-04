@@ -60,17 +60,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.debezium</groupId>
-        <artifactId>debezium-core</artifactId>
-        <version>1.8.0.Final</version>
-        <type>test-jar</type>
-      </dependency>
-      <dependency>
-        <groupId>io.debezium</groupId>
-        <artifactId>debezium-api</artifactId>
-        <version>1.9.4.Final</version>
-      </dependency>
-      <dependency>
         <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>${quarkus.platform.artifact-id}</artifactId>
         <version>${quarkus.platform.version}</version>
