@@ -15,11 +15,7 @@
  */
 package org.kcctl.service;
 
-public class KafkaConnectInfo {
-
-    public String version;
-    public String commit;
-    public String kafka_cluster_id;
+public record KafkaConnectInfo(String version, String commit, String kafka_cluster_id) {
 
     @Override
     public String toString() {

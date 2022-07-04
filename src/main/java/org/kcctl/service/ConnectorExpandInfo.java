@@ -15,8 +15,5 @@
  */
 package org.kcctl.service;
 
-public class ConnectorExpandInfo {
-
-    public ConnectorStatusInfo status;
-    public ConnectorInfo info;
+public record ConnectorExpandInfo(ConnectorStatusInfo status, ConnectorInfo info) {
 }

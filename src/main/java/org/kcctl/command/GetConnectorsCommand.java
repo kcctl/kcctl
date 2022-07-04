@@ -72,13 +72,13 @@ public class GetConnectorsCommand implements Runnable {
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version);
+        Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version());
 
         List<ConnectorStatusInfo> connectors;
         if (currentVersion.greaterOrEquals(requiredVersionForExpandApi)) {
             connectors = kafkaConnectApi.getConnectorExpandInfo(Arrays.asList("status")).values().stream()
-                    .map(m -> m.status)
-                    .sorted(Comparator.comparing(ConnectorStatusInfo::getType).thenComparing(ConnectorStatusInfo::getName))
+                    .map(m -> m.status())
+                    .sorted(Comparator.comparing(ConnectorStatusInfo::type).thenComparing(ConnectorStatusInfo::name))
                     .collect(Collectors.toList());
         }
         else {
@@ -92,10 +92,10 @@ public class GetConnectorsCommand implements Runnable {
         int i = 0;
         for (ConnectorStatusInfo status : connectors) {
             data[i] = new String[]{
-                    status.name,
-                    " " + status.type,
-                    " " + status.connector.state,
-                    " " + toString(status.tasks) };
+                    status.name(),
+                    " " + status.type(),
+                    " " + status.connector().state(),
+                    " " + toString(status.tasks()) };
             i++;
         }
 

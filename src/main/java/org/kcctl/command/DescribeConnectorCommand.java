@@ -80,7 +80,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
-        Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version);
+        Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version());
 
         if (includeTasksConfig) {
             if (!currentVersion.greaterOrEquals(requiredVersionForTasksConfig)) {
@@ -106,10 +106,10 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(connectorToDescribe);
 
             List<Tuple> connectorInfo = Arrays.asList(
-                    new Tuple("Name", connector.name),
-                    new Tuple("Type", connectorStatus.type),
-                    new Tuple("State", colorizeState(connectorStatus.connector.state)),
-                    new Tuple("Worker ID", connectorStatus.connector.worker_id));
+                    new Tuple("Name", connector.name()),
+                    new Tuple("Type", connectorStatus.type()),
+                    new Tuple("State", colorizeState(connectorStatus.connector().state())),
+                    new Tuple("Worker ID", connectorStatus.connector().worker_id()));
 
             Tuple.print(connectorInfo);
 
@@ -138,7 +138,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             }
 
             // Tasks
-            for (TaskState task : connectorStatus.tasks) {
+            for (TaskState task : connectorStatus.tasks()) {
                 Tuple.print(Arrays.asList(new Tuple("  " + task.id(), "")));
                 List<Tuple> tuples = new ArrayList<>();
                 tuples.add(new Tuple("    State", colorizeState(task.state())));
@@ -166,7 +166,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
                 List<Tuple> topics = new ArrayList<>();
 
-                for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
+                for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics()) {
                     topics.add(new Tuple("", "  " + topic));
                 }
                 topics.sort(Comparator.comparing(Tuple::getValue));

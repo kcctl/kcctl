@@ -17,7 +17,5 @@ package org.kcctl.service;
 
 import java.util.List;
 
-public class TopicsInfo {
-
-    public List<String> topics;
+public record TopicsInfo(List<String> topics) {
 }

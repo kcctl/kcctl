@@ -15,8 +15,5 @@
  */
 package org.kcctl.service;
 
-public class TaskInfo {
-
-    public String connector;
-    public Integer task;
+public record TaskInfo(String connector, Integer task) {
 }

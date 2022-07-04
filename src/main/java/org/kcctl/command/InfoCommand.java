@@ -52,8 +52,8 @@ public class InfoCommand implements Runnable {
 
         KafkaConnectInfo workerInfo = kafkaConnectApi.getWorkerInfo();
         spec.commandLine().getOut().println("URL:               " + context.getCurrentContext().getCluster());
-        spec.commandLine().getOut().println("Version:           " + workerInfo.version);
-        spec.commandLine().getOut().println("Commit:            " + workerInfo.commit);
-        spec.commandLine().getOut().println("Kafka Cluster ID:  " + workerInfo.kafka_cluster_id);
+        spec.commandLine().getOut().println("Version:           " + workerInfo.version());
+        spec.commandLine().getOut().println("Commit:            " + workerInfo.commit());
+        spec.commandLine().getOut().println("Kafka Cluster ID:  " + workerInfo.kafka_cluster_id());
     }
 }

@@ -45,7 +45,7 @@ public class TaskNamesCompletionCandidateCommand implements Runnable {
 
         for (String connector : connectors) {
             ConnectorStatusInfo status = kafkaConnectApi.getConnectorStatus(connector);
-            for (TaskState task : status.tasks) {
+            for (TaskState task : status.tasks()) {
                 completions.add(connector + "/" + task.id());
             }
         }
