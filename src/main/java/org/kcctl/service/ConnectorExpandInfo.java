@@ -15,13 +15,8 @@
  */
 package org.kcctl.service;
 
-import java.util.List;
-import java.util.Map;
+public class ConnectorExpandInfo {
 
-public class ConnectorInfo {
-
-    public String name;
-    public Map<String, String> config;
-    public List<TaskInfo> tasks;
-    public String type;
+    public ConnectorStatusInfo status;
+    public ConnectorInfo info;
 }

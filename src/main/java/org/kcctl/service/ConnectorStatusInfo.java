@@ -23,4 +23,12 @@ public class ConnectorStatusInfo {
     public ConnectorState connector;
     public String type;
     public List<TaskState> tasks;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

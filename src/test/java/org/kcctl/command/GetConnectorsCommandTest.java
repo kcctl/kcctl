@@ -15,6 +15,9 @@
  */
 package org.kcctl.command;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
@@ -50,9 +53,19 @@ class GetConnectorsCommandTest extends IntegrationTest {
         registerTestConnector("test1");
         registerTestConnector("test2");
 
+        Pattern singleTaskPattern = Pattern.compile(".*[0-9]+\\:\\s+(.*\\:[0-9]+\\s+).*");
+
         int exitCode = context.commandLine().execute();
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString().trim().lines())
+        assertThat(context.output().toString().trim().lines().map(m -> {
+            String ret = m;
+            Matcher matcher = singleTaskPattern.matcher(ret);
+            if (matcher.matches()) {
+                String workId = matcher.group(1);
+                ret = ret.replace(workId, "");
+            }
+            return ret;
+        }))
                 .map(String::trim)
                 .containsExactly(
                         "NAME    TYPE     STATE     TASKS",

@@ -15,7 +15,10 @@
  */
 package org.kcctl.command;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -24,6 +27,7 @@ import org.kcctl.service.ConnectorStatusInfo;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.TaskState;
 import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Version;
 
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -60,23 +64,38 @@ public class GetConnectorsCommand implements Runnable {
         this.spec = spec;
     }
 
+    private final Version requiredVersionForExpandApi = new Version(2, 3);
+
     @Override
     public void run() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        List<String> connectors = kafkaConnectApi.getConnectors();
+        Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version);
+
+        List<ConnectorStatusInfo> connectors;
+        if (currentVersion.greaterOrEquals(requiredVersionForExpandApi)) {
+            connectors = kafkaConnectApi.getConnectorExpandInfo(Arrays.asList("status")).values().stream()
+                    .map(m -> m.status)
+                    .sorted(Comparator.comparing(ConnectorStatusInfo::getType).thenComparing(ConnectorStatusInfo::getName))
+                    .collect(Collectors.toList());
+        }
+        else {
+            connectors = kafkaConnectApi.getConnectors().stream()
+                    .map(m -> kafkaConnectApi.getConnectorStatus(m))
+                    .collect(Collectors.toList());
+        }
+
         String[][] data = new String[connectors.size()][];
 
         int i = 0;
-        for (String name : connectors) {
-            ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(name);
+        for (ConnectorStatusInfo status : connectors) {
             data[i] = new String[]{
-                    name,
-                    " " + connectorStatus.type,
-                    " " + connectorStatus.connector.state,
-                    " " + toString(connectorStatus.tasks) };
+                    status.name,
+                    " " + status.type,
+                    " " + status.connector.state,
+                    " " + toString(status.tasks) };
             i++;
         }
 

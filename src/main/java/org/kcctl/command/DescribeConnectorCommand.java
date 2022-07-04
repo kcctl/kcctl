@@ -169,6 +169,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 for (String topic : connectorTopics.entrySet().iterator().next().getValue().topics) {
                     topics.add(new Tuple("", "  " + topic));
                 }
+                topics.sort(Comparator.comparing(Tuple::getValue));
                 Tuple.print(topics);
             }
         }

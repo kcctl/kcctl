@@ -113,8 +113,13 @@ Currently, only basic authentication is supported.
 
 This project uses [Quarkus](https://quarkus.io/), the Supersonic Subatomic Java Framework.
 
-To build the project, make sure to have Java 17 and GraalVM 21.3 or newer installed.
-Docker must be installed in order to execute the integration tests (via Testcontainers).
+To build the project, make sure to the following things are installed:
+
+* Java 17
+* Alternatively, for creating native binaries, GraalVM 22.1.0 or newer
+* When using GraalVM, the native image tool (install via `$JAVA_HOME/bin/gu install native-image`)
+* Docker must for running the integration tests (via Testcontainers)
+
 The following build commands are commonly used:
 
 ```shell script
