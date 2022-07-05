@@ -15,8 +15,5 @@
  */
 package org.kcctl.service;
 
-public class ConnectorState {
-
-    public String state;
-    public String worker_id;
+public record ConnectorState(String state, String worker_id) {
 }

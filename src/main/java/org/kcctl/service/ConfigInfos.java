@@ -19,41 +19,33 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ConfigInfos {
+public record ConfigInfos(String name,
+                          @JsonProperty("error_count") int errorCount,
+                          List<String> groups,
+                          List<ConfigInfo> configs) {
 
-    public String name;
-    @JsonProperty("error_count")
-    public int errorCount;
-    public List<String> groups;
-    public List<ConfigInfo> configs;
-
-    public static class ConfigInfo {
-        @JsonProperty("definition")
-        public ConfigKeyInfo configKey;
-        @JsonProperty("value")
-        public ConfigValueInfo configValue;
+    public record ConfigInfo(@JsonProperty("definition") ConfigKeyInfo configKey,
+                             @JsonProperty("value") ConfigValueInfo configValue) {
     }
 
-    public static class ConfigKeyInfo {
-        public String name;
-        public String type;
-        public boolean required;
-        public String defaultValue;
-        public String importance;
-        public String documentation;
-        public String group;
-        public int orderInGroup;
-        public String width;
-        public String displayName;
-        public List<String> dependents;
+    public record ConfigKeyInfo(String name,
+                                String type,
+                                boolean required,
+                                String defaultValue,
+                                String importance,
+                                String documentation,
+                                String group,
+                                int orderInGroup,
+                                String width,
+                                String displayName,
+                                List<String> dependents) {
     }
 
-    public static class ConfigValueInfo {
-        public String name;
-        public String value;
-        public List<String> recommendedValues;
-        public List<String> errors;
-        public boolean visible;
+    public record ConfigValueInfo(String name,
+                                  String value,
+                                  List<String> recommendedValues,
+                                  List<String> errors,
+                                  boolean visible) {
     }
 
 }

@@ -17,10 +17,5 @@ package org.kcctl.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ConnectorPlugin {
-
-    @JsonProperty("class")
-    public String clazz;
-    public String type;
-    public String version;
+public record ConnectorPlugin(@JsonProperty("class") String clazz, String type, String version) {
 }

@@ -224,17 +224,17 @@ public class ApplyCommand implements Callable<Integer> {
         String pluginName = clazz.substring(clazz.lastIndexOf('.') + 1);
         try {
             ConfigInfos configInfos = kafkaConnectApi.validateConfig(pluginName, mapper.writeValueAsString(connectorConfigMap));
-            int errs = configInfos.errorCount;
+            int errs = configInfos.errorCount();
             if (errs == 0) {
                 spec.commandLine().getOut().println("The configuration is valid!");
             }
             else {
                 spec.commandLine().getOut().println("The configuration is not valid! Found " + errs + " error" + ((errs != 1) ? "s" : "") + ".");
                 spec.commandLine().getOut().println(ANSI_WHITE_BOLD + "Errors" + ANSI_RESET);
-                for (ConfigInfos.ConfigInfo configInfo : configInfos.configs) {
-                    List<String> errors = configInfo.configValue.errors;
+                for (ConfigInfos.ConfigInfo configInfo : configInfos.configs()) {
+                    List<String> errors = configInfo.configValue().errors();
                     if (errors != null && !errors.isEmpty()) {
-                        spec.commandLine().getOut().println("  " + configInfo.configKey.name);
+                        spec.commandLine().getOut().println("  " + configInfo.configKey().name());
                         for (String error : errors) {
                             spec.commandLine().getOut().println("    " + error);
                         }

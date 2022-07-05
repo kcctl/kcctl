@@ -17,10 +17,5 @@ package org.kcctl.service;
 
 import java.util.List;
 
-public class ConnectorStatusInfo {
-
-    public String name;
-    public ConnectorState connector;
-    public String type;
-    public List<TaskState> tasks;
+public record ConnectorStatusInfo(String name, ConnectorState connector, String type, List<TaskState> tasks) {
 }

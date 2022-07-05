@@ -20,14 +20,10 @@ import java.util.List;
 import static org.kcctl.util.Colors.ANSI_RESET;
 import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 
-public class Tuple {
+public record Tuple(String key, String value) {
 
-    private final String key;
-    private final String value;
-
-    public Tuple(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public String getValue() {
+        return value;
     }
 
     public static void print(List<Tuple> tuples) {

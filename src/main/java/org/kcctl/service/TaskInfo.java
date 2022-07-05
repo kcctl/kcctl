@@ -15,7 +15,5 @@
  */
 package org.kcctl.service;
 
-import java.util.List;
-
-public record TopicsInfo(List<String> topics) {
+public record TaskInfo(String connector, Integer task) {
 }

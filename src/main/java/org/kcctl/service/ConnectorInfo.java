@@ -15,7 +15,8 @@
  */
 package org.kcctl.service;
 
-public class ConnectorInfo {
+import java.util.List;
+import java.util.Map;
 
-    public String name;
+public record ConnectorInfo(String name, Map<String, String> config, List<TaskInfo> tasks, String type) {
 }

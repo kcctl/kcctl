@@ -57,13 +57,13 @@ public class GetPluginsCommand implements Runnable {
                 .build(KafkaConnectApi.class);
 
         List<ConnectorPlugin> connectorPlugins = kafkaConnectApi.getConnectorPlugins();
-        connectorPlugins.sort((c1, c2) -> -c1.type.compareTo(c2.type));
+        connectorPlugins.sort((c1, c2) -> -c1.type().compareTo(c2.type()));
 
         spec.commandLine().getOut().println();
         spec.commandLine().getOut().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
-                new Column().header("TYPE").dataAlign(HorizontalAlign.LEFT).with(plugin -> plugin.type),
-                new Column().header(" CLASS").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.clazz),
-                new Column().header(" VERSION").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.version))));
+                new Column().header("TYPE").dataAlign(HorizontalAlign.LEFT).with(plugin -> plugin.type()),
+                new Column().header(" CLASS").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.clazz()),
+                new Column().header(" VERSION").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.version()))));
         spec.commandLine().getOut().println();
     }
 }
