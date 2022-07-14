@@ -34,6 +34,7 @@
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus.platform.version>2.10.1.Final</quarkus.platform.version>
+    <debezium.version>1.9.5.Final</debezium.version>
     <artifactsDir>target</artifactsDir>
   </properties>
 
@@ -110,7 +111,7 @@
     <dependency>
       <groupId>io.debezium</groupId>
       <artifactId>debezium-testing-testcontainers</artifactId>
-      <version>1.9.4.Final</version>
+      <version>${debezium.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

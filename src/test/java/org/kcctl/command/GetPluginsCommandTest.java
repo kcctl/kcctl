@@ -39,8 +39,9 @@ class GetPluginsCommandTest extends IntegrationTest {
     KcctlCommandContext<GetPluginsCommand> context;
 
     @Test
-    public void should_print_info() {
+    public void should_print_info() throws Exception {
         String debeziumVersion = ContainerImageVersions.getStableVersion("debezium/connect");
+        String kafkaVersion = getConnectVersion();
 
         int exitCode = context.commandLine().execute();
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
@@ -55,10 +56,8 @@ class GetPluginsCommandTest extends IntegrationTest {
                         "source   io.debezium.connector.postgresql.PostgresConnector          " + debeziumVersion,
                         "source   io.debezium.connector.sqlserver.SqlServerConnector          " + debeziumVersion,
                         "source   io.debezium.connector.vitess.VitessConnector                " + debeziumVersion,
-                        "source   org.apache.kafka.connect.file.FileStreamSourceConnector     3.1.0",
-                        "source   org.apache.kafka.connect.mirror.MirrorCheckpointConnector   1",
-                        "source   org.apache.kafka.connect.mirror.MirrorHeartbeatConnector    1",
-                        "source   org.apache.kafka.connect.mirror.MirrorSourceConnector       1",
-                        "sink     org.apache.kafka.connect.file.FileStreamSinkConnector       3.1.0");
+                        "source   org.apache.kafka.connect.mirror.MirrorCheckpointConnector   " + kafkaVersion,
+                        "source   org.apache.kafka.connect.mirror.MirrorHeartbeatConnector    " + kafkaVersion,
+                        "source   org.apache.kafka.connect.mirror.MirrorSourceConnector       " + kafkaVersion);
     }
 }

@@ -38,14 +38,13 @@ class InfoCommandTest extends IntegrationTest {
     KcctlCommandContext<InfoCommand> context;
 
     @Test
-    public void should_print_info() {
+    public void should_print_info() throws Exception {
         int exitCode = context.commandLine().execute();
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString().trim().lines())
-                .map(String::trim)
-                .contains(
-                        "URL:               " + kafkaConnect.getTarget(),
-                        "Version:           3.1.0",
-                        "Commit:            37edeed0777bacb3");
+        assertThat(context.output().toString().trim())
+                .matches("URL:\\s+" + kafkaConnect.getTarget() + "\\n" +
+                        "Version:\\s+" + getConnectVersion() + "\\n" +
+                        "Commit:\\s+[\\dabcdef]{16}\\n" +
+                        "Kafka Cluster ID:\\s+[\\w-]{22}");
     }
 }

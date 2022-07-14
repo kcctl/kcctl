@@ -46,53 +46,53 @@ class ApplyCommandTest extends IntegrationTest {
 
     @Test
     public void should_create_two_connectors() {
-        var path = Paths.get("src", "test", "resources", "local-file-source.json");
-        var path2 = Paths.get("src", "test", "resources", "local-file-source-2.json");
+        var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
+        var path2 = Paths.get("src", "test", "resources", "heartbeat-source-2.json");
         int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString(), "-f", path2.toAbsolutePath().toString());
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString()).contains("Created connector local-file-source", "Created connector local-file-source-2");
+        assertThat(context.output().toString()).contains("Created connector heartbeat-source", "Created connector heartbeat-source-2");
 
-        kafkaConnect.ensureConnectorRegistered("local-file-source");
-        kafkaConnect.ensureConnectorRegistered("local-file-source-2");
-        kafkaConnect.ensureConnectorState("local-file-source", Connector.State.RUNNING);
-        kafkaConnect.ensureConnectorState("local-file-source-2", Connector.State.RUNNING);
-        kafkaConnect.ensureConnectorTaskState("local-file-source", 0, Connector.State.RUNNING);
-        kafkaConnect.ensureConnectorTaskState("local-file-source-2", 0, Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorRegistered("heartbeat-source");
+        kafkaConnect.ensureConnectorRegistered("heartbeat-source-2");
+        kafkaConnect.ensureConnectorState("heartbeat-source", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorState("heartbeat-source-2", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("heartbeat-source", 0, Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("heartbeat-source-2", 0, Connector.State.RUNNING);
     }
 
     @Test
     public void should_create_connector_from_stdin() throws IOException {
-        var path = Paths.get("src", "test", "resources", "local-file-source.json");
+        var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
         InputStream fakeIn = new ByteArrayInputStream(Files.readAllBytes(path));
         System.setIn(fakeIn);
 
         int exitCode = context.commandLine().execute("-f", "-");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString().trim()).isEqualTo("Created connector local-file-source");
+        assertThat(context.output().toString().trim()).isEqualTo("Created connector heartbeat-source");
 
-        kafkaConnect.ensureConnectorRegistered("local-file-source");
-        kafkaConnect.ensureConnectorState("local-file-source", Connector.State.RUNNING);
-        kafkaConnect.ensureConnectorTaskState("local-file-source", 0, Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorRegistered("heartbeat-source");
+        kafkaConnect.ensureConnectorState("heartbeat-source", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("heartbeat-source", 0, Connector.State.RUNNING);
     }
 
     @Test
     public void should_update_connector() {
-        var path = Paths.get("src", "test", "resources", "local-file-source.json");
+        var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
         int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString().trim()).isEqualTo("Created connector local-file-source");
+        assertThat(context.output().toString().trim()).isEqualTo("Created connector heartbeat-source");
 
-        path = Paths.get("src", "test", "resources", "local-file-source-update.json");
+        path = Paths.get("src", "test", "resources", "heartbeat-source-update.json");
         exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString()).isEqualTo("""
-                Created connector local-file-source
-                Updated connector local-file-source
+                Created connector heartbeat-source
+                Updated connector heartbeat-source
                 """);
 
-        kafkaConnect.ensureConnectorRegistered("local-file-source");
-        kafkaConnect.ensureConnectorState("local-file-source", Connector.State.RUNNING);
-        kafkaConnect.ensureConnectorTaskState("local-file-source", 0, Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorRegistered("heartbeat-source");
+        kafkaConnect.ensureConnectorState("heartbeat-source", Connector.State.RUNNING);
+        kafkaConnect.ensureConnectorTaskState("heartbeat-source", 0, Connector.State.RUNNING);
     }
 
     @Test
@@ -103,7 +103,7 @@ class ApplyCommandTest extends IntegrationTest {
 
     @Test
     public void dont_apply_if_files_wrong() {
-        var path = Paths.get("src", "test", "resources", "local-file-source.json");
+        var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
         var wrongPath = Paths.get("src", "test", "resources", "dont_exists.json");
 
         int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString(), "-f", wrongPath.toAbsolutePath().toString());
@@ -114,8 +114,8 @@ class ApplyCommandTest extends IntegrationTest {
 
     @Test
     public void fail_on_first_error() {
-        var pathBad = Paths.get("src", "test", "resources", "local-file-source-bad.json");
-        var path = Paths.get("src", "test", "resources", "local-file-source.json");
+        var pathBad = Paths.get("src", "test", "resources", "heartbeat-source-bad.json");
+        var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
 
         int exitCode = context.commandLine().execute("-f", pathBad.toAbsolutePath().toString(), "-f", path.toAbsolutePath().toString());
 
