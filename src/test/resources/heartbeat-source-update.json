@@ -1,0 +1,9 @@
+{
+	"name": "heartbeat-source",
+	"config": {
+		"connector.class": "org.apache.kafka.connect.mirror.MirrorHeartbeatConnector",
+		"tasks.max": 1,
+		"topic": "heartbeat-test-2",
+		"source.cluster.alias": "source"
+	}
+}

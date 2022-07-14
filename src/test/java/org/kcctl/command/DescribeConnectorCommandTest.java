@@ -54,6 +54,6 @@ class DescribeConnectorCommandTest extends IntegrationTest {
         System.setOut(old);
 
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(baos.toString()).contains("local-file-source-test");
+        assertThat(baos.toString()).contains(HEARTBEAT_TOPIC);
     }
 }

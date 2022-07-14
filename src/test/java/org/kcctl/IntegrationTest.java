@@ -34,6 +34,7 @@ import org.junit.platform.commons.util.ReflectionUtils.HierarchyTraversalMode;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 import org.kcctl.util.ConfigurationContext;
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.lifecycle.Startables;
@@ -44,6 +45,8 @@ import io.debezium.testing.testcontainers.DebeziumContainer;
 import picocli.CommandLine;
 
 public abstract class IntegrationTest {
+
+    public static final String HEARTBEAT_TOPIC = "heartbeat-test";
 
     protected static final Network network = Network.newNetwork();
 
@@ -58,6 +61,11 @@ public abstract class IntegrationTest {
     @BeforeAll
     public static void prepare() {
         Startables.deepStart(Stream.of(kafka, kafkaConnect)).join();
+    }
+
+    public String getConnectVersion() throws Exception {
+        Container.ExecResult result = kafkaConnect.execInContainer("/bin/bash", "-c", "/usr/bin/printenv KAFKA_VERSION");
+        return result.getStdout().replace("\n", "");
     }
 
     @BeforeEach
@@ -82,10 +90,10 @@ public abstract class IntegrationTest {
 
     protected void registerTestConnector(String name) {
         ConnectorConfiguration config = ConnectorConfiguration.create()
-                .with("connector.class", "FileStreamSource")
+                .with("connector.class", "org.apache.kafka.connect.mirror.MirrorHeartbeatConnector")
                 .with("tasks.max", 1)
-                .with("topic", "local-file-source-test")
-                .with("file", "/tmp/test");
+                .with("source.cluster.alias", "source")
+                .with("topic", HEARTBEAT_TOPIC);
 
         kafkaConnect.registerConnector(name, config);
     }
