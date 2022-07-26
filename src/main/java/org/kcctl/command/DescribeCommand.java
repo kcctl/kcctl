@@ -17,7 +17,8 @@ package org.kcctl.command;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "describe", subcommands = { DescribeConnectorCommand.class }, description = "Displays detailed information about the specified resources"
+@Command(name = "describe", subcommands = { DescribeConnectorCommand.class,
+        DescribePluginCommand.class }, description = "Displays detailed information about the specified resources"
 
 )
 public class DescribeCommand {
