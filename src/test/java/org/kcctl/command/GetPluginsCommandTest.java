@@ -60,4 +60,37 @@ class GetPluginsCommandTest extends IntegrationTest {
                         "source   org.apache.kafka.connect.mirror.MirrorHeartbeatConnector    " + kafkaVersion,
                         "source   org.apache.kafka.connect.mirror.MirrorSourceConnector       " + kafkaVersion);
     }
+
+    @Test
+    public void should_filter_by_type() {
+        int exitCode = context.commandLine().execute("--types=transformation");
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString().trim().lines())
+                .anyMatch(l -> l.startsWith(" transformation"))
+                .anyMatch(l -> l.startsWith("TYPE"));
+    }
+
+    @Test
+    public void should_filter_by_types() {
+        int exitCode = context.commandLine().execute("--types=transformation,converter");
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString().trim().lines())
+                .anyMatch(l -> l.startsWith(" transformation"))
+                .anyMatch(l -> l.startsWith(" converter"))
+                .anyMatch(l -> l.startsWith("TYPE"));
+    }
+
+    @Test
+    public void should_list_all_types() {
+        // The debezium connect image does not currently contain any sink connectors
+        int exitCode = context.commandLine().execute("--types=all");
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString().trim().lines())
+                .anyMatch(l -> l.startsWith(" source"))
+                .anyMatch(l -> l.startsWith(" transformation"))
+                .anyMatch(l -> l.startsWith(" converter"))
+                .anyMatch(l -> l.startsWith(" header_converter"))
+                .anyMatch(l -> l.startsWith(" predicate"))
+                .anyMatch(l -> l.startsWith("TYPE"));
+    }
 }
