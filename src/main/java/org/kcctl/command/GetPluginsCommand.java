@@ -18,6 +18,7 @@ package org.kcctl.command;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -40,15 +41,14 @@ import picocli.CommandLine.Command;
 public class GetPluginsCommand implements Callable<Integer> {
 
     private final Version requiredVersionForAllPlugins = new Version(3, 2);
-    private final Set<String> defaultPlugins = Set.of("source", "sink");
 
     private final ConfigurationContext context;
 
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 
-    @CommandLine.Option(names = { "-t", "--types" }, description = "Types of plugins", split = ",")
-    Set<String> pluginTypes;
+    @CommandLine.Option(names = { "-t", "--types" }, description = "Valid values: ${COMPLETION-CANDIDATES}", split = ",")
+    Set<PluginType> pluginTypes;
 
     @Inject
     public GetPluginsCommand(ConfigurationContext context) {
@@ -68,21 +68,18 @@ public class GetPluginsCommand implements Callable<Integer> {
 
         Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version());
 
-        if (pluginTypes != null) {
+        if (pluginTypes != null && !pluginTypes.stream().allMatch(t -> t == PluginType.SINK || t == PluginType.SOURCE)) {
             if (!currentVersion.greaterOrEquals(requiredVersionForAllPlugins)) {
-                spec.commandLine().getErr().println("--types requires at least Kafka Connect 3.2. Current version: " + currentVersion);
+                spec.commandLine().getErr().println("Listing plugins other than source and sink requires at least Kafka Connect 3.2. Current version: " + currentVersion);
                 return 1;
             }
         }
-        else {
-            pluginTypes = defaultPlugins;
-        }
 
         List<ConnectorPlugin> connectorPlugins = kafkaConnectApi.getConnectorPlugins(false);
-        if (!pluginTypes.contains("all")) {
-            connectorPlugins.removeIf(p -> !pluginTypes.contains(p.type()));
+        if (pluginTypes != null && !pluginTypes.isEmpty()) {
+            connectorPlugins.removeIf(p -> !pluginTypes.contains(PluginType.forName(p.type())));
         }
-        connectorPlugins.sort(Comparator.comparing(c -> c.type()));
+        connectorPlugins.sort(Comparator.comparing(ConnectorPlugin::type));
 
         spec.commandLine().getOut().println();
         spec.commandLine().getOut().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
@@ -91,5 +88,29 @@ public class GetPluginsCommand implements Callable<Integer> {
                 new Column().header(" VERSION").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + (plugin.version() == null ? "n/a" : plugin.version())))));
         spec.commandLine().getOut().println();
         return 0;
+    }
+
+    public enum PluginType {
+        SOURCE("source"),
+        SINK("sink"),
+        TRANSFORMATION("transformation"),
+        CONVERTER("converter"),
+        HEADER_CONVERTER("header_converter"),
+        PREDICATE("predicate");
+
+        public final String name;
+
+        PluginType(String name) {
+            this.name = name;
+        }
+
+        public static PluginType forName(String name) {
+            return PluginType.valueOf(name.toUpperCase(Locale.ROOT));
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }
