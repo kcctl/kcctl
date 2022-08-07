@@ -15,6 +15,9 @@
  */
 package org.kcctl.command;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
@@ -39,11 +42,11 @@ class GetPluginsCommandTest extends IntegrationTest {
     KcctlCommandContext<GetPluginsCommand> context;
 
     @Test
-    public void should_print_info() throws Exception {
+    public void should_list_source_plugins() throws Exception {
         String debeziumVersion = ContainerImageVersions.getStableVersion("debezium/connect");
         String kafkaVersion = getConnectVersion();
 
-        int exitCode = context.commandLine().execute();
+        int exitCode = context.commandLine().execute("--types=source");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString().trim().lines())
                 .map(String::trim)
@@ -82,15 +85,22 @@ class GetPluginsCommandTest extends IntegrationTest {
 
     @Test
     public void should_list_all_types() {
-        // The debezium connect image does not currently contain any sink connectors
-        int exitCode = context.commandLine().execute("--types=all");
+        int exitCode = context.commandLine().execute();
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(context.output().toString().trim().lines())
+        String output = context.output().toString().trim();
+        assertThat(output.lines())
                 .anyMatch(l -> l.startsWith(" source"))
+                // The debezium connect image does not currently contain any sink connectors
                 .anyMatch(l -> l.startsWith(" transformation"))
                 .anyMatch(l -> l.startsWith(" converter"))
                 .anyMatch(l -> l.startsWith(" header_converter"))
                 .anyMatch(l -> l.startsWith(" predicate"))
                 .anyMatch(l -> l.startsWith("TYPE"));
+
+        context.output().getBuffer().setLength(0);
+        String allTypes = Arrays.asList(GetPluginsCommand.PluginType.values()).stream().map(t -> t.name).collect(Collectors.joining(","));
+        exitCode = context.commandLine().execute("--types=" + allTypes);
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(context.output().toString().trim()).isEqualTo(output);
     }
 }
