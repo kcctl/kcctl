@@ -43,7 +43,8 @@ import picocli.CommandLine.IVersionProvider;
         ConnectorNamesCompletionCandidateCommand.class,
         TaskNamesCompletionCandidateCommand.class,
         LoggerNamesCompletionCandidateCommand.class,
-        ContextNamesCompletionCandidateCommand.class
+        ContextNamesCompletionCandidateCommand.class,
+        PluginNamesCompletionCandidateCommand.class
 }, description = "A command-line interface for Kafka Connect"
 
 )

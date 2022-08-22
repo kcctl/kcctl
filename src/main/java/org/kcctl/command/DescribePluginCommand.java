@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.kcctl.completion.PluginNameCompletions;
 import org.kcctl.service.ConfigInfos;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
@@ -40,7 +41,7 @@ public class DescribePluginCommand implements Callable<Integer> {
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 
-    @CommandLine.Parameters(paramLabel = "PLUGIN NAME", description = "Name of the plugin")
+    @CommandLine.Parameters(paramLabel = "PLUGIN NAME", description = "Name of the plugin", completionCandidates = PluginNameCompletions.class)
     String name;
 
     private final ConfigurationContext context;
