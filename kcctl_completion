@@ -685,11 +685,17 @@ function _picocli_kcctl_describe_plugin() {
   local commands=""
   local flag_opts=""
   local arg_opts=""
+  local PLUGIN_NAME_pos_param_args=`kcctl plugin-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
   else
     local positionals=""
+    local currIndex
+    currIndex=$(currentPositionalIndex "plugin" "${arg_opts}" "${flag_opts}")
+    if (( currIndex >= 0 && currIndex <= 0 )); then
+      positionals=$( compgen -W "$PLUGIN_NAME_pos_param_args" -- "${curr_word}" )
+    fi
     COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
   fi
 }
