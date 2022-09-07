@@ -26,14 +26,14 @@ import org.kcctl.completion.PluginNameCompletions;
 import org.kcctl.service.ConfigInfos;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Tuple;
 import org.kcctl.util.Version;
-
-import com.github.freva.asciitable.AsciiTable;
-import com.github.freva.asciitable.Column;
-import com.github.freva.asciitable.HorizontalAlign;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+
+import static org.kcctl.util.Colors.ANSI_RESET;
+import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 
 @Command(name = "plugin", description = "Displays information about given plugin")
 public class DescribePluginCommand implements Callable<Integer> {
@@ -72,14 +72,16 @@ public class DescribePluginCommand implements Callable<Integer> {
         }
 
         List<ConfigInfos.ConfigKeyInfo> configs = kafkaConnectApi.getConnectorPluginConfig(name);
-        spec.commandLine().getOut().println();
-        spec.commandLine().getOut().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, configs, Arrays.asList(
-                new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).with(config -> config.name()),
-                new Column().header(" TYPE").dataAlign(HorizontalAlign.LEFT).with(config -> " " + config.type()),
-                new Column().header(" REQUIRED").dataAlign(HorizontalAlign.LEFT).with(config -> " " + config.required()),
-                new Column().header(" DEFAULT").dataAlign(HorizontalAlign.LEFT).with(config -> " " + config.defaultValue()),
-                new Column().header(" DOCUMENTATION").dataAlign(HorizontalAlign.LEFT).with(config -> " " + config.documentation()))));
-        spec.commandLine().getOut().println();
+        System.out.println();
+        for (ConfigInfos.ConfigKeyInfo config : configs) {
+            Tuple.print(Arrays.asList(
+                    new Tuple(ANSI_WHITE_BOLD + "Name" + ANSI_RESET, config.name()),
+                    new Tuple(ANSI_WHITE_BOLD + "Type" + ANSI_RESET, config.type()),
+                    new Tuple(ANSI_WHITE_BOLD + "Required" + ANSI_RESET, String.valueOf(config.required())),
+                    new Tuple(ANSI_WHITE_BOLD + "Default" + ANSI_RESET, config.defaultValue()),
+                    new Tuple(ANSI_WHITE_BOLD + "Documentation" + ANSI_RESET, config.documentation())));
+            System.out.println();
+        }
 
         return 0;
     }
