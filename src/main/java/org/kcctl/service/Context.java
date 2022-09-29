@@ -23,21 +23,16 @@ import org.kcctl.util.Strings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Context {
-    private final URI cluster;
-    private final String bootstrapServers;
-    private final String offsetTopic;
-    private final String username;
-    private final String password;
-    private final Map<String, Object> clientConfig;
-
+public record Context(URI cluster, String bootstrapServers, String offsetTopic,
+                      String username, String password,
+                      Map<String, Object> clientConfig) {
     public Context(
-                   @JsonProperty("cluster") URI cluster,
-                   @JsonProperty("bootstrapServers") String bootstrapServers,
-                   @JsonProperty("offsetTopic") String offsetTopic,
-                   @JsonProperty("username") String username,
-                   @JsonProperty("password") String password,
-                   @JsonProperty("clientConfig") Map<String, Object> clientConfig) {
+            @JsonProperty("cluster") URI cluster,
+            @JsonProperty("bootstrapServers") String bootstrapServers,
+            @JsonProperty("offsetTopic") String offsetTopic,
+            @JsonProperty("username") String username,
+            @JsonProperty("password") String password,
+            @JsonProperty("clientConfig") Map<String, Object> clientConfig) {
         this.cluster = cluster;
         this.bootstrapServers = bootstrapServers;
         this.offsetTopic = offsetTopic;
