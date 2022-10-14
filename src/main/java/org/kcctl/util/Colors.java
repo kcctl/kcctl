@@ -27,4 +27,10 @@ public class Colors {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
     public static final String ANSI_WHITE_BOLD = "\u001B[37;1m";
+
+    public static final String ANSI_UNDERLINE = "\u001B[4m";
+
+    public static String underline(String input) {
+        return ANSI_UNDERLINE + input + ANSI_RESET;
+    }
 }
