@@ -681,10 +681,25 @@ function _picocli_kcctl_describe_connectors() {
 function _picocli_kcctl_describe_plugin() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
   local flag_opts=""
-  local arg_opts=""
+  local arg_opts="--search --search-name --search-description"
+
+  type compopt &>/dev/null && compopt +o default
+
+  case ${prev_word} in
+    --search)
+      return
+      ;;
+    --search-name)
+      return
+      ;;
+    --search-description)
+      return
+      ;;
+  esac
   local PLUGIN_NAME_pos_param_args=`kcctl plugin-name-completions` # 0-0 values
 
   if [[ "${curr_word}" == -* ]]; then

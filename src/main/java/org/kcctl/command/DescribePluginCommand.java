@@ -18,6 +18,7 @@ package org.kcctl.command;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -26,6 +27,7 @@ import org.kcctl.completion.PluginNameCompletions;
 import org.kcctl.service.ConfigInfos;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.Search;
 import org.kcctl.util.Tuple;
 import org.kcctl.util.Version;
 
@@ -38,8 +40,38 @@ import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 @Command(name = "plugin", description = "Displays information about given plugin")
 public class DescribePluginCommand implements Callable<Integer> {
 
+    static class ConfigSearch {
+        @CommandLine.Option(names = "--search", description = "Filter results to only properties whose name or docstring matches a given regex, using Java pattern syntax. Prefix with (?i) for case-insensitive searches")
+        Pattern search;
+        @CommandLine.Option(names = "--search-name", description = "Filter results to only properties whose name matches a given regex, using Java pattern syntax. Prefix with (?i) for case-insensitive searches")
+        Pattern searchName;
+        @CommandLine.Option(names = "--search-description", description = "Filter results to only properties whose docstring matches a given regex, using Java pattern syntax. Prefix with (?i) for case-insensitive searches")
+        Pattern searchDescription;
+
+        public List<ConfigInfos.ConfigKeyInfo> filterResults(List<ConfigInfos.ConfigKeyInfo> configs) {
+            if (search != null) {
+                return Search.searchConfig(configs, search);
+            }
+            else if (searchName != null) {
+                return Search.searchConfigByName(configs, searchName);
+            }
+            else if (searchDescription != null) {
+                return Search.searchConfigByDescription(configs, searchDescription);
+            }
+            else {
+                // The if/else if branches here should be exhaustive; if for some reason picocli populates
+                // an instance of this class but none of its members, we degrade gracefully here by not
+                // performing any filtering of config results
+                return configs;
+            }
+        }
+    }
+
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
+
+    @CommandLine.ArgGroup(exclusive = true)
+    ConfigSearch configSearch;
 
     @CommandLine.Parameters(paramLabel = "PLUGIN NAME", description = "Name of the plugin", completionCandidates = PluginNameCompletions.class)
     String name;
@@ -73,6 +105,9 @@ public class DescribePluginCommand implements Callable<Integer> {
 
         List<ConfigInfos.ConfigKeyInfo> configs = kafkaConnectApi.getConnectorPluginConfig(name);
         System.out.println();
+        if (configSearch != null) {
+            configs = configSearch.filterResults(configs);
+        }
         for (ConfigInfos.ConfigKeyInfo config : configs) {
             Tuple.print(Arrays.asList(
                     new Tuple(ANSI_WHITE_BOLD + "Name" + ANSI_RESET, config.name()),
