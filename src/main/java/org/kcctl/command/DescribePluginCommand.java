@@ -41,11 +41,11 @@ import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 public class DescribePluginCommand implements Callable<Integer> {
 
     static class ConfigSearch {
-        @CommandLine.Option(names = "--search", description = "Filter results to only properties whose name or docstring matches a given regex")
+        @CommandLine.Option(names = "--search", description = "Filter results to only properties whose name or docstring matches a given regex, using Java pattern syntax. Prefix with (?i) for case-insensitive searches")
         Pattern search;
-        @CommandLine.Option(names = "--search-name", description = "Filter results to only properties whose name matches a given regex")
+        @CommandLine.Option(names = "--search-name", description = "Filter results to only properties whose name matches a given regex, using Java pattern syntax. Prefix with (?i) for case-insensitive searches")
         Pattern searchName;
-        @CommandLine.Option(names = "--search-description", description = "Filter results to only properties whose docstring matches a given regex")
+        @CommandLine.Option(names = "--search-description", description = "Filter results to only properties whose docstring matches a given regex, using Java pattern syntax. Prefix with (?i) for case-insensitive searches")
         Pattern searchDescription;
 
         public List<ConfigInfos.ConfigKeyInfo> filterResults(List<ConfigInfos.ConfigKeyInfo> configs) {
@@ -60,8 +60,8 @@ public class DescribePluginCommand implements Callable<Integer> {
             }
             else {
                 // The if/else if branches here should be exhaustive; if for some reason picocli populates
-                // the configSearch field but none of its members, we degrade gracefully here by not performing
-                // any filtering of config results
+                // an instance of this class but none of its members, we degrade gracefully here by not
+                // performing any filtering of config results
                 return configs;
             }
         }

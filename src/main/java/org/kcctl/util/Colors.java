@@ -17,20 +17,28 @@ package org.kcctl.util;
 
 public class Colors {
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-    public static final String ANSI_WHITE_BOLD = "\u001B[37;1m";
+    // ANSI escape sequence
+    private static final String E = "\u001B[";
 
-    public static final String ANSI_UNDERLINE = "\u001B[4m";
+    public static final String ANSI_RESET = E + "0m";
+    public static final String ANSI_BLACK = E + "30m";
+    public static final String ANSI_RED = E + "31m";
+    public static final String ANSI_GREEN = E + "32m";
+    public static final String ANSI_YELLOW = E + "33m";
+    public static final String ANSI_BLUE = E + "34m";
+    public static final String ANSI_PURPLE = E + "35m";
+    public static final String ANSI_CYAN = E + "36m";
+    public static final String ANSI_WHITE = E + "37m";
+    public static final String ANSI_WHITE_BOLD = E + "37;1m";
+    public static final String ANSI_BOLD = E + "1m";
+    public static final String ANSI_WHITE_BACKGROUND = E + "107m";
 
-    public static String underline(String input) {
-        return ANSI_UNDERLINE + input + ANSI_RESET;
+    /**
+     * Highlight some text with bold, black font and a white background
+     * @param input the text to highlight; if null, the literal "null" is used in its place
+     * @return the highlighted text; never null
+     */
+    public static String highlight(String input) {
+        return ANSI_WHITE_BACKGROUND + ANSI_BLACK + ANSI_BOLD + input + ANSI_RESET;
     }
 }

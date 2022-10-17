@@ -25,9 +25,22 @@ import java.util.regex.Pattern;
 
 import static org.kcctl.service.ConfigInfos.ConfigKeyInfo;
 
+/**
+ * Generic logic for filtering a collection of elements based on a regex match,
+ * with support for highlighting the matched portions of each element and examining
+ * multiple different terms (e.g., name and description) from each element.
+ */
 public class Search {
 
     // Generic records... I'm going to hell for this
+
+    /**
+     * A search term is a part of an element that can be checked against for a regex match while
+     * filtering search results, and modified in order to highlight the matching portions
+     * @param extractTerm used to extract the text to match against from the element
+     * @param setTerm used to override the text with a highlighted replacement if a match is found
+     * @param <E> the search element type
+     */
     public record SearchTerm<E>(Function<E, String> extractTerm, BiConsumer<E,String>setTerm)
     {
 
@@ -40,7 +53,8 @@ public class Search {
 
         String highlightedTerm = matcher.replaceAll(matchResult -> {
             String match = matchResult.group();
-            return match.isEmpty() ? "" : Colors.underline(matchResult.group());
+            // Sometimes regexes match empty strings; no point in highlighting those
+            return match.isEmpty() ? "" : Colors.highlight(matchResult.group());
         });
         setTerm.accept(element, highlightedTerm);
         return true;

@@ -21,6 +21,13 @@ import java.util.Objects;
 
 import static org.kcctl.service.ConfigInfos.ConfigKeyInfo;
 
+/**
+ * This class has identical structure to the {@link ConfigKeyInfo} record, but with
+ * getters and setters that allow its content to be mutated after construction.
+ * <p>
+ * It can be used to manipulate data that was deserialized into a {@link ConfigKeyInfo}
+ * instance, without sacrificing the immutability of the {@link ConfigKeyInfo} record class.
+ */
 public class MutableConfigKeyInfo {
 
     private String name;
@@ -60,7 +67,14 @@ public class MutableConfigKeyInfo {
         this.dependents = dependents;
     }
 
+    /**
+     * Construct a matching {@link MutableConfigKeyInfo} instance from a {@link ConfigKeyInfo} record
+     * @param configKeyInfo the {@link ConfigKeyInfo} instance; may not be null
+     * @return a matching {@link MutableConfigKeyInfo} for the {@link ConfigKeyInfo} instance;
+     * never null
+     */
     public static MutableConfigKeyInfo fromRecord(ConfigKeyInfo configKeyInfo) {
+        Objects.requireNonNull(configKeyInfo, "configKeyInfo may not be null");
         return new MutableConfigKeyInfo(
                 configKeyInfo.name(),
                 configKeyInfo.type(),
@@ -75,6 +89,11 @@ public class MutableConfigKeyInfo {
                 configKeyInfo.dependents() != null ? new ArrayList<>(configKeyInfo.dependents()) : null);
     }
 
+    /**
+     * Convert this instance into an immutable {@link ConfigKeyInfo} record.
+     * @return a {@link ConfigKeyInfo} whose content matches that of this
+     * {@link MutableConfigKeyInfo} instance; never null
+     */
     public ConfigKeyInfo toRecord() {
         return new ConfigKeyInfo(
                 name,

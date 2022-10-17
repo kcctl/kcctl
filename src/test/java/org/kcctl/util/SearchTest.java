@@ -41,14 +41,14 @@ public class SearchTest {
         // but not that we can highlight the portions of docstrings that match the regex.
         // We may want to add coverage in the future if this logic is refactored in order to
         // reduce the risk of regression.
-        assertConfigSearchMatch(config, Pattern.compile("p1"), Colors.underline("p1"));
-        assertConfigSearchMatch(config, Pattern.compile("p2"), Colors.underline("p2"));
-        assertConfigSearchMatch(config, Pattern.compile("^p1$"), Colors.underline("p1"));
+        assertConfigSearchMatch(config, Pattern.compile("p1"), Colors.highlight("p1"));
+        assertConfigSearchMatch(config, Pattern.compile("p2"), Colors.highlight("p2"));
+        assertConfigSearchMatch(config, Pattern.compile("^p1$"), Colors.highlight("p1"));
         assertConfigSearchMatch(config, Pattern.compile("^p"),
-                Colors.underline("p") + "1", Colors.underline("p") + "2");
+                Colors.highlight("p") + "1", Colors.highlight("p") + "2");
         assertConfigSearchMatch(config, Pattern.compile("docstring"), "p1", "p2");
         assertConfigSearchMatch(config, Pattern.compile(".*"),
-                Colors.underline("p1"), Colors.underline("p2"));
+                Colors.highlight("p1"), Colors.highlight("p2"));
         assertConfigSearchMatch(config, Pattern.compile("^p$"));
         assertConfigSearchMatch(config, Pattern.compile("^docstring$"));
     }
