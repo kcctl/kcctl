@@ -57,8 +57,10 @@ public class ApplyCommand implements Callable<Integer> {
 
     // Hack : workaround. Should be `List<ApplyConnector>` instead of List.
     // But Graalvm seems to have difficulty building a native binary with ApplyConnector type record in class fields
+    // Support "-f file1.json file2.json" in addition to "-f file1.json -f file2.json" in order to work smoothly with shell
+    // globbing (e.g., "-f file*.json")
     @Option(names = { "-f",
-            "--file" }, description = "Name of the file to apply or '-' to read from stdin. You can specify -f multiple times, if the connector names are in the files", required = true, converter = ApplyConnectorConverter.class)
+            "--file" }, description = "Names of the file to apply or '-' to read from stdin. You can specify multiple filenames, if the connector names are in the files", required = true, converter = ApplyConnectorConverter.class, arity = "1..*")
     List applyConnectors;
 
     @Option(names = { "-n", "--name" }, description = "Name of the connector when not given within the file itself")
@@ -148,7 +150,7 @@ public class ApplyCommand implements Callable<Integer> {
     private void validate() {
         if (applyConnectors.size() > 1 && name != null)
             throw new CommandLine.ParameterException(spec.commandLine(),
-                    "It is not possible to use -n when -f is given multiple times. Please provide the connector names in the connector configuration files.");
+                    "It is not possible to use -n when multiple files are given. Please provide the connector names in the connector configuration files.");
     }
 
     private int applyOrValidateConnector(KafkaConnectApi kafkaConnectApi, ApplyConnector applyConnector) throws Exception {
