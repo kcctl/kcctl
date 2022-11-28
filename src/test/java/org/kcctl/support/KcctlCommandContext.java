@@ -19,6 +19,6 @@ import java.io.StringWriter;
 
 import picocli.CommandLine;
 
-public record KcctlCommandContext<T>(T command, CommandLine commandLine, StringWriter output) {
+public record KcctlCommandContext<T>(T command, CommandLine commandLine, StringWriter output, StringWriter error) {
 
 }
