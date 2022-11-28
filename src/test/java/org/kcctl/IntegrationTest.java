@@ -110,8 +110,10 @@ public abstract class IntegrationTest {
         var commandLine = new CommandLine(command);
         var output = new StringWriter();
         commandLine.setOut(new PrintWriter(output));
+        var error = new StringWriter();
+        commandLine.setErr(new PrintWriter(error));
 
-        return new KcctlCommandContext<>(command, commandLine, output);
+        return new KcctlCommandContext<>(command, commandLine, output, error);
     }
 
     private void ensureCaseyCommand(Class<?> targetCommand) {

@@ -32,7 +32,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "delete", description = "Deletes specified connectors")
+@Command(name = "connector", description = "Deletes specified connectors")
 public class DeleteConnectorCommand implements Callable<Integer> {
     @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use CONNECTOR NAME(s) as regexp pattern(s) to apply on all connectors")
     boolean regexpMode = false;
