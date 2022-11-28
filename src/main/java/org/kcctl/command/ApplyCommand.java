@@ -60,7 +60,7 @@ public class ApplyCommand implements Callable<Integer> {
     // Support "-f file1.json file2.json" in addition to "-f file1.json -f file2.json" in order to work smoothly with shell
     // globbing (e.g., "-f file*.json")
     @Option(names = { "-f",
-            "--file" }, description = "Names of the file to apply or '-' to read from stdin. You can specify multiple filenames, if the connector names are in the files", required = true, converter = ApplyConnectorConverter.class, arity = "1..*")
+            "--file" }, description = "One or more name(s) of file(s) to apply, or '-' to read from stdin. You can specify multiple file names only if the connector names are in the files", required = true, converter = ApplyConnectorConverter.class, arity = "1..*")
     List applyConnectors;
 
     @Option(names = { "-n", "--name" }, description = "Name of the connector when not given within the file itself")
