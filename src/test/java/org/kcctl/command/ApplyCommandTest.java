@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -45,10 +48,24 @@ class ApplyCommandTest extends IntegrationTest {
     KcctlCommandContext<ApplyCommand> context;
 
     @Test
-    public void should_create_two_connectors() {
+    public void should_create_two_connectors_single_flag() {
+        test_create_two_connectors(false);
+    }
+
+    @Test
+    public void should_create_two_connectors_multiple_flags() {
+        test_create_two_connectors(true);
+    }
+
+    private void test_create_two_connectors(boolean multipleFlags) {
         var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
         var path2 = Paths.get("src", "test", "resources", "heartbeat-source-2.json");
-        int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString(), "-f", path2.toAbsolutePath().toString());
+        List<String> args = new ArrayList<>(Arrays.asList("-f", path.toAbsolutePath().toString()));
+        if (multipleFlags) {
+            args.add("-f");
+        }
+        args.add(path2.toAbsolutePath().toString());
+        int exitCode = context.commandLine().execute(args.toArray(new String[0]));
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString()).contains("Created connector heartbeat-source", "Created connector heartbeat-source-2");
 
