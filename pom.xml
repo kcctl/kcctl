@@ -19,11 +19,10 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>org.kcctl</groupId>
   <artifactId>kcctl</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  
   <properties>
     <java.version>17</java.version>
     <executable-suffix/>
@@ -447,6 +446,39 @@
                     <label>{{ projectVersionNumber }}-early-access</label>
                   </snapshot>
                 </project>
+                <release>
+                  <github>
+                    <changelog>
+                      <formatted>ALWAYS</formatted>
+                      <includeLabels>
+                        <includeLabel>changes</includeLabel>
+                        <includeLabel>dependencies</includeLabel>
+                      </includeLabels>
+                      <labelers>
+                        <labeler>
+                          <label>changes</label>
+                          <title>regex:^(?!Bump \S+ from \S+ to \S+).+$</title>
+                        </labeler>
+                        <labeler>
+                          <label>dependencies</label>
+                          <title>regex:^Bump \S+ from \S+ to \S+</title>
+                        </labeler>
+                      </labelers>
+                      <categories>
+                        <category>
+                          <title>🔄 Changes</title>
+                          <key>changes</key>
+                          <labels>changes</labels>
+                        </category>
+                        <category>
+                          <title>⚙️ Dependencies</title>
+                          <key>dependencies</key>
+                          <labels>dependencies</labels>
+                        </category>
+                      </categories>
+                    </changelog>
+                  </github>
+                </release>
                 <packagers>
                   <brew>
                     <active>RELEASE</active>
