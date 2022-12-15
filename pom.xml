@@ -469,11 +469,13 @@
                           <title>🔄 Changes</title>
                           <key>changes</key>
                           <labels>changes</labels>
+                          <order>1</order>
                         </category>
                         <category>
                           <title>⚙️ Dependencies</title>
                           <key>dependencies</key>
                           <labels>dependencies</labels>
+                          <order>2</order>
                         </category>
                       </categories>
                     </changelog>
