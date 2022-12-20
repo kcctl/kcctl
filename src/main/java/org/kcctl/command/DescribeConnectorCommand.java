@@ -33,6 +33,8 @@ import org.kcctl.util.Connectors;
 import org.kcctl.util.Tuple;
 import org.kcctl.util.Version;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -59,16 +61,24 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
     boolean includeTasksConfig;
 
+    @Option(names = { "-o", "--output-format" }, description = "Specifies the output format, i.e 'json'")
+    OutputFormat outputFormat;
+
     private final ConfigurationContext context;
+
+    private final ObjectMapper mapper;
 
     @Inject
     public DescribeConnectorCommand(ConfigurationContext context) {
         this.context = context;
+        mapper = new ObjectMapper();
     }
 
-    // Hack : Picocli currently require an empty constructor to generate the completion file
+    // Hack : Picocli currently require an empty constructor to generate the
+    // completion file
     public DescribeConnectorCommand() {
         context = new ConfigurationContext();
+        mapper = new ObjectMapper();
     }
 
     private final Version requiredVersionForTasksConfig = new Version(2, 8);
@@ -76,7 +86,6 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
@@ -104,7 +113,15 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             ConnectorInfo connector = kafkaConnectApi.getConnector(connectorToDescribe);
             ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(connectorToDescribe);
             Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(connectorToDescribe);
-
+            if (outputFormat != null) {
+                switch (outputFormat) {
+                    case JSON:
+                        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(connector));
+                        return 0;
+                    case TEXT:
+                        break;
+                }
+            }
             List<Tuple> connectorInfo = Arrays.asList(
                     new Tuple("Name", connector.name()),
                     new Tuple("Type", connectorStatus.type()),
@@ -175,7 +192,12 @@ public class DescribeConnectorCommand implements Callable<Integer> {
         }
         catch (Exception e) {
             if (!e.getMessage().contains("not found")) {
-                throw e;
+                try {
+                    throw e;
+                }
+                catch (Exception e1) {
+                    // yes not so nice, not sure how to handle exceptions in a cli app
+                }
             }
 
             spec.commandLine().getOut().println("Connector " + connectorToDescribe + " not found. The following connector(s) are available:");
@@ -204,6 +226,26 @@ public class DescribeConnectorCommand implements Callable<Integer> {
         }
         else {
             return state;
+        }
+    }
+
+    public enum OutputFormat {
+        JSON("json"),
+        TEXT("text");
+
+        public final String name;
+
+        OutputFormat(String name) {
+            this.name = name;
+        }
+
+        public static OutputFormat forName(String name) {
+            return OutputFormat.valueOf(name.toUpperCase(Locale.ROOT));
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }

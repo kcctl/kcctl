@@ -56,4 +56,21 @@ class DescribeConnectorCommandTest extends IntegrationTest {
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(baos.toString()).contains(HEARTBEAT_TOPIC);
     }
+
+    @Test
+    public void should_describe_connector_with_json() {
+        registerTestConnector("test1");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        PrintStream old = System.out;
+        System.setOut(ps);
+
+        int exitCode = context.commandLine().execute("test1", "--output-format", "json");
+        System.setOut(old);
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(baos.toString()).contains(HEARTBEAT_TOPIC);
+        assertThat(baos.toString()).contains("\"name\" : \"test1\",");
+    }
 }
