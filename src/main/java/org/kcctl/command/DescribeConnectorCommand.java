@@ -33,6 +33,8 @@ import org.kcctl.util.Connectors;
 import org.kcctl.util.Tuple;
 import org.kcctl.util.Version;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -59,16 +61,24 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
     boolean includeTasksConfig;
 
+    @Option(names = { "--output-format" }, description = "Specifies the output format, i.e 'json'")
+    String outputFormat;
+
     private final ConfigurationContext context;
+
+    private final ObjectMapper mapper;
 
     @Inject
     public DescribeConnectorCommand(ConfigurationContext context) {
         this.context = context;
+        mapper = new ObjectMapper();
     }
 
-    // Hack : Picocli currently require an empty constructor to generate the completion file
+    // Hack : Picocli currently require an empty constructor to generate the
+    // completion file
     public DescribeConnectorCommand() {
         context = new ConfigurationContext();
+        mapper = new ObjectMapper();
     }
 
     private final Version requiredVersionForTasksConfig = new Version(2, 8);
@@ -104,7 +114,13 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             ConnectorInfo connector = kafkaConnectApi.getConnector(connectorToDescribe);
             ConnectorStatusInfo connectorStatus = kafkaConnectApi.getConnectorStatus(connectorToDescribe);
             Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(connectorToDescribe);
-
+            if (outputFormat != null) {
+                switch (outputFormat) {
+                    case "json":
+                        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(connector));
+                        return 0;
+                }
+            }
             List<Tuple> connectorInfo = Arrays.asList(
                     new Tuple("Name", connector.name()),
                     new Tuple("Type", connectorStatus.type()),
@@ -132,7 +148,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             Map<String, Map<String, String>> tasksConfigs;
             if (includeTasksConfig) {
                 tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(connectorToDescribe);
-            }
+            } 
             else {
                 tasksConfigs = Collections.emptyMap();
             }
@@ -172,10 +188,13 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 topics.sort(Comparator.comparing(Tuple::getValue));
                 Tuple.print(topics);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             if (!e.getMessage().contains("not found")) {
-                throw e;
+                try {
+                    throw e;
+                } catch (Exception e1) {
+                    //yes not so nice, not sure how to handle exceptions in a cli app 
+                }
             }
 
             spec.commandLine().getOut().println("Connector " + connectorToDescribe + " not found. The following connector(s) are available:");

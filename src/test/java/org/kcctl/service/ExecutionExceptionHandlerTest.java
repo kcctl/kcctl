@@ -89,7 +89,7 @@ class ExecutionExceptionHandlerTest {
 
         @Test
         void should_handle_connect_exception() throws Exception {
-            var handler = new ExecutionExceptionHandler(new ConfigurationContext().getCurrentContext());
+            var handler = new ExecutionExceptionHandler(Context.defaultContext());
             int exitCode = handler.handleExecutionException(
                     new ConnectException(), null, null);
 
