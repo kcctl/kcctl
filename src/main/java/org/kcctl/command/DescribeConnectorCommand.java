@@ -61,8 +61,8 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
     boolean includeTasksConfig;
 
-    @Option(names = { "--output-format" }, description = "Specifies the output format, i.e 'json'")
-    String outputFormat;
+    @Option(names = { "-o", "--output-format" }, description = "Specifies the output format, i.e 'json'")
+    OutputFormat outputFormat;
 
     private final ConfigurationContext context;
 
@@ -86,7 +86,6 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
@@ -116,9 +115,11 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             Map<String, String> connectorConfig = kafkaConnectApi.getConnectorConfig(connectorToDescribe);
             if (outputFormat != null) {
                 switch (outputFormat) {
-                    case "json":
+                    case JSON:
                         System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(connector));
                         return 0;
+                    case TEXT:
+                        break;
                 }
             }
             List<Tuple> connectorInfo = Arrays.asList(
@@ -148,7 +149,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             Map<String, Map<String, String>> tasksConfigs;
             if (includeTasksConfig) {
                 tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(connectorToDescribe);
-            } 
+            }
             else {
                 tasksConfigs = Collections.emptyMap();
             }
@@ -188,12 +189,14 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 topics.sort(Comparator.comparing(Tuple::getValue));
                 Tuple.print(topics);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             if (!e.getMessage().contains("not found")) {
                 try {
                     throw e;
-                } catch (Exception e1) {
-                    //yes not so nice, not sure how to handle exceptions in a cli app 
+                }
+                catch (Exception e1) {
+                    // yes not so nice, not sure how to handle exceptions in a cli app
                 }
             }
 
@@ -223,6 +226,26 @@ public class DescribeConnectorCommand implements Callable<Integer> {
         }
         else {
             return state;
+        }
+    }
+
+    public enum OutputFormat {
+        JSON("json"),
+        TEXT("text");
+
+        public final String name;
+
+        OutputFormat(String name) {
+            this.name = name;
+        }
+
+        public static OutputFormat forName(String name) {
+            return OutputFormat.valueOf(name.toUpperCase(Locale.ROOT));
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }
