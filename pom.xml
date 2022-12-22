@@ -33,7 +33,7 @@
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus.platform.version>2.15.0.Final</quarkus.platform.version>
-    <debezium.version>2.0.1.Final</debezium.version>
+    <debezium.version>2.1.0.Final</debezium.version>
     <artifactsDir>target</artifactsDir>
   </properties>
 
