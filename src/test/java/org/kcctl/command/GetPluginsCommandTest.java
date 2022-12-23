@@ -57,6 +57,7 @@ class GetPluginsCommandTest extends IntegrationTest {
                         "source   io.debezium.connector.mysql.MySqlConnector                  " + debeziumVersion,
                         "source   io.debezium.connector.oracle.OracleConnector                " + debeziumVersion,
                         "source   io.debezium.connector.postgresql.PostgresConnector          " + debeziumVersion,
+                        "source   io.debezium.connector.spanner.SpannerConnector              " + debeziumVersion,
                         "source   io.debezium.connector.sqlserver.SqlServerConnector          " + debeziumVersion,
                         "source   io.debezium.connector.vitess.VitessConnector                " + debeziumVersion,
                         "source   org.apache.kafka.connect.mirror.MirrorCheckpointConnector   " + kafkaVersion,
