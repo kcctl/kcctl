@@ -61,7 +61,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
     boolean includeTasksConfig;
 
-    @Option(names = { "-o", "--output-format" }, description = "Specifies the output format, i.e 'json'")
+    @Option(names = { "-o", "--output-format" }, defaultValue = "text", description = "Specifies the output format, either 'text' (default) or 'json'")
     OutputFormat outputFormat;
 
     private final ConfigurationContext context;
