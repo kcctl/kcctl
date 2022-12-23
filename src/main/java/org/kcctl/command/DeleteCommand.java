@@ -18,11 +18,12 @@ package org.kcctl.command;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.inject.Inject;
+
 import org.kcctl.util.ConfigurationContext;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-
-import javax.inject.Inject;
 
 @Command(name = "delete", subcommands = { DeleteConnectorCommand.class }, description = "Deletes connectors")
 public class DeleteCommand implements Callable<Integer> {

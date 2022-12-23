@@ -50,7 +50,7 @@ public abstract class IntegrationTest {
 
     protected static final Network network = Network.newNetwork();
 
-    protected static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
+    protected static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.1.9"))
             .withNetwork(network);
 
     protected static DebeziumContainer kafkaConnect = DebeziumContainer.latestStable()
