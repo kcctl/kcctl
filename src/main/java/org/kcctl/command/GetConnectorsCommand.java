@@ -105,7 +105,7 @@ public class GetConnectorsCommand implements Runnable {
                         new Column().header("NAME").dataAlign(HorizontalAlign.LEFT),
                         new Column().header(" TYPE").dataAlign(HorizontalAlign.LEFT),
                         new Column().header(" STATE").dataAlign(HorizontalAlign.LEFT),
-                        new Column().header(" TASKS").dataAlign(HorizontalAlign.LEFT)
+                        new Column().header(" TASKS").dataAlign(HorizontalAlign.LEFT).maxWidth(100)
                 },
                 data);
 
