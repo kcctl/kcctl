@@ -1,0 +1,7 @@
+{
+    "name": "connector-class-not-found",
+    "config": {
+        "connector.class": "NonExistentSource",
+        "tasks.max": "1"
+    }
+}

@@ -140,4 +140,14 @@ class ApplyCommandTest extends IntegrationTest {
         assertThat(context.output().toString()).doesNotContain("Created connector");
     }
 
+    @Test
+    public void should_gracefully_handle_missing_connector_class() {
+        var path = Paths.get("src", "test", "resources", "nonexistent.json");
+
+        int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
+        assertThat(context.output().toString()).contains("Specified class isn't a valid connector type");
+    }
+
 }
