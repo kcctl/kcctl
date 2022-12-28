@@ -198,7 +198,7 @@ public class ApplyCommand implements Callable<Integer> {
 
                 spec.commandLine().getOut().println("Specified class isn't a valid connector type. The following connector type(s) are available:");
 
-                CommandLine getPlugins = new CommandLine(new GetPluginsCommand())
+                CommandLine getPlugins = new CommandLine(new GetPluginsCommand(context))
                         .setOut(spec.commandLine().getOut())
                         .setErr(spec.commandLine().getErr());
                 String pluginTypes = GetPluginsCommand.PluginType.SOURCE + "," + GetPluginsCommand.PluginType.SINK;

@@ -145,9 +145,21 @@ class ApplyCommandTest extends IntegrationTest {
         var path = Paths.get("src", "test", "resources", "nonexistent.json");
 
         int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
-
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
-        assertThat(context.output().toString()).contains("Specified class isn't a valid connector type");
+
+        Iterable<String> expectedOutputSubstrings = Arrays.asList(
+                "Specified class isn't a valid connector type",
+                "The following connector type(s) are available",
+                "TYPE",
+                "CLASS",
+                "VERSION",
+                "source",
+                "io.debezium.connector.mysql.MySqlConnector",
+                "org.apache.kafka.connect.mirror.MirrorSourceConnector"
+        );
+        for (String substring : expectedOutputSubstrings) {
+            assertThat(context.output().toString()).contains(substring);
+        }
     }
 
 }
