@@ -53,6 +53,6 @@ class PatchCommandTest extends IntegrationTest {
         System.setOut(old);
 
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-        assertThat(baos.toString()).contains("test:                  true");
+        assertThat(baos.toString()).contains("test:                     true");
     }
 }

@@ -47,6 +47,9 @@ class ApplyCommandTest extends IntegrationTest {
     @InjectCommandContext
     KcctlCommandContext<ApplyCommand> context;
 
+    @InjectCommandContext
+    KcctlCommandContext<PatchConnectorCommand> patchContext;
+
     @Test
     public void should_create_two_connectors_single_flag() {
         test_create_two_connectors(false);
@@ -69,6 +72,11 @@ class ApplyCommandTest extends IntegrationTest {
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString()).contains("Created connector heartbeat-source", "Created connector heartbeat-source-2");
 
+        // fix missing admin.bootstrap.servers property exception
+        String parameters = "admin.bootstrap.servers=" + getKafkaBootstrapServers();
+        patchContext.commandLine().execute("--set", parameters, "heartbeat-source", "heartbeat-source-2");
+        System.setProperty("debezium.test.records.waittime", "4");
+
         kafkaConnect.ensureConnectorRegistered("heartbeat-source");
         kafkaConnect.ensureConnectorRegistered("heartbeat-source-2");
         kafkaConnect.ensureConnectorState("heartbeat-source", Connector.State.RUNNING);
@@ -86,6 +94,11 @@ class ApplyCommandTest extends IntegrationTest {
         int exitCode = context.commandLine().execute("-f", "-");
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString().trim()).isEqualTo("Created connector heartbeat-source");
+
+        // fix missing admin.bootstrap.servers property exception
+        String parameters = "admin.bootstrap.servers=" + getKafkaBootstrapServers();
+        patchContext.commandLine().execute("--set", parameters, "heartbeat-source");
+        System.setProperty("debezium.test.records.waittime", "4");
 
         kafkaConnect.ensureConnectorRegistered("heartbeat-source");
         kafkaConnect.ensureConnectorState("heartbeat-source", Connector.State.RUNNING);
@@ -106,6 +119,11 @@ class ApplyCommandTest extends IntegrationTest {
                 Created connector heartbeat-source
                 Updated connector heartbeat-source
                 """);
+
+        // fix missing admin.bootstrap.servers property exception
+        String parameters = "admin.bootstrap.servers=" + getKafkaBootstrapServers();
+        patchContext.commandLine().execute("--set", parameters, "heartbeat-source");
+        System.setProperty("debezium.test.records.waittime", "4");
 
         kafkaConnect.ensureConnectorRegistered("heartbeat-source");
         kafkaConnect.ensureConnectorState("heartbeat-source", Connector.State.RUNNING);
@@ -155,8 +173,7 @@ class ApplyCommandTest extends IntegrationTest {
                 "VERSION",
                 "source",
                 "io.debezium.connector.mysql.MySqlConnector",
-                "org.apache.kafka.connect.mirror.MirrorSourceConnector"
-        );
+                "org.apache.kafka.connect.mirror.MirrorSourceConnector");
         for (String substring : expectedOutputSubstrings) {
             assertThat(context.output().toString()).contains(substring);
         }

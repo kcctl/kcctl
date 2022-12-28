@@ -93,9 +93,14 @@ public abstract class IntegrationTest {
                 .with("connector.class", "org.apache.kafka.connect.mirror.MirrorHeartbeatConnector")
                 .with("tasks.max", 1)
                 .with("source.cluster.alias", "source")
-                .with("topic", HEARTBEAT_TOPIC);
+                .with("topic", HEARTBEAT_TOPIC)
+                .with("admin.bootstrap.servers", getKafkaBootstrapServers());
 
         kafkaConnect.registerConnector(name, config);
+    }
+
+    protected String getKafkaBootstrapServers() {
+        return "%s:9092".formatted(kafka.getNetworkAliases().get(0));
     }
 
     private KcctlCommandContext<?> prepareContext(Field field) {

@@ -79,7 +79,7 @@ public class GetPluginsCommand implements Callable<Integer> {
         if (pluginTypes != null && !pluginTypes.isEmpty()) {
             connectorPlugins.removeIf(p -> !pluginTypes.contains(PluginType.forName(p.type())));
         }
-        connectorPlugins.sort(Comparator.comparing(ConnectorPlugin::type));
+        connectorPlugins.sort(Comparator.comparing(ConnectorPlugin::type).thenComparing(ConnectorPlugin::clazz));
 
         spec.commandLine().getOut().println();
         spec.commandLine().getOut().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(

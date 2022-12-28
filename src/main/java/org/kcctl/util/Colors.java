@@ -41,4 +41,21 @@ public class Colors {
     public static String highlight(String input) {
         return ANSI_WHITE_BACKGROUND + ANSI_BLACK + ANSI_BOLD + input + ANSI_RESET;
     }
+
+    public static String colorizeState(String state) {
+        return switch (state) {
+            case "RUNNING" -> ANSI_GREEN + "RUNNING" + ANSI_RESET;
+            case "PAUSED" -> ANSI_YELLOW + "PAUSED" + ANSI_RESET;
+            case "FAILED" -> ANSI_RED + "FAILED" + ANSI_RESET;
+            case "UNASSIGNED" -> ANSI_YELLOW + "UNASSIGNED" + ANSI_RESET;
+            default -> state;
+        };
+    }
+
+    public static String replaceColorState(String rawState) {
+        return rawState.replace("RUNNING", colorizeState("RUNNING"))
+                .replace("PAUSED", colorizeState("PAUSED"))
+                .replace("FAILED", colorizeState("FAILED"))
+                .replace("UNASSIGNED", colorizeState("UNASSIGNED"));
+    }
 }
