@@ -55,14 +55,14 @@ jobs:
 
       - name: 'Build Native Image (Linux)'
         if: ${{ runner.os == 'Linux' }}
-        run: ./mvnw -B --file pom.xml -Pnative package
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package
 
       - name: 'Build Native Image (macOS, Windows)'
         if: ${{ runner.os == 'macOS' || runner.os == 'Windows' }}
-        run: ./mvnw -B --file pom.xml -Pnative package "-Dquarkus.test.profile.tags=basic"
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package "-Dquarkus.test.profile.tags=basic"
 
       - name: 'Create distribution'
-        run: ./mvnw -B --file pom.xml -Pdist package -DskipTests
+        run: ./mvnw -ntp -B --file pom.xml -Pdist package -DskipTests
 
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v3
@@ -102,7 +102,7 @@ jobs:
       - name: 'Release with JReleaser'
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./mvnw -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
+        run: ./mvnw -ntp -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
 
       - name: JReleaser output
         if: always()
