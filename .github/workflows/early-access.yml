@@ -20,6 +20,11 @@ on:
   push:
     branches: [ main ]
 
+env:
+  JAVA_VERSION: '17'
+  JAVA_DISTRO: 'zulu'
+  GRAAL_VERSION: '22.3.0'
+
 jobs:
   # Build native executable per runner
   build:
@@ -41,8 +46,8 @@ jobs:
 
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.3.0'
-          java-version: '17'
+          version: ${{ env.GRAAL_VERSION }}
+          java-version: ${{ env.JAVA_VERSION }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -89,8 +94,8 @@ jobs:
       - name: 'Set up Java'
         uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
 
       - name: 'Cache Maven packages'
         uses: actions/cache@v3.2.3

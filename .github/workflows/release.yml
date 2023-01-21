@@ -26,17 +26,27 @@ on:
         description: "Next version"
         required: false
 
+env:
+  JAVA_VERSION: '17'
+  JAVA_DISTRO: 'zulu'
+  GRAAL_VERSION: '22.3.0'
+
 jobs:
   version:
     runs-on: ubuntu-latest
+    outputs:
+      HEAD: ${{ steps.version.outputs.HEAD }}
+      RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
+      PLAIN_VERSION: ${{ steps.version.outputs.PLAIN_VERSION }}
+      NEXT_VERSION: ${{ steps.version.outputs.NEXT_VERSION }}
     steps:
       - uses: actions/checkout@v3
 
       - name: 'Set up Java'
         uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
 
       - name: 'Cache Maven packages'
         uses: actions/cache@v3.2.3
@@ -61,18 +71,11 @@ jobs:
           git config --global user.name "GitHub Action"
           git commit -a -m "🏁 Releasing version $RELEASE_VERSION"
           git push origin HEAD:main
-          git rev-parse HEAD > HEAD
-          echo $RELEASE_VERSION > RELEASE_VERSION
-          echo $PLAIN_VERSION > PLAIN_VERSION
-          echo $NEXT_VERSION > NEXT_VERSION
-
-      - name: 'Upload version files'
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifacts
-          path: |
-            HEAD
-            *_VERSION
+          HEAD=$(git rev-parse HEAD)
+          echo "HEAD=$HEAD" >> $GITHUB_OUTPUT
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          echo "PLAIN_VERSION=$PLAIN_VERSION" >> $GITHUB_OUTPUT
 
   # Build native executable per runner
   build:
@@ -83,21 +86,11 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
-
     steps:
-      - name: 'Download all build artifacts'
-        uses: actions/download-artifact@v3
-
-      - name: 'Read HEAD ref'
-        id: head
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: artifacts/HEAD
-
       - name: 'Check out repository'
         uses: actions/checkout@v3
         with:
-          ref: ${{ steps.head.outputs.content }}
+          ref: ${{ needs.version.outputs.HEAD }}
         
       - name: 'Add Developer Command Prompt for Microsoft Visual C++ '
         if: ${{ runner.os == 'Windows' }}
@@ -105,8 +98,8 @@ jobs:
 
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.3.0'
-          java-version: '17'
+          version: ${{ env.GRAAL_VERSION }}
+          java-version: ${{ env.JAVA_VERSION }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -138,37 +131,13 @@ jobs:
 
   # Collect all executables and release
   release:
-    needs: [ build ]
+    needs: [ version, build ]
     runs-on: ubuntu-latest
-
     steps:
-      # must read HEAD before checkout
-      - name: 'Download all build artifacts'
-        uses: actions/download-artifact@v3
-
-      - name: 'Read HEAD ref'
-        id: head
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: artifacts/HEAD
-
-      - name: 'Read versions'
-        id: version
-        run: |
-          RELEASE_VERSION=`cat artifacts/RELEASE_VERSION`
-          PLAIN_VERSION=`cat artifacts/PLAIN_VERSION`
-          NEXT_VERSION=`cat artifacts/NEXT_VERSION`
-          echo "RELEASE_VERSION = $RELEASE_VERSION"
-          echo "PLAIN_VERSION   = $PLAIN_VERSION"
-          echo "NEXT_VERSION    = $NEXT_VERSION"
-          echo "::set-output name=RELEASE_VERSION::$RELEASE_VERSION"
-          echo "::set-output name=PLAIN_VERSION::$PLAIN_VERSION"
-          echo "::set-output name=NEXT_VERSION::$NEXT_VERSION"
-
       - name: 'Check out repository'
         uses: actions/checkout@v3
         with:
-          ref: ${{ steps.head.outputs.content }}
+          ref: ${{ needs.version.outputs.HEAD }}
           fetch-depth: 0
 
       # checkout will clobber downloaded artifacts
@@ -179,8 +148,8 @@ jobs:
       - name: 'Set up Java'
         uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
 
       - name: 'Cache Maven packages'
         uses: actions/cache@v3.2.3
@@ -208,7 +177,7 @@ jobs:
           
       - name: 'Set next version'
         env:
-          NEXT_VERSION: ${{ steps.version.outputs.NEXT_VERSION }}
+          NEXT_VERSION: ${{ needs.version.outputs.NEXT_VERSION }}
         run: |
           ./mvnw -ntp -B versions:set versions:commit -DnewVersion=$NEXT_VERSION
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
