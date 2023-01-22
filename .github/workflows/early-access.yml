@@ -20,6 +20,11 @@ on:
   push:
     branches: [ main ]
 
+env:
+  JAVA_VERSION: '17'
+  JAVA_DISTRO: 'zulu'
+  GRAAL_VERSION: '22.3.0'
+
 jobs:
   # Build native executable per runner
   build:
@@ -41,8 +46,8 @@ jobs:
 
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.3.0'
-          java-version: '17'
+          version: ${{ env.GRAAL_VERSION }}
+          java-version: ${{ env.JAVA_VERSION }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,14 +60,14 @@ jobs:
 
       - name: 'Build Native Image (Linux)'
         if: ${{ runner.os == 'Linux' }}
-        run: ./mvnw -B --file pom.xml -Pnative package
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package
 
       - name: 'Build Native Image (macOS, Windows)'
         if: ${{ runner.os == 'macOS' || runner.os == 'Windows' }}
-        run: ./mvnw -B --file pom.xml -Pnative package "-Dquarkus.test.profile.tags=basic"
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package "-Dquarkus.test.profile.tags=basic"
 
       - name: 'Create distribution'
-        run: ./mvnw -B --file pom.xml -Pdist package -DskipTests
+        run: ./mvnw -ntp -B --file pom.xml -Pdist package -DskipTests
 
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v3
@@ -89,8 +94,8 @@ jobs:
       - name: 'Set up Java'
         uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
 
       - name: 'Cache Maven packages'
         uses: actions/cache@v3.2.3
@@ -102,7 +107,7 @@ jobs:
       - name: 'Release with JReleaser'
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./mvnw -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
+        run: ./mvnw -ntp -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
 
       - name: JReleaser output
         if: always()

@@ -481,21 +481,17 @@
                     </changelog>
                   </github>
                 </release>
-                <packagers>
-                  <brew>
-                    <active>RELEASE</active>
-                    <continueOnError>true</continueOnError>
-                    <multiPlatform>true</multiPlatform>
-                  </brew>
-                  <sdkman>
-                    <active>RELEASE</active>
-                    <continueOnError>true</continueOnError>
-                  </sdkman>
-                </packagers>
                 <distributions>
                   <kcctl>
                     <name>kcctl</name>
-                    <type>NATIVE_IMAGE</type>
+                    <type>BINARY</type>
+                    <brew>
+                      <active>RELEASE</active>
+                      <multiPlatform>true</multiPlatform>
+                    </brew>
+                    <sdkman>
+                      <active>RELEASE</active>
+                    </sdkman>
                     <artifacts>
                       <artifact>
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz</path>
