@@ -52,7 +52,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Cache Maven packages'
-        uses: actions/cache@v3.2.4
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -98,7 +98,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRO }}
 
       - name: 'Cache Maven packages'
-        uses: actions/cache@v3.2.4
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
