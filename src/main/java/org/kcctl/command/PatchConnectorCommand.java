@@ -49,7 +49,7 @@ public class PatchConnectorCommand implements Callable<Integer> {
     CommandSpec commandSpec;
 
     @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
-    Set<String> names;
+    Set<String> names = Set.of();
 
     @Option(names = { "-e", "--reg-exp" }, description = "use CONNECTOR NAME(s) as regexp pattern(s) to use on all connectors")
     boolean regexpMode = false;

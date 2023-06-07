@@ -15,7 +15,6 @@
  */
 package org.kcctl.command;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,10 +22,12 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.kcctl.service.ConnectorExpandInfo;
 import org.kcctl.service.ConnectorStatusInfo;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.TaskState;
 import org.kcctl.util.ConfigurationContext;
+import org.kcctl.util.GetConnectorsStatusStyler;
 import org.kcctl.util.Version;
 
 import com.github.freva.asciitable.AsciiTable;
@@ -35,10 +36,6 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-
-import static org.kcctl.util.Colors.ANSI_GREEN;
-import static org.kcctl.util.Colors.ANSI_RED;
-import static org.kcctl.util.Colors.ANSI_RESET;
 
 @Command(name = "connectors", description = "Displays information about deployed connectors")
 public class GetConnectorsCommand implements Runnable {
@@ -76,14 +73,14 @@ public class GetConnectorsCommand implements Runnable {
 
         List<ConnectorStatusInfo> connectors;
         if (currentVersion.greaterOrEquals(requiredVersionForExpandApi)) {
-            connectors = kafkaConnectApi.getConnectorExpandInfo(Arrays.asList("status")).values().stream()
-                    .map(m -> m.status())
+            connectors = kafkaConnectApi.getConnectorExpandInfo(List.of("status")).values().stream()
+                    .map(ConnectorExpandInfo::status)
                     .sorted(Comparator.comparing(ConnectorStatusInfo::type).thenComparing(ConnectorStatusInfo::name))
                     .collect(Collectors.toList());
         }
         else {
             connectors = kafkaConnectApi.getConnectors().stream()
-                    .map(m -> kafkaConnectApi.getConnectorStatus(m))
+                    .map(kafkaConnectApi::getConnectorStatus)
                     .collect(Collectors.toList());
         }
 
@@ -100,16 +97,19 @@ public class GetConnectorsCommand implements Runnable {
         }
 
         spec.commandLine().getOut().println();
-        String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
-                new Column[]{
-                        new Column().header("NAME").dataAlign(HorizontalAlign.LEFT),
-                        new Column().header(" TYPE").dataAlign(HorizontalAlign.LEFT),
-                        new Column().header(" STATE").dataAlign(HorizontalAlign.LEFT),
-                        new Column().header(" TASKS").dataAlign(HorizontalAlign.LEFT).maxWidth(100)
-                },
-                data);
+        Column[] columns = new Column[]{
+                new Column().header("NAME").dataAlign(HorizontalAlign.LEFT),
+                new Column().header(" TYPE").dataAlign(HorizontalAlign.LEFT),
+                new Column().header(" STATE").dataAlign(HorizontalAlign.LEFT),
+                new Column().header(" TASKS").dataAlign(HorizontalAlign.LEFT).maxWidth(100)
+        };
+        String table = AsciiTable.builder()
+                .data(columns, data)
+                .border(AsciiTable.NO_BORDERS)
+                .styler(new GetConnectorsStatusStyler())
+                .asString();
 
-        spec.commandLine().getOut().println(table.replace("RUNNING", ANSI_GREEN + "RUNNING" + ANSI_RESET).replace("FAILED", ANSI_RED + "FAILED" + ANSI_RESET));
+        spec.commandLine().getOut().println(table);
         spec.commandLine().getOut().println();
     }
 

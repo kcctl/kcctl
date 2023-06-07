@@ -28,6 +28,7 @@ import org.kcctl.service.ConnectorStatusInfo;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.TaskState;
 import org.kcctl.service.TopicsInfo;
+import org.kcctl.util.Colors;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Connectors;
 import org.kcctl.util.Tuple;
@@ -40,11 +41,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import static org.kcctl.util.Colors.ANSI_GREEN;
-import static org.kcctl.util.Colors.ANSI_RED;
 import static org.kcctl.util.Colors.ANSI_RESET;
 import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
-import static org.kcctl.util.Colors.ANSI_YELLOW;
 
 @Command(name = "connector", aliases = "connectors", description = "Displays information about given connectors")
 public class DescribeConnectorCommand implements Callable<Integer> {
@@ -55,7 +53,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
     @Parameters(paramLabel = "CONNECTOR NAME", description = "Name of the connector", completionCandidates = ConnectorNameCompletions.class)
     Set<String> names = Set.of();
 
-    @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use CONNECTOR NAME(s) as regexp pattern(s) to use on all connectors")
+    @Option(names = { "-e", "--reg-exp" }, description = "use CONNECTOR NAME(s) as regexp pattern(s) to use on all connectors")
     boolean regexpMode = false;
 
     @Option(names = { "--tasks-config" }, description = "Displays tasks configuration")
@@ -125,7 +123,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             List<Tuple> connectorInfo = Arrays.asList(
                     new Tuple("Name", connector.name()),
                     new Tuple("Type", connectorStatus.type()),
-                    new Tuple("State", colorizeState(connectorStatus.connector().state())),
+                    new Tuple("State", Colors.colorizeState(connectorStatus.connector().state())),
                     new Tuple("Worker ID", connectorStatus.connector().worker_id()));
 
             Tuple.print(connectorInfo);
@@ -158,7 +156,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
             for (TaskState task : connectorStatus.tasks()) {
                 Tuple.print(Arrays.asList(new Tuple("  " + task.id(), "")));
                 List<Tuple> tuples = new ArrayList<>();
-                tuples.add(new Tuple("    State", colorizeState(task.state())));
+                tuples.add(new Tuple("    State", Colors.colorizeState(task.state())));
                 tuples.add(new Tuple("    Worker ID", task.worker_id()));
 
                 if (includeTasksConfig) {
@@ -209,24 +207,6 @@ public class DescribeConnectorCommand implements Callable<Integer> {
         }
 
         return 0;
-    }
-
-    private String colorizeState(String state) {
-        if (state.equals("RUNNING")) {
-            return ANSI_GREEN + "RUNNING" + ANSI_RESET;
-        }
-        else if (state.equals("PAUSED")) {
-            return ANSI_YELLOW + "PAUSED" + ANSI_RESET;
-        }
-        else if (state.equals("FAILED")) {
-            return ANSI_RED + "FAILED" + ANSI_RESET;
-        }
-        else if (state.equals("UNASSIGNED")) {
-            return ANSI_YELLOW + "UNASSIGNED" + ANSI_RESET;
-        }
-        else {
-            return state;
-        }
     }
 
     public enum OutputFormat {
