@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,10 +54,11 @@ public abstract class IntegrationTest {
     protected static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.3.1"))
             .withNetwork(network);
 
-    protected static DebeziumContainer kafkaConnect = DebeziumContainer.latestStable()
+    protected static final DebeziumContainer kafkaConnectBase = DebeziumContainer.latestStable()
             .withNetwork(network)
             .withKafka(kafka)
             .dependsOn(kafka);
+    protected static DebeziumContainer kafkaConnect = kafkaConnectBase;
 
     @BeforeAll
     public static void prepare() {
@@ -86,6 +88,12 @@ public abstract class IntegrationTest {
     @AfterEach
     public void cleanup() {
         kafkaConnect.deleteAllConnectors();
+    }
+
+    @AfterAll
+    public static void resetKafkaConnectImage() {
+        // In case a test overrode the Kafka Connect image
+        kafkaConnect = kafkaConnectBase;
     }
 
     protected void registerTestConnector(String name) {

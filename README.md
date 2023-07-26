@@ -75,8 +75,8 @@ A command-line interface for Kafka Connect
 Commands:
   info      Displays information about the Kafka Connect cluster
   config    Sets or retrieves the configuration of this client
-  get       Displays information about connector plug-ins, connectors, and
-              loggers
+  get       Displays information about connector plug-ins, connector offsets,
+              created connectors, and loggers
   describe  Displays detailed information about the specified resources
   apply     Applies the given files or the stdin content for registering or
               updating connectors
@@ -84,8 +84,8 @@ Commands:
   restart   Restarts some connectors or a task
   pause     Pauses connectors
   resume    Resumes connectors
-  delete    Deletes specified connectors
-  help      Displays help information about the specified command
+  delete    Deletes connectors
+  help      Display help information about the specified command.
 ```
 
 ### Authentication
