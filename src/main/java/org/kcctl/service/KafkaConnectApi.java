@@ -101,6 +101,10 @@ public interface KafkaConnectApi {
     @Path("/connectors/{name}/config")
     ConnectorStatusInfo updateConnector(@PathParam("name") String name, String config);
 
+    @GET
+    @Path("/connectors/{name}/offsets")
+    ConnectorOffsets getConnectorOffsets(@PathParam("name") String name);
+
     @POST
     @Path("/connectors/{name}/tasks/{id}/restart")
     ConnectorInfo restartTask(@PathParam("name") String name, @PathParam("id") String id);

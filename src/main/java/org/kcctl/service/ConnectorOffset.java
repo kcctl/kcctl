@@ -13,21 +13,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.kcctl.support;
+package org.kcctl.service;
 
-import java.io.StringWriter;
+import java.util.Map;
 
-import picocli.CommandLine;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record KcctlCommandContext<T>(T command, CommandLine commandLine, StringWriter output, StringWriter error) {
-
-    /**
-     * Clear the {@link #output() stdout} and {@link #error() stderr} for this command.
-     * Useful if multiple invocations of the command take place, and only the output of
-     * the most recent invocation is desired each time.
-     */
-    public void reset() {
-        output.getBuffer().setLength(0);
-        error.getBuffer().setLength(0);
-    }
+public record ConnectorOffset(
+        @JsonProperty("partition") Map<String, ?> partition,
+        @JsonProperty("offset") Map<String, ?> offset
+) {
 }
