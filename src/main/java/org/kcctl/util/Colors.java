@@ -46,6 +46,10 @@ public class Colors {
         return switch (state) {
             case "RUNNING" -> ANSI_GREEN + "RUNNING" + ANSI_RESET;
             case "PAUSED" -> ANSI_YELLOW + "PAUSED" + ANSI_RESET;
+            // For Connector objects, STOPPED is identical to PAUSED
+            // The only difference applies to tasks; with PAUSED, tasks stay up but
+            // in an idling state; with STOPPED, all tasks are shut down
+            case "STOPPED" -> ANSI_YELLOW + "STOPPED" + ANSI_RESET;
             case "FAILED" -> ANSI_RED + "FAILED" + ANSI_RESET;
             case "UNASSIGNED" -> ANSI_YELLOW + "UNASSIGNED" + ANSI_RESET;
             default -> state;
@@ -55,6 +59,7 @@ public class Colors {
     public static String replaceColorState(String rawState) {
         return rawState.replace("RUNNING", colorizeState("RUNNING"))
                 .replace("PAUSED", colorizeState("PAUSED"))
+                .replace("STOPPED", colorizeState("STOPPED"))
                 .replace("FAILED", colorizeState("FAILED"))
                 .replace("UNASSIGNED", colorizeState("UNASSIGNED"));
     }

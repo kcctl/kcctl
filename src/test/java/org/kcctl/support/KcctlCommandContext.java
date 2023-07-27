@@ -19,6 +19,8 @@ import java.io.StringWriter;
 
 import picocli.CommandLine;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public record KcctlCommandContext<T>(T command, CommandLine commandLine, StringWriter output, StringWriter error) {
 
     /**
@@ -30,4 +32,19 @@ public record KcctlCommandContext<T>(T command, CommandLine commandLine, StringW
         output.getBuffer().setLength(0);
         error.getBuffer().setLength(0);
     }
+
+    /**
+     * Run a command with the given arguments and verify that it has exited successfully
+     * @param args the arguments with which the command should be invoked
+     */
+    public void runAndCheckExitCode(String... args) {
+        int exitCode = commandLine.execute(args);
+        assertThat(exitCode)
+                .overridingErrorMessage(() -> "Command with args '" + String.join("', '", args) + "' "
+                        + "exited with non-zero status " + exitCode + "."
+                        + "\nStdout:\n" + output
+                        + "\nStderr:\n" + error)
+                .isEqualTo(CommandLine.ExitCode.OK);
+    }
+
 }

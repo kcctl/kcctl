@@ -54,11 +54,28 @@ public abstract class IntegrationTest {
     protected static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.3.1"))
             .withNetwork(network);
 
-    protected static final DebeziumContainer kafkaConnectBase = DebeziumContainer.latestStable()
+    protected static final DebeziumContainer kafkaConnectLatestStable = DebeziumContainer.latestStable()
             .withNetwork(network)
             .withKafka(kafka)
-            .dependsOn(kafka);
-    protected static DebeziumContainer kafkaConnect = kafkaConnectBase;
+            .dependsOn(kafka)
+            .withEnv("GROUP_ID", "debezium_latest_stable");
+
+    // TODO: remove this separate container once Debezium releases 2.4, which is based on Kafka 3.5;
+    // we can just go back to kafkaConnectLatestStable for all of our tests then
+    protected static final DebeziumContainer kafkaConnect24Alpha = new DebeziumContainer("debezium/connect:2.4.0.Alpha1")
+            .withNetwork(network)
+            .withKafka(kafka)
+            .dependsOn(kafka)
+            // Force rapid offset commits, in order for offsets to appear quickly in the REST API for the 'get offsets' command tests
+            .withEnv("OFFSET_FLUSH_INTERVAL_MS", "1000")
+            // Override the group ID to prevent this worker from forming a cluster with workers in other containers
+            .withEnv("GROUP_ID", "debezium_2_4_alpha")
+            // Can't share internal topics, either
+            .withEnv("CONFIG_STORAGE_TOPIC", "debezium_2_4_alpha_configs")
+            .withEnv("OFFSET_STORAGE_TOPIC", "debezium_2_4_alpha_offsets")
+            .withEnv("STATUS_STORAGE_TOPIC", "debezium_2_4_alpha_status");
+
+    protected static DebeziumContainer kafkaConnect = kafkaConnectLatestStable;
 
     @BeforeAll
     public static void prepare() {
@@ -93,7 +110,14 @@ public abstract class IntegrationTest {
     @AfterAll
     public static void resetKafkaConnectImage() {
         // In case a test overrode the Kafka Connect image
-        kafkaConnect = kafkaConnectBase;
+        kafkaConnect = kafkaConnectLatestStable;
+    }
+
+    protected void registerTestConnectors(String name, String... names) {
+        registerTestConnector(name);
+        for (String extraName : names) {
+            registerTestConnector(extraName);
+        }
     }
 
     protected void registerTestConnector(String name) {
