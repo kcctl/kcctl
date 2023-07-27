@@ -84,6 +84,7 @@ Commands:
   restart   Restarts some connectors or a task
   pause     Pauses connectors
   resume    Resumes connectors
+  stop      Stops (but does not delete) connectors
   delete    Deletes connectors
   help      Display help information about the specified command.
 ```

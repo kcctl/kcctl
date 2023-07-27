@@ -31,10 +31,8 @@ import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.debezium.testing.testcontainers.DebeziumContainer;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -54,25 +52,19 @@ class GetOffsetsCommandTest extends IntegrationTest {
     @BeforeAll
     public static void prepare() {
         // TODO: replace explicit container tag with DebeziumContainer.latestStable() once Debezium releases 2.4, which is based on Kafka 3.5
-        kafkaConnect = new DebeziumContainer("debezium/connect:2.4.0.Alpha1")
-                .withNetwork(network)
-                .withKafka(kafka)
-                .dependsOn(kafka)
-                // Force rapid offset commits, in order for offsets to appear quickly in the REST API
-                .withEnv("OFFSET_FLUSH_INTERVAL_MS", "100");
+        kafkaConnect = kafkaConnect24Alpha;
         IntegrationTest.prepare();
     }
 
     @Test
-    public void should_list_offsets_single_connector() throws Exception {
-        registerTestConnector("test1");
+    public void should_list_offsets_single_connector() {
+        registerTestConnector("offsets-test1");
 
         await()
                 .atMost(Duration.ofSeconds(OFFSET_AVAILABILITY_TIMEOUT_SECONDS))
                 .until(() -> {
                     context.reset();
-                    int exitCode = context.commandLine().execute("test1");
-                    assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+                    context.runAndCheckExitCode("offsets-test1");
                     String output = context.output().toString();
                     ConnectorOffsets offsets = mapper.readValue(output, ConnectorOffsets.class);
 
@@ -96,20 +88,17 @@ class GetOffsetsCommandTest extends IntegrationTest {
     }
 
     @Test
-    public void should_list_offsets_multiple_connectors() throws Exception {
+    public void should_list_offsets_multiple_connectors() {
         // IMPORTANT: None of the connector names we use in these tests should overlap,
         // even across different test cases. This is because offsets are persisted even after
         // connectors are deleted
-        registerTestConnector("test2");
-        registerTestConnector("test3");
-        registerTestConnector("test4");
+        registerTestConnectors("offsets-test2", "offsets-test3", "offsets-test4");
 
         await()
                 .atMost(Duration.ofSeconds(OFFSET_AVAILABILITY_TIMEOUT_SECONDS))
                 .until(() -> {
                     context.reset();
-                    int exitCode = context.commandLine().execute("test2", "test3");
-                    assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+                    context.runAndCheckExitCode("offsets-test2", "offsets-test3");
                     String output = context.output().toString();
 
                     // Small hack: want to make sure that there's at least one partition/offset

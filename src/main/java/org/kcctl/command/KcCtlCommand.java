@@ -38,6 +38,7 @@ import picocli.CommandLine.IVersionProvider;
         RestartCommand.class,
         PauseCommand.class,
         ResumeCommand.class,
+        StopCommand.class,
         DeleteCommand.class,
         CommandLine.HelpCommand.class,
         ConnectorNamesCompletionCandidateCommand.class,
