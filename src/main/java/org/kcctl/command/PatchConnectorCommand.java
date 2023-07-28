@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
@@ -122,7 +123,8 @@ public class PatchConnectorCommand implements Callable<Integer> {
                 return describeConnectorCommand.call();
             }
             catch (KafkaConnectException kce) {
-                if (kce.getMessage().startsWith("Cannot complete request momentarily due to stale configuration")) {
+                // Request temporarily rejected due to, e.g., a pending rebalance; we can and should try again
+                if (kce.getErrorCode() == Response.Status.CONFLICT.getStatusCode()) {
                     try {
                         Thread.sleep(100);
                     }
