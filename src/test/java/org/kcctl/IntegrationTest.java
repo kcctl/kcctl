@@ -62,6 +62,7 @@ public abstract class IntegrationTest {
 
     // TODO: remove this separate container once Debezium releases 2.4, which is based on Kafka 3.5;
     // we can just go back to kafkaConnectLatestStable for all of our tests then
+    // (https://github.com/kcctl/kcctl/issues/346)
     protected static final DebeziumContainer kafkaConnect24Alpha = new DebeziumContainer("debezium/connect:2.4.0.Alpha1")
             .withNetwork(network)
             .withKafka(kafka)

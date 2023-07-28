@@ -37,7 +37,7 @@ public record KcctlCommandContext<T>(T command, CommandLine commandLine, StringW
      * Run a command with the given arguments and verify that it has exited successfully
      * @param args the arguments with which the command should be invoked
      */
-    public void runAndCheckExitCode(String... args) {
+    public void runAndEnsureExitCodeOk(String... args) {
         int exitCode = commandLine.execute(args);
         assertThat(exitCode)
                 .overridingErrorMessage(() -> "Command with args '" + String.join("', '", args) + "' "

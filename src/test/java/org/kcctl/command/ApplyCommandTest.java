@@ -68,13 +68,12 @@ class ApplyCommandTest extends IntegrationTest {
             args.add("-f");
         }
         args.add(path2.toAbsolutePath().toString());
-        int exitCode = context.commandLine().execute(args.toArray(new String[0]));
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk(args.toArray(new String[0]));
         assertThat(context.output().toString()).contains("Created connector heartbeat-source", "Created connector heartbeat-source-2");
 
         // fix missing admin.bootstrap.servers property exception
         String parameters = "admin.bootstrap.servers=" + getKafkaBootstrapServers();
-        patchContext.commandLine().execute("--set", parameters, "heartbeat-source", "heartbeat-source-2");
+        patchContext.runAndEnsureExitCodeOk("--set", parameters, "heartbeat-source", "heartbeat-source-2");
         System.setProperty("debezium.test.records.waittime", "4");
 
         kafkaConnect.ensureConnectorRegistered("heartbeat-source");
@@ -91,8 +90,7 @@ class ApplyCommandTest extends IntegrationTest {
         InputStream fakeIn = new ByteArrayInputStream(Files.readAllBytes(path));
         System.setIn(fakeIn);
 
-        int exitCode = context.commandLine().execute("-f", "-");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("-f", "-");
         assertThat(context.output().toString().trim()).isEqualTo("Created connector heartbeat-source");
 
         // fix missing admin.bootstrap.servers property exception
@@ -108,13 +106,11 @@ class ApplyCommandTest extends IntegrationTest {
     @Test
     public void should_update_connector() {
         var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
-        int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("-f", path.toAbsolutePath().toString());
         assertThat(context.output().toString().trim()).isEqualTo("Created connector heartbeat-source");
 
         path = Paths.get("src", "test", "resources", "heartbeat-source-update.json");
-        exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("-f", path.toAbsolutePath().toString());
         assertThat(context.output().toString()).isEqualTo("""
                 Created connector heartbeat-source
                 Updated connector heartbeat-source

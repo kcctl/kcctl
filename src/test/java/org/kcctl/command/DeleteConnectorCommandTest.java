@@ -25,7 +25,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,25 +38,20 @@ class DeleteConnectorCommandTest extends IntegrationTest {
 
     @Test
     public void should_delete_connector() {
-        registerTestConnector("test1");
-        registerTestConnector("test2");
-        registerTestConnector("test3");
+        registerTestConnectors("test1", "test2", "test3");
 
-        int exitCode = context.commandLine().execute("test1", "test2");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("test1", "test2");
+
         assertThat(context.output().toString()).contains("Deleted connector test1", "Deleted connector test2");
         assertThat(context.output().toString()).doesNotContain("Deleted connector test3");
     }
 
     @Test
     public void should_delete_connector_with_regexp() {
-        registerTestConnector("match-1-test");
-        registerTestConnector("match-2-test");
-        registerTestConnector("nomatch-3-test");
+        registerTestConnectors("match-1-test", "match-2-test", "nomatch-3-test");
 
-        int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test");
+        context.runAndEnsureExitCodeOk("--reg-exp", "match-\\d-test");
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString()).contains("Deleted connector match-1-test", "Deleted connector match-2-test");
         assertThat(context.output().toString()).doesNotContain("Deleted connector nomatch-3-test");
     }
@@ -66,21 +60,17 @@ class DeleteConnectorCommandTest extends IntegrationTest {
     public void should_delete_only_once() {
         registerTestConnector("test1");
 
-        int exitCode = context.commandLine().execute("test1", "test1", "test1");
+        context.runAndEnsureExitCodeOk("test1", "test1", "test1");
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString()).containsOnlyOnce("Deleted connector test1");
     }
 
     @Test
     public void should_delete_only_once_with_regexp() {
-        registerTestConnector("match-1-test");
-        registerTestConnector("match-2-test");
-        registerTestConnector("nomatch-3-test");
+        registerTestConnectors("match-1-test", "match-2-test", "nomatch-3-test");
 
-        int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
+        context.runAndEnsureExitCodeOk("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(context.output().toString()).containsOnlyOnce("Deleted connector match-1-test");
         assertThat(context.output().toString()).containsOnlyOnce("Deleted connector match-2-test");
         assertThat(context.output().toString()).doesNotContain("Deleted connector nomatch-3-test");

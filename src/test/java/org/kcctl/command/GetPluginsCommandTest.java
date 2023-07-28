@@ -29,7 +29,6 @@ import org.kcctl.support.KcctlCommandContext;
 import io.debezium.util.ContainerImageVersions;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,8 +45,7 @@ class GetPluginsCommandTest extends IntegrationTest {
         String debeziumVersion = ContainerImageVersions.getStableVersion("debezium/connect");
         String kafkaVersion = getConnectVersion();
 
-        int exitCode = context.commandLine().execute("--types=source");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("--types=source");
         assertThat(context.output().toString().trim().lines())
                 .map(String::trim)
                 .containsExactly(
@@ -67,8 +65,7 @@ class GetPluginsCommandTest extends IntegrationTest {
 
     @Test
     public void should_filter_by_type() {
-        int exitCode = context.commandLine().execute("--types=transformation");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("--types=transformation");
         assertThat(context.output().toString().trim().lines())
                 .anyMatch(l -> l.startsWith(" transformation"))
                 .anyMatch(l -> l.startsWith("TYPE"));
@@ -76,8 +73,7 @@ class GetPluginsCommandTest extends IntegrationTest {
 
     @Test
     public void should_filter_by_types() {
-        int exitCode = context.commandLine().execute("--types=transformation,converter");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("--types=transformation,converter");
         assertThat(context.output().toString().trim().lines())
                 .anyMatch(l -> l.startsWith(" transformation"))
                 .anyMatch(l -> l.startsWith(" converter"))
@@ -86,8 +82,7 @@ class GetPluginsCommandTest extends IntegrationTest {
 
     @Test
     public void should_list_all_types() {
-        int exitCode = context.commandLine().execute();
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk();
         String output = context.output().toString().trim();
         assertThat(output.lines())
                 .anyMatch(l -> l.startsWith(" source"))
@@ -100,8 +95,7 @@ class GetPluginsCommandTest extends IntegrationTest {
 
         context.output().getBuffer().setLength(0);
         String allTypes = Arrays.asList(GetPluginsCommand.PluginType.values()).stream().map(t -> t.name).collect(Collectors.joining(","));
-        exitCode = context.commandLine().execute("--types=" + allTypes);
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("--types=" + allTypes);
         assertThat(context.output().toString().trim()).isEqualTo(output);
     }
 }

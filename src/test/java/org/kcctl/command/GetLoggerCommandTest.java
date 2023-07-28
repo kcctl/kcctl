@@ -25,7 +25,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,8 +38,7 @@ class GetLoggerCommandTest extends IntegrationTest {
 
     @Test
     public void should_print_all_loggers() {
-        int exitCode = context.commandLine().execute("ALL");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("ALL");
         assertThat(context.output().toString().trim().lines())
                 .map(String::trim)
                 .containsExactly(
@@ -51,8 +49,7 @@ class GetLoggerCommandTest extends IntegrationTest {
 
     @Test
     public void should_print_root_logger() {
-        int exitCode = context.commandLine().execute("root");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("root");
         assertThat(context.output().toString().trim().lines())
                 .map(String::trim)
                 .containsExactly(
@@ -62,8 +59,7 @@ class GetLoggerCommandTest extends IntegrationTest {
 
     @Test
     public void should_print_reflections_logger() {
-        int exitCode = context.commandLine().execute("org.reflections");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("org.reflections");
         assertThat(context.output().toString().trim().lines())
                 .map(String::trim)
                 .containsExactly(

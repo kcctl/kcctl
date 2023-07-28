@@ -26,7 +26,6 @@ import org.kcctl.support.KcctlCommandContext;
 import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,12 +39,9 @@ class ResumeConnectorCommandTest extends IntegrationTest {
 
     @Test
     public void should_resume_connector() {
-        registerTestConnector("test1");
-        registerTestConnector("test2");
-        registerTestConnector("test3");
+        registerTestConnectors("test1", "test2", "test3");
 
-        int exitCode = context.commandLine().execute("test1", "test2");
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("test1", "test2");
         assertThat(context.output().toString()).contains("Resumed connector test1", "Resumed connector test2");
         assertThat(context.output().toString()).doesNotContain("Resumed connector test3");
 
@@ -56,13 +52,9 @@ class ResumeConnectorCommandTest extends IntegrationTest {
 
     @Test
     public void should_resume_connector_with_regexp() {
-        registerTestConnector("match-1-test");
-        registerTestConnector("match-2-test");
-        registerTestConnector("nomatch-3-test");
+        registerTestConnectors("match-1-test", "match-2-test", "nomatch-3-test");
 
-        int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test");
-
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("--reg-exp", "match-\\d-test");
         assertThat(context.output().toString()).contains("Resumed connector match-1-test", "Resumed connector match-2-test");
         assertThat(context.output().toString()).doesNotContain("Resumed connector nomatch-3-test");
 
@@ -75,9 +67,7 @@ class ResumeConnectorCommandTest extends IntegrationTest {
     public void should_resume_only_once() {
         registerTestConnector("test1");
 
-        int exitCode = context.commandLine().execute("test1", "test1", "test1");
-
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("test1", "test1", "test1");
         assertThat(context.output().toString()).containsOnlyOnce("Resumed connector test1");
 
         kafkaConnect.ensureConnectorState("test1", Connector.State.RUNNING);
@@ -85,13 +75,9 @@ class ResumeConnectorCommandTest extends IntegrationTest {
 
     @Test
     public void should_resume_only_once_with_regexp() {
-        registerTestConnector("match-1-test");
-        registerTestConnector("match-2-test");
-        registerTestConnector("nomatch-3-test");
+        registerTestConnectors("match-1-test", "match-2-test", "nomatch-3-test");
 
-        int exitCode = context.commandLine().execute("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
-
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
         assertThat(context.output().toString()).containsOnlyOnce("Resumed connector match-1-test");
         assertThat(context.output().toString()).containsOnlyOnce("Resumed connector match-2-test");
         assertThat(context.output().toString()).doesNotContain("Resumed connector nomatch-3-test");

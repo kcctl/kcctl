@@ -28,7 +28,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,21 +41,18 @@ class GetConnectorsCommandTest extends IntegrationTest {
 
     @Test
     public void should_print_empty_connectors_() {
-        int exitCode = context.commandLine().execute();
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk();
         assertThat(context.output().toString().trim()).isEqualTo(
                 "NAME   TYPE   STATE   TASKS");
     }
 
     @Test
     public void should_print_registered_connectors() {
-        registerTestConnector("test1");
-        registerTestConnector("test2");
+        registerTestConnectors("test1", "test2");
 
         Pattern singleTaskPattern = Pattern.compile(".*[0-9]+\\:\\s+(.*\\:[0-9]+\\s+).*");
 
-        int exitCode = context.commandLine().execute();
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk();
         assertThat(context.output().toString().trim().lines().map(m -> {
             String ret = m;
             Matcher matcher = singleTaskPattern.matcher(ret);

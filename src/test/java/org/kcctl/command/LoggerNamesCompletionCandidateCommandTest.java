@@ -25,7 +25,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,8 +38,7 @@ class LoggerNamesCompletionCandidateCommandTest extends IntegrationTest {
 
     @Test
     public void should_print_logger_names() {
-        int exitCode = context.commandLine().execute();
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk();
         assertThat(context.output().toString().trim())
                 .isEqualTo("org.reflections root");
     }

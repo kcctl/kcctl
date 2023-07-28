@@ -52,6 +52,7 @@ class GetOffsetsCommandTest extends IntegrationTest {
     @BeforeAll
     public static void prepare() {
         // TODO: replace explicit container tag with DebeziumContainer.latestStable() once Debezium releases 2.4, which is based on Kafka 3.5
+        // (https://github.com/kcctl/kcctl/issues/346)
         kafkaConnect = kafkaConnect24Alpha;
         IntegrationTest.prepare();
     }
@@ -64,7 +65,7 @@ class GetOffsetsCommandTest extends IntegrationTest {
                 .atMost(Duration.ofSeconds(OFFSET_AVAILABILITY_TIMEOUT_SECONDS))
                 .until(() -> {
                     context.reset();
-                    context.runAndCheckExitCode("offsets-test1");
+                    context.runAndEnsureExitCodeOk("offsets-test1");
                     String output = context.output().toString();
                     ConnectorOffsets offsets = mapper.readValue(output, ConnectorOffsets.class);
 
@@ -98,7 +99,7 @@ class GetOffsetsCommandTest extends IntegrationTest {
                 .atMost(Duration.ofSeconds(OFFSET_AVAILABILITY_TIMEOUT_SECONDS))
                 .until(() -> {
                     context.reset();
-                    context.runAndCheckExitCode("offsets-test2", "offsets-test3");
+                    context.runAndEnsureExitCodeOk("offsets-test2", "offsets-test3");
                     String output = context.output().toString();
 
                     // Small hack: want to make sure that there's at least one partition/offset

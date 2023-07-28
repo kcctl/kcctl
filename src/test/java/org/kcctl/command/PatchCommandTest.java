@@ -27,7 +27,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,18 +40,16 @@ class PatchCommandTest extends IntegrationTest {
 
     @Test
     public void should_patch_two_connectors() {
-        registerTestConnector("test1");
-        registerTestConnector("test2");
+        registerTestConnectors("test1", "test2");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
         PrintStream old = System.out;
         System.setOut(ps);
 
-        int exitCode = context.commandLine().execute("--set", "test=true", "test1", "test2");
+        context.runAndEnsureExitCodeOk("--set", "test=true", "test1", "test2");
         System.setOut(old);
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(baos.toString()).contains("test:                     true");
     }
 }
