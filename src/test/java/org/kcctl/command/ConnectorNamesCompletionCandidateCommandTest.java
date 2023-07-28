@@ -25,7 +25,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,11 +38,9 @@ class ConnectorNamesCompletionCandidateCommandTest extends IntegrationTest {
 
     @Test
     public void should_print_connector_names() {
-        registerTestConnector("test1");
-        registerTestConnector("test2");
+        registerTestConnectors("test1", "test2");
 
-        int exitCode = context.commandLine().execute();
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        context.runAndEnsureExitCodeOk();
         assertThat(context.output().toString().trim())
                 .isEqualTo("test1 test2");
     }

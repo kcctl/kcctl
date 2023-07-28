@@ -28,7 +28,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,18 +41,16 @@ class DescribeConnectorCommandTest extends IntegrationTest {
 
     @Test
     public void should_describe_connector() {
-        registerTestConnector("test1");
-        registerTestConnector("test2");
+        registerTestConnectors("test1", "test2");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
         PrintStream old = System.out;
         System.setOut(ps);
 
-        int exitCode = context.commandLine().execute("test1", "test2");
+        context.runAndEnsureExitCodeOk("test1", "test2");
         System.setOut(old);
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(baos.toString()).contains(HEARTBEAT_TOPIC);
     }
 
@@ -66,10 +63,9 @@ class DescribeConnectorCommandTest extends IntegrationTest {
         PrintStream old = System.out;
         System.setOut(ps);
 
-        int exitCode = context.commandLine().execute("test1", "--output-format", "json");
+        context.runAndEnsureExitCodeOk("test1", "--output-format", "json");
         System.setOut(old);
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(baos.toString()).contains(HEARTBEAT_TOPIC);
         assertThat(baos.toString()).contains("\"name\" : \"test1\",");
     }

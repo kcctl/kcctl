@@ -56,6 +56,7 @@ class StopConnectorCommandTest extends IntegrationTest {
     @BeforeAll
     public static void prepare() {
         // TODO: replace explicit container tag with DebeziumContainer.latestStable() once Debezium releases 2.4, which is based on Kafka 3.5
+        // (https://github.com/kcctl/kcctl/issues/346)
         kafkaConnect = kafkaConnect24Alpha;
         IntegrationTest.prepare();
     }
@@ -67,7 +68,7 @@ class StopConnectorCommandTest extends IntegrationTest {
         ensureConnectorsRunning("test1", "test2", "test3");
 
         // Then stop some but not all of the connectors
-        context.runAndCheckExitCode("test1", "test2");
+        context.runAndEnsureExitCodeOk("test1", "test2");
         assertThat(context.output().toString()).contains("Stopped connector test1", "Stopped connector test2");
         assertThat(context.output().toString()).doesNotContain("Stopped connector test3");
 
@@ -84,7 +85,7 @@ class StopConnectorCommandTest extends IntegrationTest {
         ensureConnectorsRunning("match-1-test", "match-2-test", "nomatch-3-test");
 
         // Then stop some but not all of the connectors
-        context.runAndCheckExitCode("--reg-exp", "match-\\d-test");
+        context.runAndEnsureExitCodeOk("--reg-exp", "match-\\d-test");
         assertThat(context.output().toString()).contains("Stopped connector match-1-test", "Stopped connector match-2-test");
         assertThat(context.output().toString()).doesNotContain("Stopped connector nomatch-3-test");
 
@@ -99,7 +100,7 @@ class StopConnectorCommandTest extends IntegrationTest {
         registerTestConnector("test1");
         ensureConnectorsRunning("test1");
 
-        context.runAndCheckExitCode("test1", "test1", "test1");
+        context.runAndEnsureExitCodeOk("test1", "test1", "test1");
         assertThat(context.output().toString()).containsOnlyOnce("Stopped connector test1");
 
         ensureConnectorsStopped("test1");
@@ -112,7 +113,7 @@ class StopConnectorCommandTest extends IntegrationTest {
         ensureConnectorsRunning("match-1-test", "match-2-test", "nomatch-3-test");
 
         // Then stop some but not all of the connectors
-        context.runAndCheckExitCode("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
+        context.runAndEnsureExitCodeOk("--reg-exp", "match-\\d-test", "match-.*", "match-1-test");
         assertThat(context.output().toString()).containsOnlyOnce("Stopped connector match-1-test");
         assertThat(context.output().toString()).containsOnlyOnce("Stopped connector match-2-test");
         assertThat(context.output().toString()).doesNotContain("Stopped connector nomatch-3-test");

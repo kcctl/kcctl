@@ -28,7 +28,6 @@ import org.kcctl.support.KcctlCommandContext;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.kcctl.util.Colors.ANSI_RESET;
@@ -48,10 +47,9 @@ class DescribePluginCommandTest extends IntegrationTest {
         PrintStream ps = new PrintStream(baos);
         PrintStream old = System.out;
         System.setOut(ps);
-        int exitCode = context.commandLine().execute("org.apache.kafka.connect.mirror.MirrorCheckpointConnector");
+        context.runAndEnsureExitCodeOk("org.apache.kafka.connect.mirror.MirrorCheckpointConnector");
         System.setOut(old);
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(baos.toString()).contains(
                 ANSI_WHITE_BOLD + "Name" + ANSI_RESET + ":           connector.class\n" +
                         ANSI_WHITE_BOLD + "Type" + ANSI_RESET + ":           STRING\n" +
@@ -66,10 +64,9 @@ class DescribePluginCommandTest extends IntegrationTest {
         PrintStream ps = new PrintStream(baos);
         PrintStream old = System.out;
         System.setOut(ps);
-        int exitCode = context.commandLine().execute("org.apache.kafka.connect.transforms.ExtractField$Key");
+        context.runAndEnsureExitCodeOk("org.apache.kafka.connect.transforms.ExtractField$Key");
         System.setOut(old);
 
-        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
         assertThat(baos.toString()).contains(
                 ANSI_WHITE_BOLD + "Name" + ANSI_RESET + ":           field\n" +
                         ANSI_WHITE_BOLD + "Type" + ANSI_RESET + ":           STRING\n" +
