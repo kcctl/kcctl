@@ -26,7 +26,7 @@ import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.ConnectorInfo;
 import org.kcctl.service.ConnectorStatusInfo;
 import org.kcctl.service.KafkaConnectApi;
-import org.kcctl.service.KafkaConnectException;
+import org.kcctl.service.KafkaConnectNotFoundException;
 import org.kcctl.service.TaskState;
 import org.kcctl.service.TopicsInfo;
 import org.kcctl.util.Colors;
@@ -197,11 +197,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 Tuple.print(topics);
             }
         }
-        catch (KafkaConnectException e) {
-            if (!e.getMessage().contains("not found")) {
-                throw e;
-            }
-
+        catch (KafkaConnectNotFoundException e) {
             spec.commandLine().getOut().println("Connector " + connectorToDescribe + " not found. The following connector(s) are available:");
 
             GetConnectorsCommand getConnectors = new GetConnectorsCommand(context, spec);

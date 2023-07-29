@@ -26,6 +26,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -36,6 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RegisterRestClient
 @RegisterClientHeaders(value = KafkaConnectClientHeadersFactory.class)
 @RegisterProvider(value = KafkaConnectResponseExceptionMapper.class, priority = 50)
+@Retry(delay = 100L, maxDuration = 30_000L, retryOn = KafkaConnectConflictException.class)
 public interface KafkaConnectApi {
 
     @GET

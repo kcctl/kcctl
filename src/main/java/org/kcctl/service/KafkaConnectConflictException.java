@@ -17,13 +17,10 @@ package org.kcctl.service;
 
 import javax.ws.rs.core.Response;
 
-import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
+public class KafkaConnectConflictException extends KafkaConnectException {
 
-public class KafkaConnectResponseExceptionMapper implements ResponseExceptionMapper<RuntimeException> {
-
-    @Override
-    public RuntimeException toThrowable(Response response) {
-        return KafkaConnectException.from(response);
+    public KafkaConnectConflictException(String message) {
+        super(message, Response.Status.CONFLICT.getStatusCode());
     }
 
 }
