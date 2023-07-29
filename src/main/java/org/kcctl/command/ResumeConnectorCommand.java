@@ -17,14 +17,13 @@ package org.kcctl.command;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Connectors;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;

@@ -17,10 +17,9 @@ package org.kcctl.command;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.kcctl.util.ConfigurationContext;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 
 @Command(name = "context-name-completions", hidden = true)

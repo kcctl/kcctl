@@ -18,14 +18,13 @@ package org.kcctl.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.service.ConnectorStatusInfo;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.TaskState;
 import org.kcctl.util.ConfigurationContext;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 
 @Command(name = "task-name-completions", hidden = true)

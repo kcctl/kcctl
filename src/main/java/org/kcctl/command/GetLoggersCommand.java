@@ -18,8 +18,6 @@ package org.kcctl.command;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
@@ -30,6 +28,7 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 
 import static org.kcctl.util.Colors.ANSI_CYAN;

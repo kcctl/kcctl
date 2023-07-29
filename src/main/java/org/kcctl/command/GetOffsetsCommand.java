@@ -18,8 +18,6 @@ package org.kcctl.command;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.ConnectorOffsets;
@@ -30,6 +28,7 @@ import org.kcctl.util.Version;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 
 /**

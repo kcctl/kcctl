@@ -18,8 +18,6 @@ package org.kcctl.command;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
@@ -27,6 +25,7 @@ import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Connectors;
 import org.kcctl.util.Version;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;

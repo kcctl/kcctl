@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.PluginNameCompletions;
 import org.kcctl.service.ConfigInfos;
@@ -31,6 +29,7 @@ import org.kcctl.util.Search;
 import org.kcctl.util.Tuple;
 import org.kcctl.util.Version;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 

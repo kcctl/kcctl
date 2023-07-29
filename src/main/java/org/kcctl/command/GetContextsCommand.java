@@ -17,8 +17,6 @@ package org.kcctl.command;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.kcctl.service.Context;
 import org.kcctl.util.ConfigurationContext;
 
@@ -26,6 +24,7 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 
 @Command(name = "get-contexts", description = "Get all contexts")

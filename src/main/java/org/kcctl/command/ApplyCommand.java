@@ -20,8 +20,6 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.service.ConfigInfos;
 import org.kcctl.service.KafkaConnectApi;
@@ -31,6 +29,7 @@ import org.kcctl.util.ConfigurationContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;

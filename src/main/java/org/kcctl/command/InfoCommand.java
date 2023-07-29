@@ -15,13 +15,12 @@
  */
 package org.kcctl.command;
 
-import javax.inject.Inject;
-
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.KafkaConnectInfo;
 import org.kcctl.util.ConfigurationContext;
 
+import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
