@@ -15,7 +15,25 @@
  */
 package org.kcctl.service;
 
+import javax.ws.rs.core.Response;
+
 public class KafkaConnectException extends RuntimeException {
+
+    public static KafkaConnectException from(Response response) {
+        if (response.getStatusInfo() == Response.Status.UNAUTHORIZED) {
+            return new KafkaConnectException(
+                    response.readEntity(String.class),
+                    Response.Status.UNAUTHORIZED.getStatusCode());
+        }
+
+        ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
+
+        return switch (response.getStatusInfo().toEnum()) {
+            case CONFLICT -> new KafkaConnectConflictException(errorResponse.message);
+            case NOT_FOUND -> new KafkaConnectNotFoundException(errorResponse.message);
+            default -> new KafkaConnectException(errorResponse);
+        };
+    }
 
     private final int errorCode;
 

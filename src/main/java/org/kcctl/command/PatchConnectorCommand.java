@@ -15,8 +15,6 @@
  */
 package org.kcctl.command;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,12 +22,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
-import org.kcctl.service.KafkaConnectException;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Connectors;
 
@@ -115,28 +111,7 @@ public class PatchConnectorCommand implements Callable<Integer> {
         describeConnectorCommand.includeTasksConfig = false;
 
         System.out.println("New connector configuration:");
-
-        Instant start = Instant.now();
-
-        while (Duration.between(start, Instant.now()).toSeconds() < 30) {
-            try {
-                return describeConnectorCommand.call();
-            }
-            catch (KafkaConnectException kce) {
-                // Request temporarily rejected due to, e.g., a pending rebalance; we can and should try again
-                if (kce.getErrorCode() == Response.Status.CONFLICT.getStatusCode()) {
-                    try {
-                        Thread.sleep(100);
-                    }
-                    catch (InterruptedException ie) {
-                        throw new RuntimeException(ie);
-                    }
-                }
-                else {
-                    throw kce;
-                }
-            }
-        }
+        describeConnectorCommand.call();
 
         return 0;
 

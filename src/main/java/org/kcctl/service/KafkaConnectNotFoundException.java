@@ -17,13 +17,10 @@ package org.kcctl.service;
 
 import javax.ws.rs.core.Response;
 
-import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
+public class KafkaConnectNotFoundException extends KafkaConnectException {
 
-public class KafkaConnectResponseExceptionMapper implements ResponseExceptionMapper<RuntimeException> {
-
-    @Override
-    public RuntimeException toThrowable(Response response) {
-        return KafkaConnectException.from(response);
+    public KafkaConnectNotFoundException(String message) {
+        super(message, Response.Status.NOT_FOUND.getStatusCode());
     }
 
 }

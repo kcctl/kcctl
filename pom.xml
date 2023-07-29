@@ -86,6 +86,10 @@
       <artifactId>quarkus-rest-client</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.github.freva</groupId>
       <artifactId>ascii-table</artifactId>
       <version>1.8.0</version>
