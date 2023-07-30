@@ -24,18 +24,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.commons.util.ReflectionUtils.HierarchyTraversalMode;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
+import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 import org.kcctl.util.ConfigurationContext;
-import org.testcontainers.containers.Container;
+import org.kcctl.util.Version;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.lifecycle.Startables;
@@ -43,10 +46,19 @@ import org.testcontainers.utility.DockerImageName;
 
 import io.debezium.testing.testcontainers.ConnectorConfiguration;
 import io.debezium.testing.testcontainers.DebeziumContainer;
+import io.debezium.util.ContainerImageVersions;
 import picocli.CommandLine;
+
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public abstract class IntegrationTest {
 
+    public static final String DEBEZIUM_IMAGE = "debezium/connect";
+    public static final String CONNECT_VERSION_VAR = "CONNECT_VERSION";
+    public static final String NIGHTLY_BUILD = "NIGHTLY";
+    public static final String LATEST_STABLE_BUILD = "LATEST_STABLE";
+    public static final String KAFKA_VERSION_VAR = "KAFKA_VERSION";
+    public static final String DEBEZIUM_VERSION_VAR = "DEBEZIUM_VERSION";
     public static final String HEARTBEAT_TOPIC = "heartbeat-test";
 
     protected static final Network network = Network.newNetwork();
@@ -54,42 +66,84 @@ public abstract class IntegrationTest {
     protected static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.3.1"))
             .withNetwork(network);
 
-    protected static final DebeziumContainer kafkaConnectLatestStable = DebeziumContainer.latestStable()
-            .withNetwork(network)
-            .withKafka(kafka)
-            .dependsOn(kafka)
-            .withEnv("GROUP_ID", "debezium_latest_stable");
+    protected static final DebeziumContainer kafkaConnect = debeziumContainer();
 
-    // TODO: remove this separate container once Debezium releases 2.4, which is based on Kafka 3.5;
-    // we can just go back to kafkaConnectLatestStable for all of our tests then
-    // (https://github.com/kcctl/kcctl/issues/346)
-    protected static final DebeziumContainer kafkaConnect24Alpha = new DebeziumContainer("debezium/connect:2.4.0.Alpha1")
-            .withNetwork(network)
-            .withKafka(kafka)
-            .dependsOn(kafka)
-            // Force rapid offset commits, in order for offsets to appear quickly in the REST API for the 'get offsets' command tests
-            .withEnv("OFFSET_FLUSH_INTERVAL_MS", "1000")
-            // Override the group ID to prevent this worker from forming a cluster with workers in other containers
-            .withEnv("GROUP_ID", "debezium_2_4_alpha")
-            // Can't share internal topics, either
-            .withEnv("CONFIG_STORAGE_TOPIC", "debezium_2_4_alpha_configs")
-            .withEnv("OFFSET_STORAGE_TOPIC", "debezium_2_4_alpha_offsets")
-            .withEnv("STATUS_STORAGE_TOPIC", "debezium_2_4_alpha_status");
-
-    protected static DebeziumContainer kafkaConnect = kafkaConnectLatestStable;
+    private static String kafkaConnectVersion;
+    private static String debeziumVersion;
 
     @BeforeAll
-    public static void prepare() {
+    public static void prepareTestSuite() throws Exception {
         Startables.deepStart(Stream.of(kafka, kafkaConnect)).join();
+
+        kafkaConnectVersion = readVariable(kafkaConnect, KAFKA_VERSION_VAR);
+        debeziumVersion = readVariable(kafkaConnect, DEBEZIUM_VERSION_VAR);
     }
 
-    public String getConnectVersion() throws Exception {
-        Container.ExecResult result = kafkaConnect.execInContainer("/bin/bash", "-c", "/usr/bin/printenv KAFKA_VERSION");
-        return result.getStdout().replace("\n", "");
+    public static String getConnectVersion() {
+        return kafkaConnectVersion;
+    }
+
+    public static String getDebeziumVersion() {
+        return debeziumVersion;
+    }
+
+    private static DebeziumContainer debeziumContainer() {
+        String connectVersion = Optional.ofNullable(System.getenv(CONNECT_VERSION_VAR))
+                .orElse(LATEST_STABLE_BUILD);
+
+        String debeziumTag = switch (connectVersion) {
+            case NIGHTLY_BUILD -> "nightly";
+            case LATEST_STABLE_BUILD -> ContainerImageVersions.getStableVersion(IntegrationTest.DEBEZIUM_IMAGE);
+            case "3.5" -> "2.4.0.Alpha1"; // TODO: Replace with stable version once one is released for 3.5.x; see https://github.com/kcctl/kcctl/issues/346
+            case "3.4" -> "2.3.0.Final";
+            case "3.3" -> "2.1.4.Final";
+            case "3.2" -> "1.9.7.Final";
+            case "3.1" -> "1.9.3.Final";
+            case "3.0" -> "1.8.1.Final";
+            case "2.8" -> "1.7.2.Final";
+            default -> throw new IllegalArgumentException("Kafka Connect version " + connectVersion + " is not yet supported");
+        };
+
+        return new DebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag)
+                .withNetwork(network)
+                .withKafka(kafka)
+                .dependsOn(kafka)
+                // Force rapid offset commits, in order for offsets to appear quickly in the REST API for the 'get offsets' command tests
+                .withEnv("OFFSET_FLUSH_INTERVAL_MS", "1000");
+    }
+
+    private static String readVariable(GenericContainer<?> container, String envVar) throws IOException, InterruptedException {
+        return container
+                .execInContainer("/bin/bash", "-c", "/usr/bin/printenv " + envVar)
+                .getStdout()
+                .replace("\n", "");
+
     }
 
     @BeforeEach
-    void injectCommandContext() {
+    void prepareTest(TestInfo testInfo) {
+        injectCommandContext();
+        checkKafkaConnectVersion(testInfo);
+    }
+
+    private void checkKafkaConnectVersion(TestInfo testInfo) {
+        SkipIfConnectVersionIsOlderThan versionConstraint = testInfo.getTestMethod()
+                .map(method -> method.getAnnotation(SkipIfConnectVersionIsOlderThan.class))
+                .orElse(getClass().getAnnotation(SkipIfConnectVersionIsOlderThan.class));
+
+        // Neither method nor class is annotated; run the test regardless of which version of Kafka Connect we're targeting
+        if (versionConstraint == null)
+            return;
+
+        Version requiredVersion = new Version(versionConstraint.value());
+        Version actualVersion = new Version(kafkaConnectVersion);
+
+        assumeTrue(
+                actualVersion.greaterOrEquals(requiredVersion),
+                "Current version of Kafka Connect is too old to run this test");
+    }
+
+    private void injectCommandContext() {
         ReflectionUtils.findFields(getClass(), it -> it.isAnnotationPresent(InjectCommandContext.class), HierarchyTraversalMode.TOP_DOWN)
                 .forEach(field -> {
                     try {
@@ -106,12 +160,6 @@ public abstract class IntegrationTest {
     @AfterEach
     public void cleanup() {
         kafkaConnect.deleteAllConnectors();
-    }
-
-    @AfterAll
-    public static void resetKafkaConnectImage() {
-        // In case a test overrode the Kafka Connect image
-        kafkaConnect = kafkaConnectLatestStable;
     }
 
     protected void registerTestConnectors(String name, String... names) {

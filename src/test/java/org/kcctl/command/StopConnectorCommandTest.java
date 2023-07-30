@@ -17,7 +17,6 @@ package org.kcctl.command;
 
 import java.time.Duration;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -25,6 +24,7 @@ import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
+import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,6 +43,7 @@ import static org.awaitility.Awaitility.await;
 @QuarkusTest
 @TestProfile(IntegrationTestProfile.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@SkipIfConnectVersionIsOlderThan("3.5")
 class StopConnectorCommandTest extends IntegrationTest {
 
     private static final long CONNECTOR_STOP_TIMEOUT_SECONDS = 10;
@@ -52,14 +53,6 @@ class StopConnectorCommandTest extends IntegrationTest {
 
     @InjectCommandContext
     KcctlCommandContext<StopConnectorCommand> context;
-
-    @BeforeAll
-    public static void prepare() {
-        // TODO: replace explicit container tag with DebeziumContainer.latestStable() once Debezium releases 2.4, which is based on Kafka 3.5
-        // (https://github.com/kcctl/kcctl/issues/346)
-        kafkaConnect = kafkaConnect24Alpha;
-        IntegrationTest.prepare();
-    }
 
     @Test
     public void should_stop_connector() {

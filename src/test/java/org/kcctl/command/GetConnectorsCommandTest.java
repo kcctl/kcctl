@@ -15,6 +15,7 @@
  */
 package org.kcctl.command;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,7 @@ import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 
+import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
@@ -49,6 +51,10 @@ class GetConnectorsCommandTest extends IntegrationTest {
     @Test
     public void should_print_registered_connectors() {
         registerTestConnectors("test1", "test2");
+        for (String connector : List.of("test1", "test2")) {
+            kafkaConnect.ensureConnectorState(connector, Connector.State.RUNNING);
+            kafkaConnect.ensureConnectorTaskState(connector, 0, Connector.State.RUNNING);
+        }
 
         Pattern singleTaskPattern = Pattern.compile(".*[0-9]+\\:\\s+(.*\\:[0-9]+\\s+).*");
 

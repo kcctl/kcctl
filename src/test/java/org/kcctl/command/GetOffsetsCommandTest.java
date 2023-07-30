@@ -19,7 +19,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -29,6 +28,7 @@ import org.kcctl.service.ConnectorOffset;
 import org.kcctl.service.ConnectorOffsets;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
+import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -40,6 +40,7 @@ import static org.awaitility.Awaitility.await;
 @QuarkusTest
 @TestProfile(IntegrationTestProfile.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@SkipIfConnectVersionIsOlderThan("3.5")
 class GetOffsetsCommandTest extends IntegrationTest {
 
     private static final long OFFSET_AVAILABILITY_TIMEOUT_SECONDS = 30;
@@ -48,14 +49,6 @@ class GetOffsetsCommandTest extends IntegrationTest {
 
     @InjectCommandContext
     KcctlCommandContext<GetOffsetsCommand> context;
-
-    @BeforeAll
-    public static void prepare() {
-        // TODO: replace explicit container tag with DebeziumContainer.latestStable() once Debezium releases 2.4, which is based on Kafka 3.5
-        // (https://github.com/kcctl/kcctl/issues/346)
-        kafkaConnect = kafkaConnect24Alpha;
-        IntegrationTest.prepare();
-    }
 
     @Test
     public void should_list_offsets_single_connector() {
