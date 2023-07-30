@@ -25,6 +25,7 @@ import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
+import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -36,6 +37,7 @@ import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 @QuarkusTest
 @TestProfile(IntegrationTestProfile.class)
 @DisplayNameGeneration(ReplaceUnderscores.class)
+@SkipIfConnectVersionIsOlderThan("3.2")
 class DescribePluginCommandTest extends IntegrationTest {
 
     @InjectCommandContext

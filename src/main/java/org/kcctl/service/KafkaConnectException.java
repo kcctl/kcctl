@@ -28,11 +28,16 @@ public class KafkaConnectException extends RuntimeException {
 
         ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
 
-        return switch (response.getStatusInfo().toEnum()) {
-            case CONFLICT -> new KafkaConnectConflictException(errorResponse.message);
-            case NOT_FOUND -> new KafkaConnectNotFoundException(errorResponse.message);
-            default -> new KafkaConnectException(errorResponse);
-        };
+        if (response.getStatusInfo() == Response.Status.CONFLICT
+                || errorResponse.message.contains("Request cannot be completed because a rebalance is expected")) {
+            return new KafkaConnectConflictException(errorResponse.message);
+        }
+        else if (response.getStatusInfo() == Response.Status.NOT_FOUND) {
+            return new KafkaConnectNotFoundException(errorResponse.message);
+        }
+        else {
+            return new KafkaConnectException(errorResponse);
+        }
     }
 
     private final int errorCode;
