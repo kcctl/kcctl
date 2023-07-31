@@ -40,6 +40,9 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "offsets", description = "Displays information about committed connector offsets")
 public class GetOffsetsCommand implements Callable<Integer> {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     private final Version requiredVersionForReadingOffsets = new Version(3, 5);
     private final ObjectMapper mapper = new ObjectMapper();
     private final ConfigurationContext context;

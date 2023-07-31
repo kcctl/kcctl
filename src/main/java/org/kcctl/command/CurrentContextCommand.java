@@ -24,10 +24,14 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "current-context", description = "Displays the current context")
 public class CurrentContextCommand implements Runnable {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     @Inject
     ConfigurationContext context;

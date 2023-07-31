@@ -40,6 +40,9 @@ import picocli.CommandLine.Command;
 @Command(name = "plugins", description = "Displays information about available connector plug-ins")
 public class GetPluginsCommand implements Callable<Integer> {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     private final Version requiredVersionForAllPlugins = new Version(3, 2);
 
     private final ConfigurationContext context;

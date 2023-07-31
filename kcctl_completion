@@ -297,7 +297,7 @@ function _picocli_kcctl_info() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -315,7 +315,7 @@ function _picocli_kcctl_config() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="set-context get-contexts current-context use-context"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -333,7 +333,7 @@ function _picocli_kcctl_get() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="plugins connectors offsets loggers logger"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -351,7 +351,7 @@ function _picocli_kcctl_describe() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="connector connectors plugin"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -370,7 +370,7 @@ function _picocli_kcctl_apply() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="--dry-run"
+  local flag_opts="-h --help --dry-run"
   local arg_opts="-f --file -n --name"
 
   type compopt &>/dev/null && compopt +o default
@@ -399,7 +399,7 @@ function _picocli_kcctl_patch() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="logger connector connectors"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -417,7 +417,7 @@ function _picocli_kcctl_restart() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="connector connectors task"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -435,7 +435,7 @@ function _picocli_kcctl_pause() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="connector connectors"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -453,7 +453,7 @@ function _picocli_kcctl_resume() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="connector connectors"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -471,7 +471,7 @@ function _picocli_kcctl_stop() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="connector connectors"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -489,7 +489,7 @@ function _picocli_kcctl_delete() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands="connector"
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -506,14 +506,20 @@ function _picocli_kcctl_help() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="info config get describe apply patch restart pause resume stop delete"
+  local commands=""
   local flag_opts="-h --help"
   local arg_opts=""
+  local COMMAND_pos_param_args=("info" "config" "get" "describe" "apply" "patch" "restart" "pause" "resume" "stop" "delete" "help") # 0-2147483647 values
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
   else
     local positionals=""
+    local currIndex
+    currIndex=$(currentPositionalIndex "help" "${arg_opts}" "${flag_opts}")
+    if (( currIndex >= 0 && currIndex <= 2147483647 )); then
+      positionals=$( compReplyArray "${COMMAND_pos_param_args[@]}" )
+    fi
     local IFS=$'\n'
     COMPREPLY=( $(compgen -W "${commands// /$'\n'}${IFS}${positionals}" -- "${curr_word}") )
   fi
@@ -526,7 +532,7 @@ function _picocli_kcctl_config_setcontext() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts="--cluster --bootstrap-servers --offset-topic --username --password -o --client-config -f --client-config-file"
 
   type compopt &>/dev/null && compopt +o default
@@ -570,7 +576,7 @@ function _picocli_kcctl_config_getcontexts() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -588,7 +594,7 @@ function _picocli_kcctl_config_currentcontext() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -606,7 +612,7 @@ function _picocli_kcctl_config_usecontext() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
   local contextName_pos_param_args=(`kcctl context-name-completions`) # 0-0 values
 
@@ -631,7 +637,7 @@ function _picocli_kcctl_get_plugins() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts="-t --types"
   local pluginTypes_option_args=("source" "sink" "transformation" "converter" "header_converter" "predicate") # --types values
 
@@ -660,7 +666,7 @@ function _picocli_kcctl_get_connectors() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -678,7 +684,7 @@ function _picocli_kcctl_get_offsets() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
@@ -702,7 +708,7 @@ function _picocli_kcctl_get_loggers() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
@@ -720,7 +726,7 @@ function _picocli_kcctl_get_logger() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
   local LOGGER_NAME_pos_param_args=(`kcctl logger-name-completions`) # 0-0 values
 
@@ -745,7 +751,7 @@ function _picocli_kcctl_describe_connector() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="-e --reg-exp --tasks-config"
+  local flag_opts="-h --help -e --reg-exp --tasks-config"
   local arg_opts="-o --output-format"
   local outputFormat_option_args=("json" "text") # --output-format values
 
@@ -781,7 +787,7 @@ function _picocli_kcctl_describe_connectors() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="-e --reg-exp --tasks-config"
+  local flag_opts="-h --help -e --reg-exp --tasks-config"
   local arg_opts="-o --output-format"
   local outputFormat_option_args=("json" "text") # --output-format values
 
@@ -817,7 +823,7 @@ function _picocli_kcctl_describe_plugin() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts="--search --search-name --search-description"
 
   type compopt &>/dev/null && compopt +o default
@@ -856,7 +862,7 @@ function _picocli_kcctl_patch_logger() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts="-l --level"
   local level_option_args=("ERROR" "WARN" "FATAL" "DEBUG" "INFO" "TRACE") # --level values
 
@@ -892,7 +898,7 @@ function _picocli_kcctl_patch_connector() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts="-s --set -r --remove"
 
   type compopt &>/dev/null && compopt +o default
@@ -928,7 +934,7 @@ function _picocli_kcctl_patch_connectors() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts="-s --set -r --remove"
 
   type compopt &>/dev/null && compopt +o default
@@ -964,7 +970,7 @@ function _picocli_kcctl_restart_connector() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts="-t --tasks"
   local tasks_option_args=("all" "failed") # --tasks values
 
@@ -1000,7 +1006,7 @@ function _picocli_kcctl_restart_connectors() {
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts="-t --tasks"
   local tasks_option_args=("all" "failed") # --tasks values
 
@@ -1035,7 +1041,7 @@ function _picocli_kcctl_restart_task() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts=""
+  local flag_opts="-h --help"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl task-name-completions`) # 0-0 values
 
@@ -1059,7 +1065,7 @@ function _picocli_kcctl_pause_connector() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
@@ -1083,7 +1089,7 @@ function _picocli_kcctl_pause_connectors() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
@@ -1107,7 +1113,7 @@ function _picocli_kcctl_resume_connector() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
@@ -1131,7 +1137,7 @@ function _picocli_kcctl_resume_connectors() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
@@ -1155,7 +1161,7 @@ function _picocli_kcctl_stop_connector() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
@@ -1179,7 +1185,7 @@ function _picocli_kcctl_stop_connectors() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts=""
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
@@ -1203,7 +1209,7 @@ function _picocli_kcctl_delete_connector() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
   local commands=""
-  local flag_opts="-e --reg-exp"
+  local flag_opts="-h --help -e --reg-exp"
   local arg_opts=""
   local CONNECTOR_NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 

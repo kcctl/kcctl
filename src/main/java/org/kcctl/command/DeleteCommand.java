@@ -28,6 +28,9 @@ import picocli.CommandLine.Command;
 @Command(name = "delete", subcommands = { DeleteConnectorCommand.class }, description = "Deletes connectors")
 public class DeleteCommand implements Callable<Integer> {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     @CommandLine.Parameters
     // Hack: without this, picocli will fail to parse any commands that would otherwise get routed to
     // this class if arguments are provided, making it impossible to display a useful error message to users

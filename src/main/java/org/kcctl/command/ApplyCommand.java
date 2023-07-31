@@ -55,6 +55,9 @@ public class ApplyCommand implements Callable<Integer> {
         }
     }
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     // Hack : workaround. Should be `List<ApplyConnector>` instead of List.
     // But Graalvm seems to have difficulty building a native binary with ApplyConnector type record in class fields
     // Support "-f file1.json file2.json" in addition to "-f file1.json -f file2.json" in order to work smoothly with shell

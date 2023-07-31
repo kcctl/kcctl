@@ -41,6 +41,9 @@ import static org.kcctl.util.Colors.ANSI_YELLOW;
 @CommandLine.Command(name = "loggers", description = "Displays information about all configured loggers")
 public class GetLoggersCommand implements Runnable {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     private final ConfigurationContext context;
 
     @CommandLine.Spec

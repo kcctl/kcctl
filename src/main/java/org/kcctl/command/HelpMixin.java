@@ -16,12 +16,10 @@
 package org.kcctl.command;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
 
-@Command(name = "pause", subcommands = { PauseConnectorCommand.class }, description = "Pauses connectors")
-public class PauseCommand {
+public class HelpMixin {
 
-    @CommandLine.Mixin
-    HelpMixin help;
+    @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "Show this help message and exit.")
+    private boolean help;
 
 }

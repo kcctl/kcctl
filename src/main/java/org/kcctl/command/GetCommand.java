@@ -15,10 +15,15 @@
  */
 package org.kcctl.command;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "get", subcommands = { GetPluginsCommand.class, GetConnectorsCommand.class, GetOffsetsCommand.class,
         GetLoggersCommand.class,
         GetLoggerCommand.class }, description = "Displays information about connector plug-ins, connector offsets, created connectors, and loggers")
 public class GetCommand {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
 }

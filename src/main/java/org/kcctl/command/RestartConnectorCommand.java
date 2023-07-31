@@ -35,6 +35,9 @@ import picocli.CommandLine.Parameters;
 @Command(name = "connector", aliases = "connectors", description = "Restarts the specified connector(s)")
 public class RestartConnectorCommand implements Callable<Integer> {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     private final Version requiredVersionForIncludingTasks = new Version(3, 0);
     @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use NAME(s) as regexp pattern(s) to use on all connectors")
     boolean regexpMode = false;

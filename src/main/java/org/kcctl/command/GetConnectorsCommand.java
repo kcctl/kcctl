@@ -40,6 +40,8 @@ import picocli.CommandLine.Command;
 @Command(name = "connectors", description = "Displays information about deployed connectors")
 public class GetConnectorsCommand implements Runnable {
 
+    @CommandLine.Mixin
+    HelpMixin help;
     private final ConfigurationContext context;
 
     @CommandLine.Spec

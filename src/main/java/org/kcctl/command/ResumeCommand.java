@@ -15,8 +15,13 @@
  */
 package org.kcctl.command;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "resume", subcommands = { ResumeConnectorCommand.class }, description = "Resumes connectors")
 public class ResumeCommand {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
 }

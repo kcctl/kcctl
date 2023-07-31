@@ -67,6 +67,9 @@ public class DescribePluginCommand implements Callable<Integer> {
         }
     }
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 
