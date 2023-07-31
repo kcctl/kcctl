@@ -15,6 +15,8 @@
  */
 package org.kcctl.command;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import org.kcctl.support.KcctlCommandContext;
 import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
+import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,4 +89,35 @@ class RestartConnectorCommandTest extends IntegrationTest {
         kafkaConnect.ensureConnectorState("match-2-test", Connector.State.RUNNING);
         kafkaConnect.ensureConnectorState("nomatch-3-test", Connector.State.RUNNING);
     }
+
+    @Test
+    @SkipIfConnectVersionIsOlderThan("3.0")
+    public void should_restart_connectors_and_all_tasks() {
+        registerTestConnectors("test1", "test2", "test3");
+
+        for (String connector : List.of("test1", "test2")) {
+            kafkaConnect.ensureConnectorState(connector, Connector.State.RUNNING);
+            kafkaConnect.ensureConnectorTaskState(connector, 0, Connector.State.RUNNING);
+        }
+
+        context.runAndEnsureExitCodeOk("-t", "all", "test1", "test2");
+        assertThat(context.output().toString()).contains("Restarted connector test1 and 1 task(s)", "Restarted connector test2 and 1 task(s)");
+        assertThat(context.output().toString()).doesNotContain("Restarted connector test3");
+    }
+
+    @Test
+    @SkipIfConnectVersionIsOlderThan("3.0")
+    public void should_restart_connector_and_failed_tasks() {
+        registerTestConnectors("test1", "test2", "test3");
+
+        for (String connector : List.of("test1", "test2")) {
+            kafkaConnect.ensureConnectorState(connector, Connector.State.RUNNING);
+            kafkaConnect.ensureConnectorTaskState(connector, 0, Connector.State.RUNNING);
+        }
+
+        context.runAndEnsureExitCodeOk("-t", "failed", "test1", "test2");
+        assertThat(context.output().toString()).contains("Restarted connector test1 and 0 task(s)", "Restarted connector test2 and 0 task(s)");
+        assertThat(context.output().toString()).doesNotContain("Restarted connector test3");
+    }
+
 }

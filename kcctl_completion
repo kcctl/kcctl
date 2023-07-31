@@ -961,10 +961,22 @@ function _picocli_kcctl_patch_connectors() {
 function _picocli_kcctl_restart_connector() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
   local flag_opts="-e --reg-exp"
-  local arg_opts=""
+  local arg_opts="-t --tasks"
+  local tasks_option_args=("all" "failed") # --tasks values
+
+  type compopt &>/dev/null && compopt +o default
+
+  case ${prev_word} in
+    -t|--tasks)
+      local IFS=$'\n'
+      COMPREPLY=( $( compReplyArray "${tasks_option_args[@]}" ) )
+      return $?
+      ;;
+  esac
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
   if [[ "${curr_word}" == -* ]]; then
@@ -985,10 +997,22 @@ function _picocli_kcctl_restart_connector() {
 function _picocli_kcctl_restart_connectors() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
   local flag_opts="-e --reg-exp"
-  local arg_opts=""
+  local arg_opts="-t --tasks"
+  local tasks_option_args=("all" "failed") # --tasks values
+
+  type compopt &>/dev/null && compopt +o default
+
+  case ${prev_word} in
+    -t|--tasks)
+      local IFS=$'\n'
+      COMPREPLY=( $( compReplyArray "${tasks_option_args[@]}" ) )
+      return $?
+      ;;
+  esac
   local NAME_pos_param_args=(`kcctl connector-name-completions`) # 0-2147483647 values
 
   if [[ "${curr_word}" == -* ]]; then
