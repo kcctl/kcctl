@@ -22,12 +22,16 @@ import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.KafkaConnectInfo;
 import org.kcctl.util.ConfigurationContext;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
 
 @Command(name = "info", description = "Displays information about the Kafka Connect cluster")
 public class InfoCommand implements Runnable {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     private final ConfigurationContext context;
 

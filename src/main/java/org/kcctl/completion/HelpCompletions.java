@@ -13,15 +13,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.kcctl.command;
+package org.kcctl.completion;
+
+import java.util.Iterator;
+import java.util.Map;
+
+import org.kcctl.command.KcCtlCommand;
 
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
 
-@Command(name = "pause", subcommands = { PauseConnectorCommand.class }, description = "Pauses connectors")
-public class PauseCommand {
+public class HelpCompletions implements Iterable<String> {
 
-    @CommandLine.Mixin
-    HelpMixin help;
+    @Override
+    public Iterator<String> iterator() {
+        CommandLine commandLine = new CommandLine(new KcCtlCommand());
+        return commandLine.getSubcommands().entrySet().stream()
+                .filter(e -> !e.getValue().getCommandSpec().usageMessage().hidden())
+                .map(Map.Entry::getKey)
+                .iterator();
+    }
 
 }

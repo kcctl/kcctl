@@ -49,6 +49,9 @@ import static org.kcctl.util.Colors.ANSI_WHITE_BOLD;
 @Command(name = "connector", aliases = "connectors", description = "Displays information about given connectors")
 public class DescribeConnectorCommand implements Callable<Integer> {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 

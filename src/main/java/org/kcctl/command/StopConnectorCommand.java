@@ -34,6 +34,9 @@ import picocli.CommandLine.Parameters;
 @Command(name = "connector", aliases = "connectors", description = "Stops (but does not delete) the specified connector(s)")
 public class StopConnectorCommand implements Callable<Integer> {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     private final Version requiredVersionForStoppingConnectors = new Version(3, 5);
 
     @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use NAME(s) as regexp pattern(s) to use on all connectors")

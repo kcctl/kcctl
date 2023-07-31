@@ -31,6 +31,10 @@ import picocli.CommandLine.Parameters;
 
 @Command(name = "connector", aliases = "connectors", description = "Pauses the specified connector(s)")
 public class PauseConnectorCommand implements Runnable {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
     @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use NAME(s) as regexp pattern(s) to use on all connectors")
     boolean regexpMode = false;
 

@@ -31,6 +31,10 @@ import picocli.CommandLine.Parameters;
 
 @Command(name = "connector", aliases = "connectors", description = "Resumes the specified connector(s)")
 public class ResumeConnectorCommand implements Runnable {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
     @CommandLine.Option(names = { "-e", "--reg-exp" }, description = "use NAME(s) as regexp pattern(s) to use on all connectors")
     boolean regexpMode = false;
 

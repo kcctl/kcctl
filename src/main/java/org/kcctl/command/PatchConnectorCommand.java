@@ -32,6 +32,7 @@ import org.kcctl.util.Connectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
@@ -41,6 +42,9 @@ import picocli.CommandLine.Spec;
 
 @Command(name = "connector", aliases = "connectors", description = "Patches the specified connector(s) with the given configuration parameters")
 public class PatchConnectorCommand implements Callable<Integer> {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     @Spec
     CommandSpec commandSpec;

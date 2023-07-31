@@ -28,12 +28,16 @@ import org.kcctl.service.Context;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Strings;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "set-context", description = "Configures the specified context with the provided arguments")
 public class SetContextCommand implements Callable<Integer> {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     @Parameters(index = "0", description = "Context name")
     String contextName;

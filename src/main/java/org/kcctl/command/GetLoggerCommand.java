@@ -41,6 +41,9 @@ import static org.kcctl.util.Colors.ANSI_YELLOW;
 @CommandLine.Command(name = "logger", description = "Displays information about a specific logger")
 public class GetLoggerCommand implements Runnable {
 
+    @CommandLine.Mixin
+    HelpMixin help;
+
     @Parameters(paramLabel = "LOGGER NAME", description = "Name of the logger", completionCandidates = LoggerNameCompletions.class)
     String path;
 

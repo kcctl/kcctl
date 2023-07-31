@@ -26,10 +26,14 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "get-contexts", description = "Get all contexts")
 public class GetContextsCommand implements Runnable {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     @Inject
     ConfigurationContext configContext;

@@ -15,8 +15,13 @@
  */
 package org.kcctl.command;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "stop", subcommands = { StopConnectorCommand.class }, description = "Stops (but does not delete) connectors")
 public class StopCommand {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
 }

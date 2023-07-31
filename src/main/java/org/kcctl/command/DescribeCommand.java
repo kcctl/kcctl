@@ -15,6 +15,7 @@
  */
 package org.kcctl.command;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "describe", subcommands = { DescribeConnectorCommand.class,
@@ -22,4 +23,8 @@ import picocli.CommandLine.Command;
 
 )
 public class DescribeCommand {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
 }

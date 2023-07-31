@@ -18,11 +18,15 @@ package org.kcctl.command;
 import org.kcctl.completion.ContextNameCompletions;
 import org.kcctl.util.ConfigurationContext;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "use-context", description = "Configures kcctl to use the specified context")
 public class UseContextCommand implements Runnable {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     @Parameters(index = "0", description = "Context name", completionCandidates = ContextNameCompletions.class)
     String contextName;

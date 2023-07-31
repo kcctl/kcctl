@@ -31,7 +31,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "logger", description = "Changes the log level of given class/Connector path")
-public class PatchLogLevelCommand implements Callable {
+public class PatchLogLevelCommand implements Callable<Object> {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     @Inject
     ConfigurationContext context;

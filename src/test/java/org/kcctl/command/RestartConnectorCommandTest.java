@@ -24,11 +24,11 @@ import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
+import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 
 import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

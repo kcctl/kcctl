@@ -15,6 +15,7 @@
  */
 package org.kcctl.command;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "config", subcommands = { SetContextCommand.class, GetContextsCommand.class,
@@ -22,4 +23,8 @@ import picocli.CommandLine.Command;
 
 )
 public class ConfigCommand {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
 }

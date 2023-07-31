@@ -22,11 +22,15 @@ import org.kcctl.completion.TaskNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "task", description = "Restarts the specified connector or task")
+@Command(name = "task", description = "Restarts the specified task")
 public class RestartTaskCommand implements Runnable {
+
+    @CommandLine.Mixin
+    HelpMixin help;
 
     @Inject
     ConfigurationContext context;

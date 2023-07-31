@@ -15,8 +15,13 @@
  */
 package org.kcctl.command;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "restart", subcommands = { RestartConnectorCommand.class, RestartTaskCommand.class }, description = "Restarts some connectors or a task")
 public class RestartCommand {
+
+    @CommandLine.Mixin
+    HelpMixin help;
+
 }
