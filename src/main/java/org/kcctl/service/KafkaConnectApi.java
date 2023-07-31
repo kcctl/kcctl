@@ -71,6 +71,13 @@ public interface KafkaConnectApi {
     @Path("/connectors/{name}/restart")
     void restartConnector(@PathParam("name") String name);
 
+    @POST
+    @Path("/connectors/{name}/restart")
+    ConnectorStatusInfo restartConnectorAndTasks(
+                                                 @PathParam("name") String name,
+                                                 @QueryParam("includeTasks") boolean includeTasks,
+                                                 @QueryParam("onlyFailed") boolean onlyFailed);
+
     @PUT
     @Path("/connectors/{name}/pause")
     void pauseConnector(@PathParam("name") String name);
