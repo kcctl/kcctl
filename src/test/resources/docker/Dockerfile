@@ -24,6 +24,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk
 RUN cd /tmp && \
     git clone https://github.com/apache/kafka.git -b trunk && \
     cd kafka && \
+    ls && \
     grep "version=" gradle.properties | sed 's/version=//g' > $KAFKA_HOME/kafka_version && \
     ./gradlew clean releaseTarGz --rerun-tasks
 
