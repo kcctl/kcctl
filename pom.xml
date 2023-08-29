@@ -33,7 +33,7 @@
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus.platform.version>2.16.2.Final</quarkus.platform.version>
-    <debezium.version>2.1.2.Final</debezium.version>
+    <debezium.version>2.3.2.Final</debezium.version>
     <artifactsDir>target</artifactsDir>
   </properties>
 
@@ -121,6 +121,13 @@
       <groupId>io.debezium</groupId>
       <artifactId>debezium-testing-testcontainers</artifactId>
       <version>${debezium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.debezium</groupId>
+      <artifactId>debezium-core</artifactId>
+      <version>${debezium.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -313,6 +320,7 @@
           <aggregate>true</aggregate>
           <excludes>
             <exclude>LICENSE.txt</exclude>
+            <exclude>**/Dockerfile</exclude>
           </excludes>
         </configuration>
         <executions>

@@ -56,6 +56,7 @@ public abstract class IntegrationTest {
     public static final String DEBEZIUM_IMAGE = "debezium/connect";
     public static final String CONNECT_VERSION_VAR = "CONNECT_VERSION";
     public static final String NIGHTLY_BUILD = "NIGHTLY";
+    public static final String TRUNK_BUILD = "TRUNK";
     public static final String LATEST_STABLE_BUILD = "LATEST_STABLE";
     public static final String KAFKA_VERSION_VAR = "KAFKA_VERSION";
     public static final String DEBEZIUM_VERSION_VAR = "DEBEZIUM_VERSION";
@@ -92,6 +93,7 @@ public abstract class IntegrationTest {
                 .orElse(LATEST_STABLE_BUILD);
 
         String debeziumTag = switch (connectVersion) {
+            case TRUNK_BUILD -> TRUNK_BUILD;
             case NIGHTLY_BUILD -> "nightly";
             case LATEST_STABLE_BUILD -> ContainerImageVersions.getStableVersion(IntegrationTest.DEBEZIUM_IMAGE);
             case "3.5" -> "2.4.0.Alpha1"; // TODO: Replace with stable version once one is released for 3.5.x; see https://github.com/kcctl/kcctl/issues/346
@@ -104,7 +106,9 @@ public abstract class IntegrationTest {
             default -> throw new IllegalArgumentException("Kafka Connect version " + connectVersion + " is not yet supported");
         };
 
-        return new DebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag)
+        DebeziumContainer debeziumContainer = TRUNK_BUILD.equals(debeziumTag) ? new ConnectTrunkDebeziumContainer() : new DebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag);
+
+        return debeziumContainer
                 .withNetwork(network)
                 .withKafka(kafka)
                 .dependsOn(kafka)
@@ -113,8 +117,13 @@ public abstract class IntegrationTest {
     }
 
     private static String readVariable(GenericContainer<?> container, String envVar) throws IOException, InterruptedException {
+
+        String connectVersion = Optional.ofNullable(System.getenv(CONNECT_VERSION_VAR))
+                .orElse(LATEST_STABLE_BUILD);
+        String command = KAFKA_VERSION_VAR.equals(envVar) && TRUNK_BUILD.equals(connectVersion) ? "cat /kafka/kafka_version" : "/usr/bin/printenv " + envVar;
+
         return container
-                .execInContainer("/bin/bash", "-c", "/usr/bin/printenv " + envVar)
+                .execInContainer("/bin/bash", "-c", command)
                 .getStdout()
                 .replace("\n", "");
 
