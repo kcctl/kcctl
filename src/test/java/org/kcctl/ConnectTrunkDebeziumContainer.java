@@ -20,7 +20,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 
 public class ConnectTrunkDebeziumContainer extends DebeziumContainer {
 
-    public static final String DEBEZIUM_CONNECT_TRUNK_IMAGE_NAME = "debezium-connect:trunk";
+    public static final String DEBEZIUM_CONNECT_TRUNK_IMAGE_NAME = "debezium/connect:trunk";
     public static final String DOCKERFILE_PATH = "docker/Dockerfile";
     public static final String DOCKERFILE_NAME = "Dockerfile";
 
