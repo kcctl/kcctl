@@ -40,7 +40,7 @@ jobs:
       PLAIN_VERSION: ${{ steps.version.outputs.PLAIN_VERSION }}
       NEXT_VERSION: ${{ steps.version.outputs.NEXT_VERSION }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: 'Set up Java'
         uses: actions/setup-java@v3
@@ -88,7 +88,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out repository'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ needs.version.outputs.HEAD }}
         
@@ -135,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Check out repository'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ needs.version.outputs.HEAD }}
           fetch-depth: 0
