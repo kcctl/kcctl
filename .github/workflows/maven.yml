@@ -43,7 +43,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRO }}
 
       - name: 'Cache Maven packages'
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v3.3.2
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
