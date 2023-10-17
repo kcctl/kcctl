@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
+import org.kcctl.service.AlterResetOffsetsResponse;
 import org.kcctl.service.ConnectorOffsets;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
@@ -98,10 +99,10 @@ class DeleteOffsetsCommandTest extends IntegrationTest {
 
                     int exitCode = deleteContext.commandLine().execute("delete-offsets-test1");
                     String output = deleteContext.output().toString();
-                    ConnectorOffsets offsets = mapper.readValue(output, ConnectorOffsets.class);
+                    AlterResetOffsetsResponse response = mapper.readValue(output, AlterResetOffsetsResponse.class);
 
                     assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-                    assertThat(offsets.offsets()).isNull();
+                    assertThat(response.message()).isEqualTo("The offsets for this connector have been reset successfully");
 
                     return true;
                 });
@@ -126,10 +127,10 @@ class DeleteOffsetsCommandTest extends IntegrationTest {
 
                     int exitCode = deleteContext.commandLine().execute("delete-offsets-test1", "delete-offsets-test2");
                     String output = deleteContext.output().toString();
-                    ConnectorOffsets offsets = mapper.readValue(output, ConnectorOffsets.class);
+                    AlterResetOffsetsResponse response = mapper.readValue(output, AlterResetOffsetsResponse.class);
 
                     assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-                    assertThat(offsets.offsets()).isNull();
+                    assertThat(response.message()).isEqualTo("The offsets for this connector have been reset successfully");
 
                     return true;
                 });

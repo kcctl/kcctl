@@ -120,7 +120,7 @@ public interface KafkaConnectApi {
 
     @DELETE
     @Path("/connectors/{name}/offsets")
-    ConnectorOffsets deleteConnectorOffsets(@PathParam("name") String name);
+    AlterResetOffsetsResponse deleteConnectorOffsets(@PathParam("name") String name);
 
     @POST
     @Path("/connectors/{name}/tasks/{id}/restart")

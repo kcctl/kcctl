@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
-import org.kcctl.service.ConnectorOffsets;
+import org.kcctl.service.AlterResetOffsetsResponse;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Version;
@@ -75,10 +75,8 @@ public class DeleteOffsetsCommand implements Callable<Integer> {
         }
 
         for (String connector : names) {
-            ConnectorOffsets offsets = kafkaConnectApi.deleteConnectorOffsets(connector);
-            // Display with JSON; the contents aren't very readable as raw text, and this output format
-            // plays nicely with the endpoint to patch connector offsets (you can use the output here as the
-            // body for requests to that endpoint)
+            AlterResetOffsetsResponse offsets = kafkaConnectApi.deleteConnectorOffsets(connector);
+            // Display with JSON; the contents aren't very readable as raw text.
             String offsetsJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(offsets);
             spec.commandLine().getOut().println(offsetsJson);
         }
