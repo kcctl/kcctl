@@ -15,6 +15,7 @@
  */
 package org.kcctl.command;
 
+import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
-import org.kcctl.service.AlterResetOffsetsResponse;
 import org.kcctl.service.ConnectorOffsets;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
@@ -66,18 +66,15 @@ class DeleteOffsetsCommandTest extends IntegrationTest {
                 .until(() -> {
                     deleteContext.reset();
 
-                    if (!isOffsetAvailable("delete-offsets-test1")) {
-                        // No offsets have been committed yet; wait a little longer for an offset commit to complete
-                        return false;
-                    }
-
-                    int exitCode = deleteContext.commandLine().execute("delete-offsets-test1");
-                    String errorMessage = deleteContext.error().toString();
-
-                    assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
-                    assertThat(errorMessage).contains("Connectors must be in the STOPPED state before their offsets can be modified. This can be done for the specified connector by issuing a 'PUT' request to the '/connectors/delete-offsets-test1/stop' endpoint" );
-                    return true;
+                    // No offsets have been committed yet; wait a little longer for an offset commit to complete
+                    return isOffsetAvailable("delete-offsets-test1");
                 });
+
+        int exitCode = deleteContext.commandLine().execute("delete-offsets-test1");
+        String errorMessage = deleteContext.error().toString();
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
+        assertThat(errorMessage).contains("Connectors must be in the STOPPED state before their offsets can be modified. This can be done for the specified connector by issuing a 'PUT' request to the '/connectors/delete-offsets-test1/stop' endpoint" );
     }
 
     @Test
@@ -90,22 +87,19 @@ class DeleteOffsetsCommandTest extends IntegrationTest {
                 .until(() -> {
                     deleteContext.reset();
 
-                    if (!isOffsetAvailable("delete-offsets-test1")) {
-                        // No offsets have been committed yet; wait a little longer for an offset commit to complete
-                        return false;
-                    }
-
-                    stopContext.runAndEnsureExitCodeOk("delete-offsets-test1");
-
-                    int exitCode = deleteContext.commandLine().execute("delete-offsets-test1");
-                    String output = deleteContext.output().toString();
-                    AlterResetOffsetsResponse response = mapper.readValue(output, AlterResetOffsetsResponse.class);
-
-                    assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-                    assertThat(response.message()).isEqualTo("The offsets for this connector have been reset successfully");
-
-                    return true;
+                    // No offsets have been committed yet; wait a little longer for an offset commit to complete
+                    return isOffsetAvailable("delete-offsets-test1");
                 });
+
+        stopContext.runAndEnsureExitCodeOk("delete-offsets-test1");
+        kafkaConnect.ensureConnectorState("delete-offsets-test1", Connector.State.STOPPED);
+
+
+        int exitCode = deleteContext.commandLine().execute("delete-offsets-test1");
+        String output = deleteContext.output().toString();
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(output).isEqualTo("The offsets for this connector have been reset successfully\n");
     }
 
     @Test
@@ -118,25 +112,26 @@ class DeleteOffsetsCommandTest extends IntegrationTest {
                 .until(() -> {
                     deleteContext.reset();
 
-                    if (!isOffsetAvailable("delete-offsets-test1") && !isOffsetAvailable("delete-offsets-test2")) {
-                        // No offsets have been committed yet; wait a little longer for an offset commit to complete
-                        return false;
-                    }
-
-                    stopContext.runAndEnsureExitCodeOk("delete-offsets-test1", "delete-offsets-test2");
-
-                    int exitCode = deleteContext.commandLine().execute("delete-offsets-test1", "delete-offsets-test2");
-                    String output = deleteContext.output().toString();
-                    AlterResetOffsetsResponse response = mapper.readValue(output, AlterResetOffsetsResponse.class);
-
-                    assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
-                    assertThat(response.message()).isEqualTo("The offsets for this connector have been reset successfully");
-
-                    return true;
+                    // No offsets have been committed yet; wait a little longer for an offset commit to complete
+                    return isOffsetAvailable("delete-offsets-test1") || isOffsetAvailable("delete-offsets-test2");
                 });
+
+        stopContext.runAndEnsureExitCodeOk("delete-offsets-test1", "delete-offsets-test2");
+        kafkaConnect.ensureConnectorState("delete-offsets-test1", Connector.State.STOPPED);
+        kafkaConnect.ensureConnectorState("delete-offsets-test2", Connector.State.STOPPED);
+
+        int exitCode = deleteContext.commandLine().execute("delete-offsets-test1", "delete-offsets-test2");
+        String output = deleteContext.output().toString();
+
+        assertThat(exitCode).isEqualTo(CommandLine.ExitCode.OK);
+        assertThat(output).isEqualTo("""
+                The offsets for this connector have been reset successfully
+                The offsets for this connector have been reset successfully
+                """);
     }
 
     private boolean isOffsetAvailable(String connectorName) throws IOException {
+
         getContext.reset();
         getContext.runAndEnsureExitCodeOk(connectorName);
         String output = getContext.output().toString();

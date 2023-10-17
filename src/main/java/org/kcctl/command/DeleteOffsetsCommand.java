@@ -76,9 +76,7 @@ public class DeleteOffsetsCommand implements Callable<Integer> {
 
         for (String connector : names) {
             AlterResetOffsetsResponse offsets = kafkaConnectApi.deleteConnectorOffsets(connector);
-            // Display with JSON; the contents aren't very readable as raw text.
-            String offsetsJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(offsets);
-            spec.commandLine().getOut().println(offsetsJson);
+            spec.commandLine().getOut().println(offsets.message());
         }
 
         return 0;
