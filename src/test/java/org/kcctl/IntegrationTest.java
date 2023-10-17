@@ -46,7 +46,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import io.debezium.testing.testcontainers.ConnectorConfiguration;
 import io.debezium.testing.testcontainers.DebeziumContainer;
-import io.debezium.util.ContainerImageVersions;
+import io.debezium.testing.testcontainers.util.ContainerImageVersions;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
