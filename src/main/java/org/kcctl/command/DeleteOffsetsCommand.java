@@ -27,9 +27,6 @@ import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Version;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import picocli.CommandLine;
 
 /**
@@ -44,7 +41,6 @@ public class DeleteOffsetsCommand implements Callable<Integer> {
     HelpMixin help;
 
     private final Version requiredVersionForDeletingOffsets = new Version(3, 6);
-    private final ObjectMapper mapper = new ObjectMapper();
     private final ConfigurationContext context;
 
     @CommandLine.Spec
@@ -64,7 +60,7 @@ public class DeleteOffsetsCommand implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws JsonProcessingException {
+    public Integer call() {
         KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
