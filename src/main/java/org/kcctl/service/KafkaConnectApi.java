@@ -20,6 +20,7 @@ import java.util.Map;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -121,6 +122,10 @@ public interface KafkaConnectApi {
     @DELETE
     @Path("/connectors/{name}/offsets")
     AlterResetOffsetsResponse deleteConnectorOffsets(@PathParam("name") String name);
+
+    @PATCH
+    @Path("/connectors/{name}/offsets")
+    AlterResetOffsetsResponse patchConnectorOffsets(@PathParam("name") String name, ConnectorOffsets offsets);
 
     @POST
     @Path("/connectors/{name}/tasks/{id}/restart")

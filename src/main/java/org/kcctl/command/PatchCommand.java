@@ -19,7 +19,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "patch", subcommands = { PatchLogLevelCommand.class,
-        PatchConnectorCommand.class }, description = "Modifies the configuration of some connectors or a logger")
+        PatchConnectorCommand.class, PatchOffsetsCommand.class }, description = "Modifies the configuration of some connectors or a logger")
 public class PatchCommand {
 
     @CommandLine.Mixin
