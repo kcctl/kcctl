@@ -16,7 +16,7 @@
 package org.kcctl.command;
 
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.LoggerNameCompletions;
@@ -79,22 +79,24 @@ public class GetLoggerCommand implements Runnable {
 
             int i = 0;
             for (final JsonNode header : (Iterable<JsonNode>) connectorLoggers::elements) {
-                for (final Map.Entry<String, JsonNode> field : (Iterable<Map.Entry<String, JsonNode>>) header::fields) {
-                    data[i] = new String[]{
-                            classPaths.next(),
-                            " " + field.getValue().textValue()
-                    };
-                }
+                String level = Optional.ofNullable(header.get("level"))
+                        .map(JsonNode::textValue)
+                        .orElse("null");
+                data[i] = new String[]{
+                        classPaths.next(),
+                        " " + level
+                };
+                // TODO: Add last_modified field to table
                 i++;
             }
         }
         else {
-            ObjectNode connectorLoggers = kafkaConnectApi.getLoggers(path);
-            data = new String[connectorLoggers.size()][];
-            data[0] = new String[]{
+            ObjectNode connectorLogger = kafkaConnectApi.getLoggers(path);
+            String[] row = new String[]{
                     path,
-                    connectorLoggers.findValue("level").textValue()
+                    connectorLogger.findValue("level").textValue()
             };
+            data = new String[][]{ row };
         }
         spec.commandLine().getOut().println();
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
