@@ -139,6 +139,10 @@ public interface KafkaConnectApi {
     @Path("/admin/loggers/{classPath}")
     List<String> updateLogLevel(@PathParam("classPath") String classPath, String content);
 
+    @PUT
+    @Path("/admin/loggers/{classPath}")
+    String updateLogLevelWithScope(@PathParam("classPath") String classPath, @QueryParam("scope") String scope, String content);
+
     @GET
     @Path("/admin/loggers/{path}")
     ObjectNode getLoggers(@PathParam("path") String path);
