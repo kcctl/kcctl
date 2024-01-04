@@ -88,7 +88,7 @@ public abstract class IntegrationTest {
         return debeziumVersion;
     }
 
-    private static DebeziumContainer debeziumContainer() {
+    protected static DebeziumContainer debeziumContainer() {
         String connectVersion = Optional.ofNullable(System.getenv(CONNECT_VERSION_VAR))
                 .orElse(LATEST_STABLE_BUILD);
 
@@ -200,9 +200,13 @@ public abstract class IntegrationTest {
         Type genericType = ((ParameterizedType) type).getActualTypeArguments()[0];
         Class<?> targetCommand = (Class<?>) genericType;
 
+        return prepareContext(targetCommand, kafkaConnect);
+    }
+
+    protected static <T> KcctlCommandContext<T> prepareContext(Class<T> targetCommand, DebeziumContainer kafkaConnect) {
         ensureCaseyCommand(targetCommand);
 
-        var context = initializeConfigurationContext();
+        var context = initializeConfigurationContext(kafkaConnect);
         var command = instantiateCommand(targetCommand, context);
         var commandLine = new CommandLine(command);
         var output = new StringWriter();
@@ -213,13 +217,13 @@ public abstract class IntegrationTest {
         return new KcctlCommandContext<>(command, commandLine, output, error);
     }
 
-    private void ensureCaseyCommand(Class<?> targetCommand) {
+    private static void ensureCaseyCommand(Class<?> targetCommand) {
         if (!targetCommand.isAnnotationPresent(CommandLine.Command.class)) {
             throw new IntegrationTestException("KcctlCommandContext should target a type annotated with @CommandLine.Command");
         }
     }
 
-    private ConfigurationContext initializeConfigurationContext() {
+    private static ConfigurationContext initializeConfigurationContext(DebeziumContainer kafkaConnect) {
         try {
             var tempDir = Files.createTempDirectory("kcctl-test");
             var configFile = tempDir.resolve(".kcctl");
@@ -242,9 +246,9 @@ public abstract class IntegrationTest {
         }
     }
 
-    private Object instantiateCommand(Class<?> targetCommand, ConfigurationContext configurationContext) {
+    protected static <T> T instantiateCommand(Class<T> targetCommand, ConfigurationContext configurationContext) {
         try {
-            Constructor<?> constructor = targetCommand.getDeclaredConstructor(ConfigurationContext.class);
+            Constructor<T> constructor = targetCommand.getDeclaredConstructor(ConfigurationContext.class);
             return constructor.newInstance(configurationContext);
         }
         catch (NoSuchMethodException e) {
