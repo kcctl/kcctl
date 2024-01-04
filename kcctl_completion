@@ -863,8 +863,9 @@ function _picocli_kcctl_patch_logger() {
 
   local commands=""
   local flag_opts="-h --help"
-  local arg_opts="-l --level"
+  local arg_opts="-l --level -s --scope"
   local level_option_args=("ERROR" "WARN" "FATAL" "DEBUG" "INFO" "TRACE") # --level values
+  local scope_option_args=("worker" "cluster") # --scope values
 
   type compopt &>/dev/null && compopt +o default
 
@@ -872,6 +873,11 @@ function _picocli_kcctl_patch_logger() {
     -l|--level)
       local IFS=$'\n'
       COMPREPLY=( $( compReplyArray "${level_option_args[@]}" ) )
+      return $?
+      ;;
+    -s|--scope)
+      local IFS=$'\n'
+      COMPREPLY=( $( compReplyArray "${scope_option_args[@]}" ) )
       return $?
       ;;
   esac
