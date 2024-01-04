@@ -15,17 +15,13 @@
  */
 package org.kcctl.command;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import jakarta.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -56,11 +52,7 @@ public class LoggerNamesCompletionCandidateCommand implements Runnable {
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        ObjectNode connectorLoggers = kafkaConnectApi.getLoggers("");
-        Iterator<String> fieldNames = connectorLoggers.fieldNames();
-        List<String> loggers = new ArrayList<>();
-        fieldNames.forEachRemaining(loggers::add);
-
+        Set<String> loggers = kafkaConnectApi.getLoggers().keySet();
         spec.commandLine().getOut().println(String.join(" ", loggers));
     }
 }

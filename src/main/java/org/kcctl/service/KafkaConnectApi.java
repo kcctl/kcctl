@@ -32,8 +32,6 @@ import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 @Path("/")
 @RegisterRestClient
 @RegisterClientHeaders(value = KafkaConnectClientHeadersFactory.class)
@@ -145,5 +143,9 @@ public interface KafkaConnectApi {
 
     @GET
     @Path("/admin/loggers/{path}")
-    ObjectNode getLoggers(@PathParam("path") String path);
+    LoggerLevel getLogger(@PathParam("path") String path);
+
+    @GET
+    @Path("/admin/loggers")
+    Map<String, LoggerLevel> getLoggers();
 }
