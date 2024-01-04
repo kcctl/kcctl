@@ -15,17 +15,15 @@
  */
 package org.kcctl.command;
 
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.Map;
 
 import jakarta.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.service.LoggerLevel;
 import org.kcctl.util.ConfigurationContext;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
@@ -65,23 +63,15 @@ public class GetLoggersCommand implements Runnable {
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
 
-        ObjectNode connectorLoggers = kafkaConnectApi.getLoggers("");
-        Iterator<String> classPaths = connectorLoggers.fieldNames();
+        Map<String, LoggerLevel> loggers = kafkaConnectApi.getLoggers();
+        String[][] data = loggers.entrySet().stream()
+                .map(e -> {
+                    String logger = e.getKey();
+                    LoggerLevel loggerLevel = e.getValue();
+                    String level = " " + loggerLevel.level();
+                    return new String[]{ logger, level };
+                }).toArray(String[][]::new);
 
-        String[][] data = new String[connectorLoggers.size()][];
-
-        int i = 0;
-        for (final JsonNode header : (Iterable<JsonNode>) connectorLoggers::elements) {
-            String level = Optional.ofNullable(header.get("level"))
-                    .map(JsonNode::textValue)
-                    .orElse("null");
-            data[i] = new String[]{
-                    classPaths.next(),
-                    " " + level
-            };
-            // TODO: Add last_modified field to table
-            i++;
-        }
         spec.commandLine().getOut().println();
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
                 new Column[]{

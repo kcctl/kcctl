@@ -15,16 +15,15 @@
  */
 package org.kcctl.command;
 
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.LoggerNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
+import org.kcctl.service.LoggerLevel;
 import org.kcctl.util.ConfigurationContext;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
@@ -65,41 +64,30 @@ public class GetLoggerCommand implements Runnable {
 
     @Override
     public void run() {
-        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
-                .baseUri(context.getCurrentContext().getCluster())
-                .build(KafkaConnectApi.class);
-
         String[][] data;
         if (path.equals(DEFAULT_PATH)) {
             // all
-            ObjectNode connectorLoggers = kafkaConnectApi.getLoggers("");
-            Iterator<String> classPaths = connectorLoggers.fieldNames();
-
-            data = new String[connectorLoggers.size()][];
-
-            int i = 0;
-            for (final JsonNode header : (Iterable<JsonNode>) connectorLoggers::elements) {
-                String level = Optional.ofNullable(header.get("level"))
-                        .map(JsonNode::textValue)
-                        .orElse("null");
-                data[i] = new String[]{
-                        classPaths.next(),
-                        " " + level
-                };
-                // TODO: Add last_modified field to table
-                i++;
-            }
+            // TODO: This duplicates logic in the 'get loggers' command
+            Map<String, LoggerLevel> loggers = allLoggers();
+            data = loggers.entrySet().stream()
+                    .map(e -> {
+                        String logger = e.getKey();
+                        LoggerLevel loggerLevel = e.getValue();
+                        String level = " " + loggerLevel.level();
+                        return new String[]{ logger, level };
+                    }).toArray(String[][]::new);
         }
         else {
-            ObjectNode connectorLogger = kafkaConnectApi.getLoggers(path);
+            LoggerLevel loggerLevel = logger(path);
             String[] row = new String[]{
                     path,
-                    connectorLogger.findValue("level").textValue()
+                    loggerLevel.level()
             };
             data = new String[][]{ row };
         }
         spec.commandLine().getOut().println();
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
+                // TODO: Add last_modified field to table
                 new Column[]{
                         new Column().header("LOGGER").dataAlign(HorizontalAlign.LEFT),
                         new Column().header(" LEVEL").dataAlign(HorizontalAlign.LEFT)
@@ -111,5 +99,22 @@ public class GetLoggerCommand implements Runnable {
                 .replace("DEBUG", ANSI_YELLOW + "DEBUG" + ANSI_RESET)
                 .replace("INFO", ANSI_GREEN + "INFO" + ANSI_RESET)
                 .replace("TRACE", ANSI_CYAN + "TRACE" + ANSI_RESET));
+    }
+
+    // visible for testing
+    Map<String, LoggerLevel> allLoggers() {
+        return kafkaConnectRequest(KafkaConnectApi::getLoggers);
+    }
+
+    // visible for testing
+    LoggerLevel logger(String path) {
+        return kafkaConnectRequest(kafkaConnectApi -> kafkaConnectApi.getLogger(path));
+    }
+
+    private <T> T kafkaConnectRequest(Function<KafkaConnectApi, T> request) {
+        KafkaConnectApi kafkaConnectApi = RestClientBuilder.newBuilder()
+                .baseUri(context.getCurrentContext().getCluster())
+                .build(KafkaConnectApi.class);
+        return request.apply(kafkaConnectApi);
     }
 }
