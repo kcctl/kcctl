@@ -15,8 +15,9 @@
  */
 package org.kcctl;
 
-import io.debezium.testing.testcontainers.DebeziumContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+
+import io.debezium.testing.testcontainers.DebeziumContainer;
 
 public class ConnectTrunkDebeziumContainer extends DebeziumContainer {
 

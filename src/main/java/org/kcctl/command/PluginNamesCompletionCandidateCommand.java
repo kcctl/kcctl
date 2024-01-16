@@ -18,7 +18,7 @@ package org.kcctl.command;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.service.ConnectorPlugin;

@@ -18,7 +18,7 @@ package org.kcctl.command;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.kcctl.util.ConfigurationContext;
 

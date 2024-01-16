@@ -15,9 +15,9 @@
  */
 package org.kcctl.service;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;

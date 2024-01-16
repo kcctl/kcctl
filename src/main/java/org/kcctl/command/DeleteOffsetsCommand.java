@@ -15,19 +15,22 @@
  */
 package org.kcctl.command;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
+import java.util.concurrent.Callable;
+
+import jakarta.inject.Inject;
+
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.AlterResetOffsetsResponse;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Version;
-import picocli.CommandLine;
 
-import javax.inject.Inject;
-import java.util.Set;
-import java.util.concurrent.Callable;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import picocli.CommandLine;
 
 /**
  * Deletes the committed offsets for a connector.

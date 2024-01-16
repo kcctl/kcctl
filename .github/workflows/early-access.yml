@@ -21,9 +21,8 @@ on:
     branches: [ main ]
 
 env:
-  JAVA_VERSION: '17'
-  JAVA_DISTRO: 'zulu'
-  GRAAL_VERSION: '22.3.0'
+  JAVA_VERSION: '21'
+  JAVA_DISTRO: 'temurin'
 
 jobs:
   # Build native executable per runner
@@ -46,8 +45,8 @@ jobs:
 
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: ${{ env.GRAAL_VERSION }}
           java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'graalvm-community'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 

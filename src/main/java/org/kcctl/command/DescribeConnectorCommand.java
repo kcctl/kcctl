@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;

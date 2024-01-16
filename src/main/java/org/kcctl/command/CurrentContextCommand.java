@@ -15,7 +15,7 @@
  */
 package org.kcctl.command;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.kcctl.service.Context;
 import org.kcctl.util.ConfigurationContext;
