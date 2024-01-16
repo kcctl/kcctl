@@ -107,7 +107,8 @@ public abstract class IntegrationTest {
             default -> throw new IllegalArgumentException("Kafka Connect version " + connectVersion + " is not yet supported");
         };
 
-        DebeziumContainer debeziumContainer = TRUNK_BUILD.equals(debeziumTag) ? new ConnectTrunkDebeziumContainer() : new DebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag);
+        DebeziumContainer debeziumContainer = TRUNK_BUILD.equals(debeziumTag) ? new ConnectTrunkDebeziumContainer()
+                : new DebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag);
 
         return debeziumContainer
                 .withNetwork(network)

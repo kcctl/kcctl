@@ -15,9 +15,9 @@
  */
 package org.kcctl.command;
 
-import io.debezium.testing.testcontainers.Connector;
-import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.TestProfile;
+import java.io.IOException;
+import java.time.Duration;
+
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -28,10 +28,11 @@ import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-import picocli.CommandLine;
 
-import java.io.IOException;
-import java.time.Duration;
+import io.debezium.testing.testcontainers.Connector;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
+import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -43,7 +44,6 @@ import static org.awaitility.Awaitility.await;
 class DeleteOffsetsCommandTest extends IntegrationTest {
 
     private static final long OFFSET_AVAILABILITY_TIMEOUT_SECONDS = 30;
-
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -74,7 +74,8 @@ class DeleteOffsetsCommandTest extends IntegrationTest {
         String errorMessage = deleteContext.error().toString();
 
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
-        assertThat(errorMessage).contains("Connectors must be in the STOPPED state before their offsets can be modified. This can be done for the specified connector by issuing a 'PUT' request to the '/connectors/delete-offsets-test1/stop' endpoint" );
+        assertThat(errorMessage).contains(
+                "Connectors must be in the STOPPED state before their offsets can be modified. This can be done for the specified connector by issuing a 'PUT' request to the '/connectors/delete-offsets-test1/stop' endpoint");
     }
 
     @Test
@@ -93,7 +94,6 @@ class DeleteOffsetsCommandTest extends IntegrationTest {
 
         stopContext.runAndEnsureExitCodeOk("delete-offsets-test1");
         kafkaConnect.ensureConnectorState("delete-offsets-test1", Connector.State.STOPPED);
-
 
         int exitCode = deleteContext.commandLine().execute("delete-offsets-test1");
         String output = deleteContext.output().toString();

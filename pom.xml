@@ -24,7 +24,7 @@
   <artifactId>kcctl</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <properties>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
     <executable-suffix/>
     <maven.compiler.parameters>true</maven.compiler.parameters>
     <maven.compiler.release>${java.version}</maven.compiler.release>
@@ -32,8 +32,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-    <quarkus.platform.version>2.16.2.Final</quarkus.platform.version>
-    <debezium.version>2.4.0.Final</debezium.version>
+    <quarkus.platform.version>3.6.6</quarkus.platform.version>
+    <debezium.version>2.5.0.Final</debezium.version>
     <artifactsDir>target</artifactsDir>
   </properties>
 
@@ -102,6 +102,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
+      <version>3.25.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -179,7 +180,6 @@
               <configFile>etc/eclipse-formatter-config.xml</configFile>
           </configuration>
         </plugin>
-
         <plugin>
           <groupId>net.revelc.code</groupId>
           <artifactId>impsort-maven-plugin</artifactId>
@@ -344,6 +344,7 @@
           </execution>
         </executions>
       </plugin>
+      <!--
       <plugin>
         <groupId>net.revelc.code</groupId>
         <artifactId>impsort-maven-plugin</artifactId>
@@ -357,6 +358,7 @@
           </execution>
         </executions>
       </plugin>
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>

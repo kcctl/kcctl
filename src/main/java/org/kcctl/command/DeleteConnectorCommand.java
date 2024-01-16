@@ -18,7 +18,7 @@ package org.kcctl.command;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.http.HttpStatus;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
