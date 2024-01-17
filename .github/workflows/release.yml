@@ -122,7 +122,7 @@ jobs:
         run: ./mvnw -ntp -B --file pom.xml -Pdist package -DskipTests
 
       - name: 'Upload build artifact'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: artifacts
           path: |
@@ -168,7 +168,7 @@ jobs:
 
       - name: JReleaser output
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: jreleaser-logs
           path: |
