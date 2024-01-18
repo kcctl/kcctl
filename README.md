@@ -80,7 +80,8 @@ Commands:
   describe  Displays detailed information about the specified resources
   apply     Applies the given files or the stdin content for registering or
               updating connectors
-  patch     Modifies the configuration of some connectors or a logger
+  patch     Modifies connector offsets, connector configurations, or logger
+              levels
   restart   Restarts some connectors or a task
   pause     Pauses connectors
   resume    Resumes connectors
