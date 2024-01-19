@@ -133,6 +133,26 @@ public class ConfigurationContext {
         return true;
     }
 
+    public boolean removeContext(String contextName) {
+        if (!configFile.exists()) {
+            warnAboutMissingConfigFile();
+            return false;
+        }
+
+        var configuration = tryReadConfiguration();
+
+        if (!configuration.configurationContexts().containsKey(contextName)) {
+            return false;
+        }
+
+        if (configuration.removeContext(contextName) == null) {
+            return false;
+        }
+
+        tryWriteConfiguration(configuration);
+        return true;
+    }
+
     private Configuration tryReadConfiguration() {
         try {
             return objectMapper.readValue(configFile, Configuration.class);

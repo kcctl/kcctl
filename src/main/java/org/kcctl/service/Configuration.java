@@ -39,6 +39,10 @@ public class Configuration {
         this.currentContext = currentContext;
     }
 
+    public Context removeContext(String context) {
+        return configurationContexts.remove(context);
+    }
+
     @JsonAnyGetter
     public Map<String, Context> configurationContexts() {
         return configurationContexts;
