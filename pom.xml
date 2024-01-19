@@ -452,97 +452,6 @@
       </properties>
     </profile>
     <profile>
-      <id>ea-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jreleaser</groupId>
-            <artifactId>jreleaser-maven-plugin</artifactId>
-            <version>1.10.0</version>
-            <configuration>
-              <jreleaser>
-                <project>
-                  <snapshot>
-                    <label>{{ projectVersionNumber }}-early-access</label>
-                  </snapshot>
-                </project>
-                <release>
-                  <github>
-                    <changelog>
-                      <formatted>ALWAYS</formatted>
-                      <includeLabels>
-                        <includeLabel>changes</includeLabel>
-                        <includeLabel>dependencies</includeLabel>
-                      </includeLabels>
-                      <labelers>
-                        <labeler>
-                          <label>changes</label>
-                          <title>regex:^(?!Bump \S+ from \S+ to \S+).+$</title>
-                        </labeler>
-                        <labeler>
-                          <label>dependencies</label>
-                          <title>regex:^Bump \S+ from \S+ to \S+</title>
-                        </labeler>
-                      </labelers>
-                      <categories>
-                        <category>
-                          <title>🔄 Changes</title>
-                          <key>changes</key>
-                          <labels>changes</labels>
-                          <order>1</order>
-                        </category>
-                        <category>
-                          <title>⚙️ Dependencies</title>
-                          <key>dependencies</key>
-                          <labels>dependencies</labels>
-                          <order>2</order>
-                        </category>
-                      </categories>
-                    </changelog>
-                  </github>
-                </release>
-                <distributions>
-                  <kcctl>
-                    <name>kcctl</name>
-                    <type>BINARY</type>
-                    <brew>
-                      <active>RELEASE</active>
-                      <multiPlatform>true</multiPlatform>
-                    </brew>
-                    <sdkman>
-                      <active>RELEASE</active>
-                    </sdkman>
-                    <artifacts>
-                      <artifact>
-                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz</path>
-                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-x86_64.tar.gz</transform>
-                        <platform>linux-x86_64</platform>
-                      </artifact>
-                      <artifact>
-                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-x86_64.zip</path>
-                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-x86_64.zip</transform>
-                        <platform>linux-x86_64</platform>
-                      </artifact>
-                      <artifact>
-                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip</path>
-                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-windows-x86_64.zip</transform>
-                        <platform>windows-x86_64</platform>
-                      </artifact>
-                      <artifact>
-                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip</path>
-                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-x86_64.zip</transform>
-                        <platform>osx-x86_64</platform>
-                      </artifact>
-                    </artifacts>
-                  </kcctl>
-                </distributions>
-              </jreleaser>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>release</id>
       <build>
         <plugins>
@@ -628,11 +537,13 @@
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-aarch_64.tar.gz</path>
                         <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-aarch_64.tar.gz</transform>
                         <platform>osx-aarch_64</platform>
+                        <active>RELEASE</active>
                       </artifact>
                       <artifact>
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-aarch_64.zip</path>
                         <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-aarch_64.zip</transform>
                         <platform>osx-aarch_64</platform>
+                        <active>RELEASE</active>
                       </artifact>
                     </artifacts>
                   </kcctl>
