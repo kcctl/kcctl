@@ -33,7 +33,7 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 
 @Command(name = "remove-context", description = "Removes a context from your contexts")
-public class RemoveContextCommand implements Runnable {
+public class RemoveContextCommand implements Callable<Integer> {
 
     @CommandLine.Mixin
     HelpMixin help;
@@ -42,11 +42,12 @@ public class RemoveContextCommand implements Runnable {
     String contextName;
 
     @Override
-    public void run() {
+    public Integer call() {
         ConfigurationContext context = new ConfigurationContext();
 
         if (context.getCurrentContextName().equals(contextName)) {
             System.out.println("Set another context before removing the current context.");
+            return 1;
         }
         else {
             boolean success = context.removeContext(contextName);
@@ -56,8 +57,11 @@ public class RemoveContextCommand implements Runnable {
             }
             else {
                 System.out.println("Couldn't remove context; There was no context named '" + contextName + "'");
+                return 1;
             }
         }
+
+        return 0;
     }
 
 }
