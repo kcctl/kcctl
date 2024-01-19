@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        os: [ ubuntu-latest, macOS-latest, macos-latest-xlarge, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out repository'
@@ -100,7 +100,6 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'graalvm-community'
-          components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Cache Maven packages'
