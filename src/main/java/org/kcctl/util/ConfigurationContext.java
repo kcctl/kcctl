@@ -141,10 +141,6 @@ public class ConfigurationContext {
 
         var configuration = tryReadConfiguration();
 
-        if (!configuration.configurationContexts().containsKey(contextName)) {
-            return false;
-        }
-
         if (configuration.removeContext(contextName) == null) {
             return false;
         }
