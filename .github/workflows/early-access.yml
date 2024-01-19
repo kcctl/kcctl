@@ -54,7 +54,7 @@ jobs:
           echo "VERSION=$(echo $version)" >> $GITHUB_OUTPUT
 
   build:
-    depends: [ precheck ]
+    needs: [ precheck ]
     if: endsWith(${{ needs.precheck.outputs.VERSION }}, '-SNAPSHOT')
     runs-on: ubuntu-latest
     steps:
@@ -79,7 +79,7 @@ jobs:
 
   # Build native executable per runner
   package:
-    depends: [ build ]
+    needs: [ build ]
     name: 'Build with Graal on ${{ matrix.os }}'
     strategy:
       fail-fast: true
