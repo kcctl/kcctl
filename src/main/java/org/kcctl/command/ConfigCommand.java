@@ -19,7 +19,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "config", subcommands = { SetContextCommand.class, GetContextsCommand.class,
-        CurrentContextCommand.class, UseContextCommand.class }, description = "Sets or retrieves the configuration of this client"
+        CurrentContextCommand.class, UseContextCommand.class, RemoveContextCommand.class }, description = "Sets or retrieves the configuration of this client"
 
 )
 public class ConfigCommand {

@@ -97,6 +97,23 @@ class ConfigurationContextTest {
     }
 
     @Nested
+    class RemoveContext {
+        @Test
+        void should_remove_existing_context_test() throws IOException {
+            var configFile = tempDir.toPath().resolve(".kcctl");
+
+            Files.writeString(configFile, "{ \"currentContext\": \"local\", \"local\": { \"cluster\": \"http://localhost:8083\" }, \"preprod\": { \"cluster\": \"http://preprod:8083\"}}");
+
+            new ConfigurationContext(tempDir).removeContext("preprod");
+
+            var actualConfiguration = Files.readString(configFile);
+
+            assertThatJson(actualConfiguration)
+                    .isEqualTo("{ 'currentContext': 'local', 'local': { 'cluster': 'http://localhost:8083' }}");
+        }
+    }
+
+    @Nested
     class GetCluster {
         @Test
         void should_return_the_cluster_url_for_the_current_context() throws IOException {
