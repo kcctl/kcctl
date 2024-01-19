@@ -116,6 +116,28 @@ class PatchOffsetsCommandTest extends IntegrationTest {
                 .until(() -> getOffsets("patch-offsets-test1").offsets().size() == 2);
     }
 
+    @Test
+    public void require_offset_argument() {
+        int exitCode = patchContext.commandLine().execute("some-connector");
+        assertEquals(CommandLine.ExitCode.USAGE, exitCode);
+        assertThat(patchContext.error().toString()).contains("Missing required argument ");
+    }
+
+    @Test
+    public void disallow_multiple_offset_arguments() {
+        String sourcePartition = "{\"sourceClusterAlias\": \"kcctl-test-src\", \"targetClusterAlias\": \"kcctl-test-dst\"}";
+        String sourceOffset = "{\"offset\": 0}";
+        int exitCode = patchContext.commandLine().execute(
+                "--source-partition", sourcePartition,
+                "--source-offset", sourceOffset,
+                "--kafka-topic", "topic",
+                "--kafka-partition", "0",
+                "--kafka-offset", "0",
+                "some-connector");
+        assertEquals(CommandLine.ExitCode.USAGE, exitCode);
+        assertThat(patchContext.error().toString()).contains("are mutually exclusive ");
+    }
+
     private boolean isOffsetAvailable(String connectorName) throws IOException {
         return !getOffsets(connectorName).offsets().isEmpty();
     }

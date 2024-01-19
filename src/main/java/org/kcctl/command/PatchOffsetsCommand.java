@@ -132,7 +132,7 @@ public class PatchOffsetsCommand implements Callable<Integer> {
         }
     }
 
-    @CommandLine.ArgGroup(exclusive = true)
+    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     PatchedConnectorOffset patchedOffset;
 
     @Inject
