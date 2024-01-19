@@ -86,7 +86,7 @@ Commands:
   pause     Pauses connectors
   resume    Resumes connectors
   stop      Stops (but does not delete) connectors
-  delete    Deletes connectors
+  delete    Deletes connectors or their offsets
   help      Display help information about the specified command.
 ```
 

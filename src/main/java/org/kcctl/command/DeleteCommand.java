@@ -25,7 +25,7 @@ import org.kcctl.util.ConfigurationContext;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "delete", subcommands = { DeleteConnectorCommand.class }, description = "Deletes connectors")
+@Command(name = "delete", subcommands = { DeleteConnectorCommand.class, DeleteOffsetsCommand.class }, description = "Deletes connectors or their offsets")
 public class DeleteCommand implements Callable<Integer> {
 
     @CommandLine.Mixin
