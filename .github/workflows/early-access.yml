@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        os: [ ubuntu-latest, macOS-latest, macos-latest-xlarge, windows-latest ]
     runs-on: ${{ matrix.os }}
 
     steps:
