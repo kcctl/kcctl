@@ -1,5 +1,5 @@
 #
-#  Copyright 2021 The original authors
+#  Copyright 2021-2024 The original authors
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,16 +25,67 @@ env:
   JAVA_DISTRO: 'temurin'
 
 jobs:
-  # Build native executable per runner
-  build:
-    name: 'Build with Graal on ${{ matrix.os }}'
+  precheck:
     if: github.repository == 'kcctl/kcctl' && startsWith(github.event.head_commit.message, '🏁 Releasing version') != true && startsWith(github.event.head_commit.message, '⬆️  Next version') != true
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.vars.outputs.VERSION }}
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v4
+
+      - name: 'Cancel previous run'
+        uses: styfle/cancel-workflow-action@0.12.0
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Set up Java'
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+          cache: maven
+
+      - name: 'Version'
+        id: vars
+        shell: bash
+        run: |
+          version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "VERSION=$(echo $version)" >> $GITHUB_OUTPUT
+
+  build:
+    depends: [ precheck ]
+    if: endsWith(${{ needs.precheck.outputs.VERSION }}, '-SNAPSHOT')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v4
+
+      - name: 'Add Developer Command Prompt for Microsoft Visual C++ '
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: 'Set up Graal'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: maven
+
+      - name: 'Build'
+        if: ${{ runner.os == 'Linux' }}
+        run: ./mvnw -ntp -B --file pom.xml test
+
+  # Build native executable per runner
+  package:
+    depends: [ build ]
+    name: 'Build with Graal on ${{ matrix.os }}'
     strategy:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@v4
@@ -43,26 +94,21 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
 
-      - uses: graalvm/setup-graalvm@v1
+      - name: 'Set up Graal'
+        uses: graalvm/setup-graalvm@v1
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 'Cache Maven packages'
-        uses: actions/cache@v4.0.0
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          cache: maven
 
       - name: 'Build Native Image (Linux)'
         if: ${{ runner.os == 'Linux' }}
-        run: ./mvnw -ntp -B --file pom.xml -Pnative package
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests
 
       - name: 'Build Native Image (macOS, Windows)'
         if: ${{ runner.os == 'macOS' || runner.os == 'Windows' }}
-        run: ./mvnw -ntp -B --file pom.xml -Pnative package "-Dquarkus.test.profile.tags=basic"
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests "-Dquarkus.test.profile.tags=basic"
 
       - name: 'Create distribution'
         run: ./mvnw -ntp -B --file pom.xml -Pdist package -DskipTests
@@ -77,9 +123,8 @@ jobs:
 
   # Collect all executables and release
   release:
-    needs: [ build ]
+    needs: [ package ]
     runs-on: ubuntu-latest
-
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@v4
@@ -94,20 +139,14 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRO }}
-
-      - name: 'Cache Maven packages'
-        uses: actions/cache@v4.0.0
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          cache: maven
 
       - name: 'Release with JReleaser'
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./mvnw -ntp -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
 
-      - name: JReleaser output
+      - name: 'JReleaser output'
         if: always()
         uses: actions/upload-artifact@v3
         with:

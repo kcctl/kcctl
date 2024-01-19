@@ -1,5 +1,5 @@
 #
-#  Copyright 2021 The original authors
+#  Copyright 2021-2024 The original authors
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -40,20 +40,15 @@ jobs:
       PLAIN_VERSION: ${{ steps.version.outputs.PLAIN_VERSION }}
       NEXT_VERSION: ${{ steps.version.outputs.NEXT_VERSION }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 'Check out repository'
+        uses: actions/checkout@v4
 
       - name: 'Set up Java'
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRO }}
-
-      - name: 'Cache Maven packages'
-        uses: actions/cache@v4.0.0
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          cache: maven
 
       - name: 'Set release version'
         id: version
@@ -77,9 +72,34 @@ jobs:
           echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_OUTPUT
           echo "PLAIN_VERSION=$PLAIN_VERSION" >> $GITHUB_OUTPUT
 
-  # Build native executable per runner
   build:
-    needs: [ version ]
+    depends: [ version ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.HEAD }}
+
+      - name: 'Add Developer Command Prompt for Microsoft Visual C++ '
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: 'Set up Graal'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: maven
+
+      - name: 'Build'
+        if: ${{ runner.os == 'Linux' }}
+        run: ./mvnw -ntp -B --file pom.xml test
+
+  # Build native executable per runner
+  package:
+    needs: [ version, build ]
     name: 'Build with Graal on ${{ matrix.os }}'
     strategy:
       fail-fast: true
@@ -96,26 +116,21 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
 
-      - uses: graalvm/setup-graalvm@v1
+      - name: 'Set up Graal'
+        uses: graalvm/setup-graalvm@v1
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 'Cache Maven packages'
-        uses: actions/cache@v4.0.0
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          cache: maven
 
       - name: 'Build Native Image (Linux)'
         if: ${{ runner.os == 'Linux' }}
-        run: ./mvnw -ntp -B --file pom.xml -Pnative package
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests
 
       - name: 'Build Native Image (macOS, Windows)'
         if: ${{ runner.os == 'macOS' || runner.os == 'Windows' }}
-        run: ./mvnw -ntp -B --file pom.xml -Pnative package "-Dquarkus.test.profile.tags=basic"
+        run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests "-Dquarkus.test.profile.tags=basic"
 
       - name: 'Create distribution'
         run: ./mvnw -ntp -B --file pom.xml -Pdist package -DskipTests
@@ -130,7 +145,7 @@ jobs:
 
   # Collect all executables and release
   release:
-    needs: [ version, build ]
+    needs: [ version, package ]
     runs-on: ubuntu-latest
     steps:
       - name: 'Check out repository'
@@ -149,13 +164,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRO }}
-
-      - name: 'Cache Maven packages'
-        uses: actions/cache@v4.0.0
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          cache: maven
 
       - name: 'Release with JReleaser'
         env:
@@ -165,7 +174,7 @@ jobs:
           JRELEASER_HOMEBREW_GITHUB_TOKEN: ${{ secrets.JRELEASER_HOMEBREW_GITHUB_TOKEN }}
         run: ./mvnw -ntp -B --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
 
-      - name: JReleaser output
+      - name: 'JReleaser output'
         if: always()
         uses: actions/upload-artifact@v3
         with:
