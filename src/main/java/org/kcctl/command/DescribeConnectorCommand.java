@@ -19,6 +19,7 @@ import org.kcctl.service.ConnectorInfo;
 import org.kcctl.service.ConnectorStatusInfo;
 import org.kcctl.service.KafkaConnectApi;
 import org.kcctl.service.KafkaConnectNotFoundException;
+import org.kcctl.service.TaskConfig;
 import org.kcctl.service.TaskState;
 import org.kcctl.service.TopicsInfo;
 import org.kcctl.util.Colors;
@@ -76,7 +77,6 @@ public class DescribeConnectorCommand implements Callable<Integer> {
         mapper = new ObjectMapper();
     }
 
-    private final Version requiredVersionForTasksConfig = new Version(2, 8);
     private final Version requiredVersionForTopicsApi = new Version(2, 5);
 
     @Override
@@ -85,13 +85,6 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 .baseUri(context.getCurrentContext().getCluster())
                 .build(KafkaConnectApi.class);
         Version currentVersion = new Version(kafkaConnectApi.getWorkerInfo().version());
-
-        if (includeTasksConfig) {
-            if (!currentVersion.greaterOrEquals(requiredVersionForTasksConfig)) {
-                System.out.println("--tasks-config requires at least Kafka Connect 2.8. Current version: " + currentVersion);
-                return 1;
-            }
-        }
 
         Set<String> selectedConnector = Connectors.getSelectedConnectors(kafkaConnectApi, names, regexpMode);
         for (String connectorToDescribe : selectedConnector) {
@@ -150,7 +143,11 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
             Map<String, Map<String, String>> tasksConfigs;
             if (includeTasksConfig) {
-                tasksConfigs = kafkaConnectApi.getConnectorTasksConfig(connectorToDescribe);
+                tasksConfigs = new HashMap<>();
+                List<TaskConfig> connectorTasks = kafkaConnectApi.getConnectorTasks(connectorToDescribe);
+                for (TaskConfig taskConfig : connectorTasks) {
+                    tasksConfigs.put(taskConfig.id().toString(), taskConfig.config());
+                }
             }
             else {
                 tasksConfigs = Collections.emptyMap();

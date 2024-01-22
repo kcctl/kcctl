@@ -47,6 +47,22 @@ class DescribeConnectorCommandTest extends IntegrationTest {
     }
 
     @Test
+    public void should_describe_connector_with_task_configs() {
+        registerTestConnector("test1");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        PrintStream old = System.out;
+        System.setOut(ps);
+
+        context.runAndEnsureExitCodeOk("test1", "--tasks-config");
+        System.setOut(old);
+
+        assertThat(baos.toString()).contains(HEARTBEAT_TOPIC);
+        assertThat(baos.toString()).contains("task.class");
+    }
+
+    @Test
     public void should_describe_connector_with_json() {
         registerTestConnector("test1");
 
