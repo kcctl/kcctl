@@ -7,10 +7,7 @@
  */
 package org.kcctl.service;
 
-public record TaskInfo(String connector, Integer task) {
+import java.util.Map;
 
-    @Override
-    public String toString() {
-        return connector + "-" + task;
-    }
+public record TaskConfig(TaskInfo id, Map<String, String> config) {
 }
