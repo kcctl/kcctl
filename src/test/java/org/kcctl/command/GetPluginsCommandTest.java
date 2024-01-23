@@ -7,7 +7,6 @@
  */
 package org.kcctl.command;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,7 +40,7 @@ class GetPluginsCommandTest extends IntegrationTest {
     KcctlCommandContext<GetPluginsCommand> context;
 
     @Test
-    public void should_list_source_plugins() throws Exception {
+    public void should_list_source_plugins() {
         String debeziumVersion = getDebeziumVersion();
         String kafkaVersion = getConnectVersion();
 
@@ -126,7 +125,7 @@ class GetPluginsCommandTest extends IntegrationTest {
                 .anyMatch(l -> l.startsWith("TYPE"));
 
         context.output().getBuffer().setLength(0);
-        String allTypes = Arrays.asList(GetPluginsCommand.PluginType.values()).stream().map(t -> t.name).collect(Collectors.joining(","));
+        String allTypes = Stream.of(GetPluginsCommand.PluginType.values()).map(t -> t.name).collect(Collectors.joining(","));
         context.runAndEnsureExitCodeOk("--types=" + allTypes);
         assertThat(context.output().toString().trim()).isEqualTo(output);
     }

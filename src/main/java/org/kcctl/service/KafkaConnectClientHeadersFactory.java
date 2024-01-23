@@ -29,7 +29,7 @@ public class KafkaConnectClientHeadersFactory implements ClientHeadersFactory {
     @Override
     public MultivaluedMap<String, String> update(MultivaluedMap<String, String> incomingHeaders,
                                                  MultivaluedMap<String, String> clientOutgoingHeaders) {
-        MultivaluedMap<String, String> result = new MultivaluedHashMap<String, String>();
+        MultivaluedMap<String, String> result = new MultivaluedHashMap<>();
         Context currentContext = context.getCurrentContext();
 
         if (currentContext.isUsingBasicAuthentication()) {

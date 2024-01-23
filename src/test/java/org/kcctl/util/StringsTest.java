@@ -75,21 +75,21 @@ public class StringsTest {
         public void noPropertiesInStringIsEmpty() throws IOException {
             final Properties props = Strings.toProperties("");
 
-            assertEquals(true, props.isEmpty());
+            assertTrue(props.isEmpty());
         }
 
         @Test
         public void commaOnlyStringIsEmpty() throws IOException {
             final Properties props = Strings.toProperties(",");
 
-            assertEquals(true, props.isEmpty());
+            assertTrue(props.isEmpty());
         }
 
         @Test
         public void multipleCommasOnlyStringIsEmpty() throws IOException {
             final Properties props = Strings.toProperties(",,");
 
-            assertEquals(true, props.isEmpty());
+            assertTrue(props.isEmpty());
         }
     }
 }

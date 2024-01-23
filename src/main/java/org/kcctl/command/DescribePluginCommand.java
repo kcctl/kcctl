@@ -7,7 +7,6 @@
  */
 package org.kcctl.command;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
@@ -104,7 +103,7 @@ public class DescribePluginCommand implements Callable<Integer> {
             configs = configSearch.filterResults(configs);
         }
         for (ConfigInfos.ConfigKeyInfo config : configs) {
-            Tuple.print(Arrays.asList(
+            Tuple.print(List.of(
                     new Tuple(ANSI_WHITE_BOLD + "Name" + ANSI_RESET, config.name()),
                     new Tuple(ANSI_WHITE_BOLD + "Type" + ANSI_RESET, config.type()),
                     new Tuple(ANSI_WHITE_BOLD + "Required" + ANSI_RESET, String.valueOf(config.required())),

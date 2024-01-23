@@ -29,7 +29,7 @@ class InfoCommandTest extends IntegrationTest {
     KcctlCommandContext<InfoCommand> context;
 
     @Test
-    public void should_print_info() throws Exception {
+    public void should_print_info() {
         context.runAndEnsureExitCodeOk();
         assertThat(context.output().toString().trim())
                 .matches("URL:\\s+" + kafkaConnect.getTarget() + "\\n" +

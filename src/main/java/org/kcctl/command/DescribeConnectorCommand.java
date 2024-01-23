@@ -117,7 +117,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                         break;
                 }
             }
-            List<Tuple> connectorInfo = Arrays.asList(
+            List<Tuple> connectorInfo = List.of(
                     new Tuple("Name", connector.name()),
                     new Tuple("Type", connectorStatus.type()),
                     new Tuple("State", Colors.colorizeState(connectorStatus.connector().state())),
@@ -136,10 +136,10 @@ public class DescribeConnectorCommand implements Callable<Integer> {
                 config.add(new Tuple("  " + configEntry.getKey(), configEntry.getValue()));
             }
 
-            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
+            Tuple.print(List.of(new Tuple(ANSI_WHITE_BOLD + "Config" + ANSI_RESET, "")));
             Tuple.print(config);
 
-            Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, "")));
+            Tuple.print(List.of(new Tuple(ANSI_WHITE_BOLD + "Tasks" + ANSI_RESET, "")));
 
             Map<String, Map<String, String>> tasksConfigs;
             if (includeTasksConfig) {
@@ -155,7 +155,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
             // Tasks
             for (TaskState task : connectorStatus.tasks()) {
-                Tuple.print(Arrays.asList(new Tuple("  " + task.id(), "")));
+                Tuple.print(List.of(new Tuple("  " + task.id(), "")));
                 List<Tuple> tuples = new ArrayList<>();
                 tuples.add(new Tuple("    State", Colors.colorizeState(task.state())));
                 tuples.add(new Tuple("    Worker ID", task.worker_id()));
@@ -178,7 +178,7 @@ public class DescribeConnectorCommand implements Callable<Integer> {
 
                 Map<String, TopicsInfo> connectorTopics = kafkaConnectApi.getConnectorTopics(connectorToDescribe);
 
-                Tuple.print(Arrays.asList(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
+                Tuple.print(List.of(new Tuple(ANSI_WHITE_BOLD + "Topics" + ANSI_RESET, "")));
 
                 List<Tuple> topics = new ArrayList<>();
 

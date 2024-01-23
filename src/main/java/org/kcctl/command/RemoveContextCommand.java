@@ -7,21 +7,11 @@
  */
 package org.kcctl.command;
 
-import org.kcctl.service.Context;
 import org.kcctl.util.ConfigurationContext;
-import org.kcctl.util.Strings;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
 @Command(name = "remove-context", description = "Removes a context from your contexts")

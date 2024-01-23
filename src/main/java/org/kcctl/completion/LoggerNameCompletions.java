@@ -7,14 +7,14 @@
  */
 package org.kcctl.completion;
 
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class LoggerNameCompletions implements Iterable<String> {
 
     @Override
     public Iterator<String> iterator() {
-        return Arrays.asList("kcctl", "logger-name-completions").iterator();
+        return List.of("kcctl", "logger-name-completions").iterator();
     }
 
 }

@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -55,7 +54,7 @@ class ApplyCommandTest extends IntegrationTest {
     private void test_create_two_connectors(boolean multipleFlags) {
         var path = Paths.get("src", "test", "resources", "heartbeat-source.json");
         var path2 = Paths.get("src", "test", "resources", "heartbeat-source-2.json");
-        List<String> args = new ArrayList<>(Arrays.asList("-f", path.toAbsolutePath().toString()));
+        List<String> args = new ArrayList<>(List.of("-f", path.toAbsolutePath().toString()));
         if (multipleFlags) {
             args.add("-f");
         }
@@ -153,7 +152,7 @@ class ApplyCommandTest extends IntegrationTest {
         int exitCode = context.commandLine().execute("-f", path.toAbsolutePath().toString());
         assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
 
-        Iterable<String> expectedOutputSubstrings = Arrays.asList(
+        Iterable<String> expectedOutputSubstrings = List.of(
                 "Specified class isn't a valid connector type",
                 "The following connector type(s) are available",
                 "TYPE",
