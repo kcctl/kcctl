@@ -38,7 +38,7 @@ public class GetContextsCommand implements Runnable {
         String[][] data = contexts.entrySet()
                 .stream()
                 .map(e -> new String[]{ e.getKey() + (e.getKey().equals(current) ? "*" : ""), e.getValue().getCluster().toASCIIString() })
-                .toArray(size -> new String[size][]);
+                .toArray(String[][]::new);
 
         String table = AsciiTable.getTable(AsciiTable.NO_BORDERS,
                 new Column[]{

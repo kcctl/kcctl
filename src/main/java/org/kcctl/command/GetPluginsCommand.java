@@ -7,7 +7,6 @@
  */
 package org.kcctl.command;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -77,8 +76,8 @@ public class GetPluginsCommand implements Callable<Integer> {
         connectorPlugins.sort(Comparator.comparing(ConnectorPlugin::type).thenComparing(ConnectorPlugin::clazz));
 
         spec.commandLine().getOut().println();
-        spec.commandLine().getOut().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, Arrays.asList(
-                new Column().header("TYPE").dataAlign(HorizontalAlign.LEFT).with(plugin -> plugin.type()),
+        spec.commandLine().getOut().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, connectorPlugins, List.of(
+                new Column().header("TYPE").dataAlign(HorizontalAlign.LEFT).with(ConnectorPlugin::type),
                 new Column().header(" CLASS").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + plugin.clazz()),
                 new Column().header(" VERSION").dataAlign(HorizontalAlign.LEFT).with(plugin -> " " + (plugin.version() == null ? "n/a" : plugin.version())))));
         spec.commandLine().getOut().println();

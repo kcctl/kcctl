@@ -111,12 +111,12 @@ public class PatchLogLevelCommand implements Callable<Object> {
         return 0;
     }
 
-    public static enum LogLevel {
+    public enum LogLevel {
         ERROR,
         WARN,
         FATAL,
         DEBUG,
         INFO,
-        TRACE;
+        TRACE
     }
 }

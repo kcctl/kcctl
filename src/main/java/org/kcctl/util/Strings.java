@@ -28,16 +28,10 @@ public class Strings {
         // Thanks to https://stackoverflow.com/a/58481108
         // for the pattern here
         final String formattedString = string.trim().replace(",", System.lineSeparator());
-        final StringReader stringReader = new StringReader(formattedString);
-        try {
+        try (StringReader stringReader = new StringReader(formattedString)) {
             final Properties properties = new Properties();
             properties.load(stringReader);
             return properties;
-        }
-        finally {
-            if (stringReader != null) {
-                stringReader.close();
-            }
         }
     }
 }

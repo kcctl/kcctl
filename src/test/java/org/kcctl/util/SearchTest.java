@@ -7,7 +7,6 @@
  */
 package org.kcctl.util;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -67,7 +66,7 @@ public class SearchTest {
         List<String> actualNames = Search.searchConfig(config, regex).stream()
                 .map(ConfigKeyInfo::name)
                 .collect(Collectors.toList());
-        assertEquals(Arrays.asList(expectedNames), actualNames);
+        assertEquals(List.of(expectedNames), actualNames);
     }
 
 }

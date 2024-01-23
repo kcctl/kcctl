@@ -7,14 +7,14 @@
  */
 package org.kcctl.completion;
 
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class ConnectorNameCompletions implements Iterable<String> {
 
     @Override
     public Iterator<String> iterator() {
-        return Arrays.asList("kcctl", "connector-name-completions").iterator();
+        return List.of("kcctl", "connector-name-completions").iterator();
     }
 
 }

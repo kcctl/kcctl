@@ -8,7 +8,6 @@
 package org.kcctl.command;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -108,10 +107,9 @@ public class PatchOffsetsCommand implements Callable<Integer> {
             Map<String, Object> partition;
             Map<String, Object> offset;
             if (sinkConnectorOffset != null) {
-                partition = new HashMap<>();
-                partition.put("kafka_topic", sinkConnectorOffset.topic);
-                partition.put("kafka_partition", sinkConnectorOffset.partition);
-                offset = Collections.singletonMap("kafka_offset", sinkConnectorOffset.offset);
+                partition = Map.of("kafka_topic", sinkConnectorOffset.topic,
+                                   "kafka_partition", sinkConnectorOffset.partition);
+                offset = Map.of("kafka_offset", sinkConnectorOffset.offset);
             }
             else if (sourceConnectorOffset != null) {
                 partition = sourceConnectorOffset.partition();

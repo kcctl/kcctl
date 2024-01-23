@@ -50,7 +50,7 @@ class ExecutionExceptionHandlerTest {
         }
 
         public String errorPrintLnFormatted(String str) {
-            return Colors.ANSI_RED + str + Colors.ANSI_RESET + System.getProperty("line.separator");
+            return Colors.ANSI_RED + str + Colors.ANSI_RESET + System.lineSeparator();
         }
 
         @Test
