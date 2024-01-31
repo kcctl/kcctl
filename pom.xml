@@ -529,13 +529,11 @@
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-aarch_64.tar.gz</path>
                         <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-aarch_64.tar.gz</transform>
                         <platform>osx-aarch_64</platform>
-                        <active>RELEASE</active>
                       </artifact>
                       <artifact>
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-aarch_64.zip</path>
                         <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-aarch_64.zip</transform>
                         <platform>osx-aarch_64</platform>
-                        <active>RELEASE</active>
                       </artifact>
                     </artifacts>
                   </kcctl>
