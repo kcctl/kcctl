@@ -5,10 +5,10 @@ _It's Casey. Casey Cuddle._
 This project is a command-line client for [Kafka Connect](https://kafka.apache.org/documentation/#connect).
 Relying on the idioms and semantics of _kubectl_,
 it allows you to register and examine connectors, delete them, restart them, etc.
-You can see what _kcctl_ is about in this [lightning talk from Devoxx](https://www.youtube.com/watch?v=cH3EgjYBvyE) (video opens in a new window):
+You can see what _kcctl_ is about in this [lightning talk from Devoxx](https://www.youtube.com/watch?v=cH3EgjYBvyE):
 
 <p align="center">
-<a href="https://youtu.be/cH3EgjYBvyE" target="_blank"><img src="thumbnail.jpg" width="75%" alt="Taming Kafka Connect with kcctl"></a>
+<a href="https://youtu.be/cH3EgjYBvyE"><img src="thumbnail.jpg" width="75%" alt="Taming Kafka Connect with kcctl"></a>
 </p>
 
 ## 🧸 Installation
