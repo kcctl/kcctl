@@ -76,7 +76,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        os: [ ubuntu-latest, macOS-latest, macos-14, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out repository'
@@ -99,7 +99,7 @@ jobs:
         run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests
 
       - name: 'Build Native Image (macOS, Windows)'
-        if: ${{ runner.os == 'macOS' || runner.os == 'Windows' }}
+        if: ${{ runner.os != 'Linux' }}
         run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests "-Dquarkus.test.profile.tags=basic"
 
       - name: 'Create distribution'
@@ -108,7 +108,7 @@ jobs:
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ matrix.os }}
+          name: artifacts-${{ runner.os }}-${{ runner.arch }}
           path: |
             target/*.zip
             target/*.tar.gz
