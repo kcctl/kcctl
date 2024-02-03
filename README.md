@@ -8,7 +8,7 @@ it allows you to register and examine connectors, delete them, restart them, etc
 You can see what _kcctl_ is about in this [lightning talk from Devoxx](https://www.youtube.com/watch?v=cH3EgjYBvyE) (video opens in a new window):
 
 <p align="center">
-<a href="https://youtu.be/cH3EgjYBvyE" target="_blank"><img src="thumbnail.jpg" width="50%" alt="Taming Kafka Connect with kcctl"></a>
+<a href="https://youtu.be/cH3EgjYBvyE" target="_blank"><img src="thumbnail.jpg" width="75%" alt="Taming Kafka Connect with kcctl"></a>
 </p>
 
 ## 🧸 Installation
