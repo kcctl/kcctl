@@ -13,13 +13,13 @@ You can see what _kcctl_ is about in this [lightning talk from Devoxx](https://w
 
 ## 🧸 Installation
 
-The latest stable release of _kcctl_ (x86) for Linux, macOS, and Windows can be retrieved via [SDKMan](https://sdkman.io/sdks#kcctl):
+The latest stable release of _kcctl_ for Linux (x86), macOS (x86 and AArch64), and Windows (x86) can be retrieved via [SDKMan](https://sdkman.io/sdks#kcctl):
 
 ```shell script
 sdk install kcctl
 ```
 
-You may also use [Homebrew](https://brew.sh/) to install _kcctl_ on Linux and macOs, by configuring our tap
+You may also use [Homebrew](https://brew.sh/) to install _kcctl_ on Linux and macOS, by configuring our tap:
 
 ```shell script
 brew install kcctl/tap/kcctl
@@ -28,7 +28,7 @@ brew install kcctl/tap/kcctl
 It is recommended to install the bash/zsh completion script _kcctl_completion_:
 
 ```shell script
-wget https://raw.githubusercontent.com/kcctl/kcctl/main/kcctl_completion
+wget https://raw.githubusercontent.com/kcctl/kcctl/v<RELEASE>/kcctl_completion
 . kcctl_completion
 ```
 
