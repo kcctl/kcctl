@@ -5,11 +5,13 @@ _It's Casey. Casey Cuddle._
 This project is a command-line client for [Kafka Connect](https://kafka.apache.org/documentation/#connect).
 Relying on the idioms and semantics of _kubectl_,
 it allows you to register and examine connectors, delete them, restart them, etc.
-You can see what _kcctl_ is about in this short video:
+You can see what _kcctl_ is about in this [lightning talk from Devoxx](https://www.youtube.com/watch?v=cH3EgjYBvyE) (video opens in a new window):
 
-[![kcctl Intro](https://img.youtube.com/vi/F9bUsM1ZwKk/0.jpg)](https://www.youtube.com/watch?v=F9bUsM1ZwKk)
+<p align="center">
+<a href="https://youtu.be/cH3EgjYBvyE" target="_blank"><img src="thumbnail.jpg" width="50%" alt="Taming Kafka Connect with kcctl"></a>
+</p>
 
-## Installation
+## 🧸 Installation
 
 The latest stable release of _kcctl_ (x86) for Linux, macOS, and Windows can be retrieved via [SDKMan](https://sdkman.io/sdks#kcctl):
 
@@ -39,7 +41,7 @@ Note: on macOS, you need to remove the quarantine flag after downloading, as the
 xattr -r -d com.apple.quarantine path /to/kcctl-1.0.0-SNAPSHOT-osx-x86_64/
 ```
 
-## Usage
+## 🧸 Usage
 
 ### Quickstart
 
@@ -111,7 +113,7 @@ kcctl config set-context local --cluster http://localhost:8083 --username myuser
 
 Currently, only basic authentication is supported.
 
-## Development
+## 🧸 Development
 
 This project uses [Quarkus](https://quarkus.io/), the Supersonic Subatomic Java Framework.
 
@@ -206,6 +208,6 @@ Currently, three kinds of completions exist: `connector-name-completions`, `task
 - Picocli ([guide](https://quarkus.io/guides/picocli)): Develop command line applications with Picocli
 - Quarkus native apps ([guide](https://quarkus.io/guides/maven-tooling.html)): Develop native applications with Quarkus and GraalVM
 
-## License
+## 🧸 License
 
 This code base is available under the Apache License, version 2.
