@@ -100,7 +100,7 @@
     <dependency>
       <groupId>net.javacrumbs.json-unit</groupId>
       <artifactId>json-unit-assertj</artifactId>
-      <version>3.2.4</version>
+      <version>3.2.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
