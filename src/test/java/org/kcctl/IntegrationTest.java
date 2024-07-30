@@ -88,9 +88,10 @@ public abstract class IntegrationTest {
             case TRUNK_BUILD -> TRUNK_BUILD;
             case NIGHTLY_BUILD -> "nightly";
             case LATEST_STABLE_BUILD -> ContainerImageVersions.getStableVersion(IntegrationTest.DEBEZIUM_IMAGE);
-            case "3.6" -> "2.5.0.Final";
+            case "3.7" -> "2.7.0.Final";
+            case "3.6" -> "2.5.4.Final";
             case "3.5" -> "2.4.2.Final";
-            case "3.4" -> "2.3.0.Final";
+            case "3.4" -> "2.3.4.Final";
             case "3.3" -> "2.1.4.Final";
             case "3.2" -> "1.9.7.Final";
             case "3.1" -> "1.9.3.Final";

@@ -33,6 +33,8 @@ class GetPluginsCommandTest extends IntegrationTest {
 
     private static final Version SPANNER_CONNECTOR_MIN_VERSION = new Version(2, 1);
     private static final Version INFORMIX_CONNECTOR_MIN_VERSION = new Version(2, 5);
+    private static final Version AS400_CONNECTOR_MIN_VERSION = new Version(2, 7);
+    private static final Version MARIADB_CONNECTOR_MIN_VERSION = new Version(3, 0); // will be in 2.7.1.Final too. For now, this only fails NIGHTLY (see DBZ-8088)
     private static final Version MIRROR_MAKER_MIN_GRANULAR_VERSION = new Version(3, 2);
     private static final Version FILE_CONNECTOR_REMOVAL_MIN_VERSION = new Version(3, 2); // Also removed in 3.1.1 (see https://issues.apache.org/jira/browse/KAFKA-13748) but there's no Debezium image built off of that so 3.2.x is fine
 
@@ -57,6 +59,16 @@ class GetPluginsCommandTest extends IntegrationTest {
             informixConnectorDescription = "source   io.debezium.connector.informix.InformixConnector            " + debeziumVersion;
         }
 
+        String as400ConnectorDescription = null;
+        if (parsedDebeziumVersion.greaterOrEquals(AS400_CONNECTOR_MIN_VERSION)) {
+            as400ConnectorDescription = "source   io.debezium.connector.db2as400.As400RpcConnector            " + debeziumVersion;
+        }
+
+        String mariaDbConnectorDescription = null;
+        if (parsedDebeziumVersion.greaterOrEquals(MARIADB_CONNECTOR_MIN_VERSION)) {
+            mariaDbConnectorDescription = "source   io.debezium.connector.mariadb.MariaDbConnector              " + debeziumVersion;
+        }
+
         String mirrorMakerVersion = "1";
         if (parsedKafkaVersion.greaterOrEquals(MIRROR_MAKER_MIN_GRANULAR_VERSION)) {
             mirrorMakerVersion = kafkaVersion;
@@ -70,7 +82,9 @@ class GetPluginsCommandTest extends IntegrationTest {
         String[] expectedOutput = Stream.of(
                 "TYPE     CLASS                                                       VERSION",
                 "source   io.debezium.connector.db2.Db2Connector                      " + debeziumVersion,
+                as400ConnectorDescription,
                 informixConnectorDescription,
+                mariaDbConnectorDescription,
                 "source   io.debezium.connector.mongodb.MongoDbConnector              " + debeziumVersion,
                 "source   io.debezium.connector.mysql.MySqlConnector                  " + debeziumVersion,
                 "source   io.debezium.connector.oracle.OracleConnector                " + debeziumVersion,
