@@ -450,7 +450,7 @@
           <plugin>
             <groupId>org.jreleaser</groupId>
             <artifactId>jreleaser-maven-plugin</artifactId>
-            <version>1.11.0</version>
+            <version>1.13.1</version>
             <configuration>
               <jreleaser>
                 <project>
