@@ -108,7 +108,7 @@ jobs:
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ runner.os }}-${{ runner.arch }}
+          name: artifacts-${{ matrix.os }}-${{ runner.arch }}
           path: |
             target/*.zip
             target/*.tar.gz
