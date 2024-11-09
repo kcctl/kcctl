@@ -31,7 +31,7 @@ import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 import org.kcctl.util.ConfigurationContext;
 import org.kcctl.util.Version;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public abstract class IntegrationTest {
 
-    public static final String DEBEZIUM_IMAGE = "debezium/connect";
+    public static final String DEBEZIUM_IMAGE = "quay.io/debezium/connect";
     public static final String CONNECT_VERSION_VAR = "CONNECT_VERSION";
     public static final String NIGHTLY_BUILD = "NIGHTLY";
     public static final String TRUNK_BUILD = "TRUNK";
@@ -56,7 +56,7 @@ public abstract class IntegrationTest {
 
     protected static final Network network = Network.newNetwork();
 
-    protected static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.3.1"))
+    protected static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("apache/kafka-native:3.8.0"))
             .withNetwork(network);
 
     protected static final DebeziumContainer kafkaConnect = debeziumContainer();
@@ -100,8 +100,8 @@ public abstract class IntegrationTest {
             default -> throw new IllegalArgumentException("Kafka Connect version " + connectVersion + " is not yet supported");
         };
 
-        DebeziumContainer debeziumContainer = TRUNK_BUILD.equals(debeziumTag) ? new ConnectTrunkDebeziumContainer()
-                : new DebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag);
+        NativeImageEnabledDebeziumContainer debeziumContainer = TRUNK_BUILD.equals(debeziumTag) ? new ConnectTrunkDebeziumContainer()
+                : new NativeImageEnabledDebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag);
 
         return debeziumContainer
                 .withNetwork(network)
@@ -185,7 +185,7 @@ public abstract class IntegrationTest {
     }
 
     protected String getKafkaBootstrapServers() {
-        return "%s:9092".formatted(kafka.getNetworkAliases().get(0));
+        return "%s:9093".formatted(kafka.getNetworkAliases().get(0));
     }
 
     private KcctlCommandContext<?> prepareContext(Field field) {

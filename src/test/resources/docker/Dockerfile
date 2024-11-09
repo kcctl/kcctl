@@ -13,7 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-FROM debezium/connect:latest
+FROM quay.io/debezium/connect:latest
 
 USER root
 

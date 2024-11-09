@@ -33,8 +33,8 @@ class GetPluginsCommandTest extends IntegrationTest {
 
     private static final Version SPANNER_CONNECTOR_MIN_VERSION = new Version(2, 1);
     private static final Version INFORMIX_CONNECTOR_MIN_VERSION = new Version(2, 5);
-    private static final Version AS400_CONNECTOR_MIN_VERSION = new Version(2, 7);
-    private static final Version MARIADB_CONNECTOR_MIN_VERSION = new Version(3, 0); // will be in 2.7.1.Final too. For now, this only fails NIGHTLY (see DBZ-8088)
+    private static final Version AS400_CONNECTOR_MIN_VERSION = new Version(3, 0);
+    private static final Version MARIADB_CONNECTOR_MIN_VERSION = new Version(2, 7);
     private static final Version MIRROR_MAKER_MIN_GRANULAR_VERSION = new Version(3, 2);
     private static final Version FILE_CONNECTOR_REMOVAL_MIN_VERSION = new Version(3, 2); // Also removed in 3.1.1 (see https://issues.apache.org/jira/browse/KAFKA-13748) but there's no Debezium image built off of that so 3.2.x is fine
 
