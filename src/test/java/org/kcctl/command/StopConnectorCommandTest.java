@@ -7,7 +7,7 @@
  */
 package org.kcctl.command;
 
-import java.time.Duration;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -18,30 +18,15 @@ import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
 import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.debezium.testing.testcontainers.Connector;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 @QuarkusTest
 @TestProfile(IntegrationTestProfile.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @SkipIfConnectVersionIsOlderThan("3.5")
 class StopConnectorCommandTest extends IntegrationTest {
-
-    private static final long CONNECTOR_STOP_TIMEOUT_SECONDS = 10;
-
-    private final OkHttpClient httpClient = new OkHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @InjectCommandContext
     KcctlCommandContext<StopConnectorCommand> context;
@@ -117,32 +102,9 @@ class StopConnectorCommandTest extends IntegrationTest {
         }
     }
 
-    // TODO: Replace this with kafkaConnect.ensureConnectorState if/when
-    // the Debezium testing library is updated with support for the STOPPED state
-    // (https://github.com/debezium/debezium/pull/4709)
     private void ensureConnectorsStopped(String... connectors) {
-        assertThat(connectors).isNotEmpty();
-        await()
-                .atMost(Duration.ofSeconds(CONNECTOR_STOP_TIMEOUT_SECONDS))
-                .until(() -> {
-                    for (String connector : connectors) {
-                        Request request = new Request.Builder().url(kafkaConnect.getConnectorStatusUri(connector)).build();
-                        try (Response response = httpClient.newCall(request).execute()) {
-                            assertThat(response.isSuccessful()).isTrue();
-                            try (ResponseBody responseBody = response.body()) {
-                                assertThat(responseBody).isNotNull();
-                                ObjectNode parsedObject = (ObjectNode) mapper.readTree(responseBody.string());
-                                // We don't check for an empty set of tasks, since that's the responsibility of the Kafka Connect
-                                // runtime. All that we check for is acknowledgment by the runtime that our request to stop the
-                                // connector was received; if some tasks haven't been shut down, that's a problem with the runtime,
-                                // not kcctl
-                                return "STOPPED".equals(parsedObject.get("connector").get("state").asText());
-                            }
-                        }
-                    }
-                    // Should never happen; we check for an empty connectors list above
-                    throw new IllegalArgumentException("Connectors list cannot be empty");
-                });
+        for (String connector : connectors) {
+            kafkaConnect.ensureConnectorState(connector, Connector.State.STOPPED);
+        }
     }
-
 }

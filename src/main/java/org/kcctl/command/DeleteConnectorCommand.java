@@ -11,8 +11,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import jakarta.inject.Inject;
-
-import org.apache.http.HttpStatus;
+import jakarta.ws.rs.core.Response.Status;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kcctl.completion.ConnectorNameCompletions;
 import org.kcctl.service.KafkaConnectApi;
@@ -64,7 +63,7 @@ public class DeleteConnectorCommand implements Callable<Integer> {
             }
         }
         catch (KafkaConnectException kce) {
-            if (kce.getErrorCode() == HttpStatus.SC_NOT_FOUND) {
+            if (kce.getHttpStatus() == Status.NOT_FOUND) {
                 spec.commandLine().getOut().println(kce.getMessage());
             }
             else {

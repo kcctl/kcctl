@@ -11,7 +11,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
+
 import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
 import org.kcctl.util.ConfigurationContext;
 
@@ -45,6 +46,6 @@ public class KafkaConnectClientHeadersFactory implements ClientHeadersFactory {
 
     private static String generateBasicAuthHeaderValue(String username, String password) {
         return String.format("Basic %s",
-                new Base64().encodeAsString(String.format("%s:%s", username, password).getBytes()));
+                Base64.getEncoder().encodeToString(String.format("%s:%s", username, password).getBytes()));
     }
 }

@@ -10,6 +10,7 @@ package org.kcctl.service;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
@@ -17,7 +18,9 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
@@ -29,6 +32,8 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterClientHeaders(value = KafkaConnectClientHeadersFactory.class)
 @RegisterProvider(value = KafkaConnectResponseExceptionMapper.class, priority = 50)
 @Retry(delay = 100L, maxDuration = 30_000L, retryOn = KafkaConnectConflictException.class)
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public interface KafkaConnectApi {
 
     @GET

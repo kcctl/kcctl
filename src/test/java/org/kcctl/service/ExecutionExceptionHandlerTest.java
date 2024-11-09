@@ -22,6 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.kcctl.util.Colors;
 import org.kcctl.util.ConfigurationContext;
 
+import jakarta.ws.rs.core.Response.Status;
 import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +58,7 @@ class ExecutionExceptionHandlerTest {
         void should_handle_unauthorized_errors() throws Exception {
             var handler = new ExecutionExceptionHandler(new ConfigurationContext().getCurrentContext());
             int exitCode = handler.handleExecutionException(
-                    new KafkaConnectException("Unauthorized", 401), null, null);
+                    new KafkaConnectException("Unauthorized", Status.UNAUTHORIZED), null, null);
 
             assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
             assertThat(fakeSystemErr.toString())
@@ -69,7 +70,7 @@ class ExecutionExceptionHandlerTest {
         void should_allow_uncaught_kc_exceptions_to_bubble_up() {
             var handler = new ExecutionExceptionHandler(new ConfigurationContext().getCurrentContext());
             assertThrows(KafkaConnectException.class, () -> handler.handleExecutionException(
-                    new KafkaConnectException("Woa", 999), null, null));
+                    new KafkaConnectException("Woa", Status.INTERNAL_SERVER_ERROR), null, null));
         }
 
         @Test
