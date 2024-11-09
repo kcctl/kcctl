@@ -25,7 +25,7 @@
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus.platform.version>3.8.2</quarkus.platform.version>
-    <debezium.version>2.5.2.Final</debezium.version>
+    <debezium.version>3.0.1.Final</debezium.version>
     <artifactsDir>target</artifactsDir>
   </properties>
 
@@ -106,7 +106,6 @@
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>4.2.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -126,12 +125,12 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>kafka</artifactId>
+      <version>1.20.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>okhttp</artifactId>
-      <version>4.12.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>

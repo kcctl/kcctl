@@ -108,7 +108,7 @@ public class PatchOffsetsCommand implements Callable<Integer> {
             Map<String, Object> offset;
             if (sinkConnectorOffset != null) {
                 partition = Map.of("kafka_topic", sinkConnectorOffset.topic,
-                                   "kafka_partition", sinkConnectorOffset.partition);
+                        "kafka_partition", sinkConnectorOffset.partition);
                 offset = Map.of("kafka_offset", sinkConnectorOffset.offset);
             }
             else if (sourceConnectorOffset != null) {
