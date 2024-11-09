@@ -8,6 +8,7 @@
 package org.kcctl.service;
 
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class KafkaConnectException extends RuntimeException {
 
@@ -15,37 +16,37 @@ public class KafkaConnectException extends RuntimeException {
         if (response.getStatusInfo() == Response.Status.UNAUTHORIZED) {
             return new KafkaConnectException(
                     response.readEntity(String.class),
-                    Response.Status.UNAUTHORIZED.getStatusCode());
+                    Response.Status.UNAUTHORIZED);
         }
 
         ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
 
         if (response.getStatusInfo() == Response.Status.CONFLICT
-                || errorResponse.message.contains("Request cannot be completed because a rebalance is expected")) {
-            return new KafkaConnectConflictException(errorResponse.message);
+                || errorResponse.message().contains("Request cannot be completed because a rebalance is expected")) {
+            return new KafkaConnectConflictException(errorResponse.message());
         }
         else if (response.getStatusInfo() == Response.Status.NOT_FOUND) {
-            return new KafkaConnectNotFoundException(errorResponse.message);
+            return new KafkaConnectNotFoundException(errorResponse.message());
         }
         else {
             return new KafkaConnectException(errorResponse);
         }
     }
 
-    private final int errorCode;
+    private final Status httpStatus;
 
-    public KafkaConnectException(String message, int errorCode) {
+    public KafkaConnectException(String message, Status httpStatus) {
         super(message);
-        this.errorCode = errorCode;
+        this.httpStatus = httpStatus;
     }
 
     public KafkaConnectException(ErrorResponse error) {
-        super(getMessage(error.message));
-        this.errorCode = error.error_code;
+        super(getMessage(error.message()));
+        this.httpStatus = Status.fromStatusCode(error.error_code());
     }
 
-    public int getErrorCode() {
-        return errorCode;
+    public Status getHttpStatus() {
+        return httpStatus;
     }
 
     private static String getMessage(String originalMessage) {

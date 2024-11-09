@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response;
 public class KafkaConnectConflictException extends KafkaConnectException {
 
     public KafkaConnectConflictException(String message) {
-        super(message, Response.Status.CONFLICT.getStatusCode());
+        super(message, Response.Status.CONFLICT);
     }
 
 }

@@ -9,9 +9,9 @@ package org.kcctl.service;
 
 import java.net.ConnectException;
 
-import org.apache.http.HttpStatus;
 import org.kcctl.util.Colors;
 
+import jakarta.ws.rs.core.Response.Status;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParseResult;
@@ -49,8 +49,8 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
 
         if (ex instanceof KafkaConnectException) {
             var kafkaConnectException = (KafkaConnectException) ex;
-            switch (kafkaConnectException.getErrorCode()) {
-                case HttpStatus.SC_UNAUTHORIZED: {
+            switch (kafkaConnectException.getHttpStatus()) {
+                case Status.UNAUTHORIZED: {
                     return new ExitCodeErrorMessagePair(
                             CommandLine.ExitCode.SOFTWARE,
                             "The configured user is unauthorized to run this command.");

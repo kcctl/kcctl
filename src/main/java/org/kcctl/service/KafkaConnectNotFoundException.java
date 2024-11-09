@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response;
 public class KafkaConnectNotFoundException extends KafkaConnectException {
 
     public KafkaConnectNotFoundException(String message) {
-        super(message, Response.Status.NOT_FOUND.getStatusCode());
+        super(message, Response.Status.NOT_FOUND);
     }
 
 }
