@@ -45,6 +45,8 @@ jobs:
           TRUNK, # For testing new features not yet released
           NIGHTLY, # Bleeding edge snapshot builds from Debezium; can optionally disable this version during CI testing if an upstream bug causes test failures
           LATEST_STABLE,
+          "3.7",
+          "3.8",
           "3.6",
           "3.5",
           "3.4",
