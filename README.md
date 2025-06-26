@@ -29,7 +29,7 @@ It is recommended to install the bash/zsh completion script _kcctl_completion_:
 
 ```shell script
 wget https://raw.githubusercontent.com/kcctl/kcctl/v<RELEASE>/kcctl_completion
-. kcctl_completion
+. ./kcctl_completion
 ```
 
 Alternatively, you can obtain early access binaries from [here](https://github.com/kcctl/kcctl/releases).
