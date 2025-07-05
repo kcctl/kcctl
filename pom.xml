@@ -434,7 +434,7 @@
           <plugin>
             <groupId>org.jreleaser</groupId>
             <artifactId>jreleaser-maven-plugin</artifactId>
-            <version>1.15.0</version>
+            <version>1.16.0</version>
             <configuration>
               <jreleaser>
                 <project>
@@ -500,6 +500,16 @@
                         <platform>linux-x86_64</platform>
                       </artifact>
                       <artifact>
+                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-aarch_64.tar.gz</path>
+                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-aarch_64.tar.gz</transform>
+                        <platform>linux-aarch_64</platform>
+                      </artifact>
+                      <artifact>
+                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-linux-aarch_64.zip</path>
+                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-linux-aarch_64.zip</transform>
+                        <platform>linux-aarch_64</platform>
+                      </artifact>
+                      <artifact>
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip</path>
                         <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-windows-x86_64.zip</transform>
                         <platform>windows-x86_64</platform>
@@ -507,6 +517,11 @@
                       <artifact>
                         <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip</path>
                         <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-x86_64.zip</transform>
+                        <platform>osx-x86_64</platform>
+                      </artifact>
+                      <artifact>
+                        <path>{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.tar.gz</path>
+                        <transform>artifacts/{{distributionName}}-{{projectEffectiveVersion}}-osx-x86_64.tar.gz</transform>
                         <platform>osx-x86_64</platform>
                       </artifact>
                       <artifact>
