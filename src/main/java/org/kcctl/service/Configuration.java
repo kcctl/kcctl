@@ -14,6 +14,10 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+// Read and written with Jackson directly, outside the REST client, which registers its own types
+@RegisterForReflection
 public class Configuration {
 
     private String currentContext;
