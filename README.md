@@ -120,7 +120,7 @@ This project uses [Quarkus](https://quarkus.io/), the Supersonic Subatomic Java 
 To build the project, make sure to the following things are installed:
 
 * Java 25 (the project compiles to Java 21)
-* Alternatively, for creating native binaries, GraalVM for JDK 25
+* Alternatively, for creating native binaries, GraalVM for JDK 25; run `etc/blocked-certificates.sh patch` once per GraalVM installation, so that the binary rejects the certificates listed in `etc/blocked.certs`
 * Docker must for running the integration tests (via Testcontainers)
 
 The following build commands are commonly used:
