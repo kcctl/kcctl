@@ -18,6 +18,9 @@ on:
         description: "Next version"
         required: false
 
+permissions:
+  contents: read
+
 env:
   JAVA_VERSION: '25'
   JAVA_DISTRO: 'temurin'
@@ -25,7 +28,10 @@ env:
 
 jobs:
   version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      # Pushes the release version commit to main
+      contents: write
     outputs:
       HEAD: ${{ steps.version.outputs.HEAD }}
       RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
@@ -66,7 +72,7 @@ jobs:
 
   build:
     needs: [ version ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
@@ -96,7 +102,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest, ubuntu-24.04-arm, macos-26-intel, macos-26, windows-latest ]
+        # Pinned images: a Linux image moving to a newer Ubuntu release could raise the glibc version
+        # the binaries require.
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, macos-26-intel, macos-26, windows-2025 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out repository'
@@ -146,7 +154,11 @@ jobs:
   # Collect all executables and release
   release:
     needs: [ version, package ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      # Creates the release and pushes the next version commit; JReleaser closes the release's milestone
+      contents: write
+      issues: write
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6

@@ -14,6 +14,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 env:
   JAVA_VERSION: '25'
   JAVA_DISTRO: 'temurin'
@@ -21,7 +24,7 @@ env:
 jobs:
   build:
     if: startsWith(github.event.head_commit.message, '🏁 Releasing version') != true && startsWith(github.event.head_commit.message, '⬆️  Next version') != true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: ${{ matrix.connect_version == 'NIGHTLY' }}
     steps:
       - name: 'Check out repository'
