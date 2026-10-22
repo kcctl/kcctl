@@ -299,13 +299,16 @@
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
-          <header>etc/license.txt</header>
           <strictCheck>true</strictCheck>
           <aggregate>true</aggregate>
-          <excludes>
-            <exclude>LICENSE.txt</exclude>
-            <exclude>**/Dockerfile</exclude>
-          </excludes>
+          <licenseSets>
+            <licenseSet>
+              <header>etc/license.txt</header>
+              <excludes>
+                <exclude>LICENSE.txt</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
         </configuration>
         <executions>
           <execution>
