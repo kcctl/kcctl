@@ -17,6 +17,9 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   JAVA_VERSION: '25'
   JAVA_DISTRO: 'temurin'
@@ -24,7 +27,7 @@ env:
 jobs:
   precheck:
     if: github.repository == 'kcctl/kcctl' && startsWith(github.event.head_commit.message, '🏁 Releasing version') != true && startsWith(github.event.head_commit.message, '⬆️  Next version') != true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       VERSION: ${{ steps.vars.outputs.VERSION }}
     steps:
@@ -48,7 +51,7 @@ jobs:
   build:
     needs: [ precheck ]
     if: endsWith(${{ needs.precheck.outputs.VERSION }}, '-SNAPSHOT')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
@@ -76,7 +79,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest, ubuntu-24.04-arm, macos-26-intel, macos-26, windows-latest ]
+        # Pinned images: a Linux image moving to a newer Ubuntu release could raise the glibc version
+        # the binaries require.
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, macos-26-intel, macos-26, windows-2025 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out repository'
@@ -124,7 +129,10 @@ jobs:
   # Collect all executables and release
   release:
     needs: [ package ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      # Replaces the early-access release
+      contents: write
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
