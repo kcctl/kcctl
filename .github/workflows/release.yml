@@ -116,6 +116,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: maven
 
+      - name: 'Block compromised certificates in Graal'
+        shell: bash
+        run: etc/blocked-certificates.sh patch "$JAVA_HOME"
+
       - name: 'Build Native Image (Linux)'
         if: ${{ runner.os == 'Linux' }}
         run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests
@@ -123,6 +127,10 @@ jobs:
       - name: 'Build Native Image (macOS, Windows)'
         if: ${{ runner.os != 'Linux' }}
         run: ./mvnw -ntp -B --file pom.xml -Pnative package -DskipTests "-Dquarkus.test.profile.tags=basic"
+
+      - name: 'Check the binary blocks every certificate in etc/blocked.certs'
+        shell: bash
+        run: etc/blocked-certificates.sh check target/kcctl-*-runner${{ runner.os == 'Windows' && '.exe' || '' }}
 
       - name: 'Create distribution'
         run: ./mvnw -ntp -B --file pom.xml -Pdist package -DskipTests
