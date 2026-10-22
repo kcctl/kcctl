@@ -14,8 +14,8 @@ import org.testcontainers.kafka.KafkaContainer;
 import io.debezium.testing.testcontainers.DebeziumContainer;
 
 /**
- * The upstream {@code DebeziumContainer} only supports the legacy {@code KafkaContainer},
- * so we're adding support for the new one here for now.
+ * The upstream {@code DebeziumContainer} connects to Kafka through a Strimzi cluster only, so this
+ * connects it to a plain {@code KafkaContainer}.
  */
 public class NativeImageEnabledDebeziumContainer extends DebeziumContainer {
 
@@ -27,12 +27,13 @@ public class NativeImageEnabledDebeziumContainer extends DebeziumContainer {
         super(withFileFromClasspath);
     }
 
-    public NativeImageEnabledDebeziumContainer withKafka(final KafkaContainer kafkaContainer) {
-        return withKafka(kafkaContainer.getNetwork(), kafkaContainer.getNetworkAliases().get(0) + ":9093");
+    public NativeImageEnabledDebeziumContainer withKafkaBroker(final KafkaContainer kafkaContainer) {
+        return withKafkaBroker(kafkaContainer.getNetwork(), kafkaContainer.getNetworkAliases().get(0) + ":9093");
     }
 
-    public NativeImageEnabledDebeziumContainer withKafka(final Network network, final String bootstrapServers) {
-        super.withKafka(network, bootstrapServers);
+    public NativeImageEnabledDebeziumContainer withKafkaBroker(final Network network, final String bootstrapServers) {
+        withNetwork(network);
+        withEnv("BOOTSTRAP_SERVERS", bootstrapServers);
         return (NativeImageEnabledDebeziumContainer) self();
     }
 
