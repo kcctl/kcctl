@@ -31,7 +31,9 @@ class LoggerNamesCompletionCandidateCommandTest extends IntegrationTest {
     @Test
     public void should_print_logger_names() {
         context.runAndEnsureExitCodeOk();
-        assertThat(context.output().toString().trim())
-                .isEqualTo("org.reflections root");
+        // Newer Kafka Connect versions list further loggers, such as those of the installed connectors,
+        // and do not always list the root logger
+        assertThat(context.output().toString().trim().split(" "))
+                .contains("org.reflections");
     }
 }

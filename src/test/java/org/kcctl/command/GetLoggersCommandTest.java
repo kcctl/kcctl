@@ -14,6 +14,7 @@ import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
+import org.kcctl.support.OutputLines;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -31,11 +32,10 @@ class GetLoggersCommandTest extends IntegrationTest {
     @Test
     public void should_print_loggers() {
         context.runAndEnsureExitCodeOk();
-        assertThat(context.output().toString().trim().lines())
-                .map(String::trim)
-                .containsExactly(
-                        "LOGGER            LEVEL",
-                        "org.reflections   \u001B[31mERROR\u001B[0m",
-                        "root              \u001B[32mINFO\u001B[0m");
+        // Newer Kafka Connect versions list further loggers, such as those of the installed connectors,
+        // and do not always list the root logger, which GetLoggerCommandTest covers
+        assertThat(OutputLines.of(context.output().toString()))
+                .startsWith("LOGGER LEVEL")
+                .contains("org.reflections \u001B[31mERROR\u001B[0m");
     }
 }
