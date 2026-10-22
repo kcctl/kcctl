@@ -6,41 +6,37 @@
 #  Licensed under the Apache Software License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
 #
 
-version: '2'
+# Kafka Connect with HTTP basic authentication on its REST API, for trying out kcctl's
+# --username and --password options by hand; see "Manual testing" in the README.
 services:
-  zookeeper:
-    image: debezium/zookeeper:1.7
-    ports:
-     - 2181:2181
-     - 2888:2888
-     - 3888:3888
   kafka:
-    image: debezium/kafka:1.7
-    ports:
-     - 9092:9092
-    links:
-     - zookeeper
+    image: apache/kafka:4.3.2
     environment:
-     - ZOOKEEPER_CONNECT=zookeeper:2181
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
   connect:
-   image: debezium/connect-base:1.7
-   ports:
-    - 8083:8083
-   links:
-    - kafka
-   volumes:
-    - ./basic-auth:/kafka/config/basic-auth
-   environment:
-    - BOOTSTRAP_SERVERS=kafka:9092
-    - GROUP_ID=1
-    - CONFIG_STORAGE_TOPIC=my_connect_configs
-    - OFFSET_STORAGE_TOPIC=my_connect_offsets
-    - STATUS_STORAGE_TOPIC=my_connect_statuses
-
-    #  Add the basic auth extension
-    - CONNECT_REST_EXTENSION_CLASSES=org.apache.kafka.connect.rest.basic.auth.extension.BasicAuthSecurityRestExtension
-    
-    #  Set the login config:
-    #  - see ./basic-auth/jaas.config for basic auth configuration
-    #  - see ./basic-auth/connect.password for credentials
-    - KAFKA_OPTS=-Djava.security.auth.login.config=/kafka/config/basic-auth/jaas.config
+    image: quay.io/debezium/connect:3.7.0.Final
+    ports:
+      - 8083:8083
+    depends_on:
+      - kafka
+    volumes:
+      - ./basic-auth:/kafka/config/basic-auth
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      # The basic auth extension, with the users of ./basic-auth/connect.password
+      CONNECT_REST_EXTENSION_CLASSES: org.apache.kafka.connect.rest.basic.auth.extension.BasicAuthSecurityRestExtension
+      KAFKA_OPTS: -Djava.security.auth.login.config=/kafka/config/basic-auth/jaas.config

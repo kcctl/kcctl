@@ -202,6 +202,69 @@ Edit the completion script _kcctl\_completion_, replace all the quotes around ge
 
 Currently, three kinds of completions exist: `connector-name-completions`, `task-name-completions`, and `logger-name-completions`.
 
+### Manual Testing Against Secured Clusters
+
+Two Docker Compose setups start a single Kafka broker with Kafka Connect for trying out kcctl by hand:
+
+* _docker-compose.basic-auth.yml_: the Kafka Connect REST API requires HTTP basic authentication, with the user `testuser` and the password `testpassword` (see _basic-auth/connect.password_)
+* _docker-compose.broker-auth.yml_: the Kafka broker requires SASL/PLAIN authentication, which Kafka Connect and its connectors use; the REST API kcctl talks to is not secured
+
+Both expose the REST API on port 8083, so only one of them can run at a time.
+kcctl reads its configuration from _.kcctl_ in the directory the `user.home` system property names, so the commands below keep their contexts out of your own _~/.kcctl_ by running kcctl through a shell function that points `user.home` to a directory of its own:
+
+```shell script
+mkdir -p /tmp/kcctl-manual-test
+kc() { kcctl -Duser.home=/tmp/kcctl-manual-test "$@"; }
+```
+
+Basic authentication on the REST API:
+
+```shell script
+docker compose -f docker-compose.basic-auth.yml up -d
+
+# Wait until Kafka Connect is up; without credentials it answers 401
+until [ "$(curl -s "http://localhost:8083/" -o /dev/null -w '%{http_code}')" = "401" ]; do sleep 2; done
+
+kc config set-context basic-auth --cluster=http://localhost:8083 --username=testuser --password=testpassword
+kc config use-context basic-auth
+kc info                                     # prints the Kafka Connect version
+kc apply -f basic-auth/heartbeat.json       # registers the connector "heartbeat"
+kc get connectors                           # lists "heartbeat" as RUNNING once its task has started
+kc describe connector heartbeat
+kc delete connector heartbeat
+
+# The same without credentials is rejected
+kc config set-context basic-auth-missing --cluster=http://localhost:8083
+kc config use-context basic-auth-missing
+kc info                                     # fails with an authentication error (HTTP 401)
+
+docker compose -f docker-compose.basic-auth.yml down -v
+```
+
+SASL authentication on the broker:
+
+```shell script
+docker compose -f docker-compose.broker-auth.yml up -d
+
+# Wait until Kafka Connect is up
+until curl -sf "http://localhost:8083/" -o /dev/null; do sleep 2; done
+
+kc config set-context broker-auth --cluster=http://localhost:8083
+kc config use-context broker-auth
+kc info
+kc apply -f broker-auth/heartbeat.json      # the connector authenticates against the broker itself
+kc get connectors                           # lists "heartbeat" as RUNNING once its task has started
+kc get offsets heartbeat                    # offsets are read from the broker by Kafka Connect
+kc stop connector heartbeat
+kc delete offsets heartbeat                 # requires a stopped connector
+kc delete connector heartbeat
+
+docker compose -f docker-compose.broker-auth.yml down -v
+```
+
+Afterwards, `rm -r /tmp/kcctl-manual-test` removes the contexts.
+If Kafka Connect does not come up, `docker compose -f <file> logs connect` shows why; a connector that does not reach RUNNING shows its error in `kc describe connector heartbeat`.
+
 ### Related Quarkus Guides
 
 - Picocli ([guide](https://quarkus.io/guides/picocli)): Develop command line applications with Picocli

@@ -1,0 +1,13 @@
+{
+  "name": "heartbeat",
+  "config": {
+    "connector.class": "org.apache.kafka.connect.mirror.MirrorHeartbeatConnector",
+    "tasks.max": "1",
+    "source.cluster.alias": "source",
+    "topic": "heartbeat-test",
+    "admin.bootstrap.servers": "kafka:9092",
+    "admin.security.protocol": "SASL_PLAINTEXT",
+    "admin.sasl.mechanism": "PLAIN",
+    "admin.sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"admin-secret\";"
+  }
+}
