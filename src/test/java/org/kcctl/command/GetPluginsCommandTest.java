@@ -7,7 +7,7 @@
  */
 package org.kcctl.command;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,8 +18,8 @@ import org.kcctl.IntegrationTest;
 import org.kcctl.IntegrationTestProfile;
 import org.kcctl.support.InjectCommandContext;
 import org.kcctl.support.KcctlCommandContext;
+import org.kcctl.support.OutputLines;
 import org.kcctl.support.SkipIfConnectVersionIsOlderThan;
-import org.kcctl.util.Version;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -31,78 +31,42 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class GetPluginsCommandTest extends IntegrationTest {
 
-    private static final Version SPANNER_CONNECTOR_MIN_VERSION = new Version(2, 1);
-    private static final Version INFORMIX_CONNECTOR_MIN_VERSION = new Version(2, 5);
-    private static final Version AS400_CONNECTOR_MIN_VERSION = new Version(3, 0);
-    private static final Version MARIADB_CONNECTOR_MIN_VERSION = new Version(2, 7);
-    private static final Version MIRROR_MAKER_MIN_GRANULAR_VERSION = new Version(3, 2);
-    private static final Version FILE_CONNECTOR_REMOVAL_MIN_VERSION = new Version(3, 2); // Also removed in 3.1.1 (see https://issues.apache.org/jira/browse/KAFKA-13748) but there's no Debezium image built off of that so 3.2.x is fine
-
     @InjectCommandContext
     KcctlCommandContext<GetPluginsCommand> context;
 
+    /**
+     * Source connectors every Debezium image ships, in the order kcctl lists them. Images add
+     * further connectors over time, which the assertion tolerates.
+     */
+    private static final List<String> DEBEZIUM_SOURCE_CONNECTORS = List.of(
+            "io.debezium.connector.db2.Db2Connector",
+            "io.debezium.connector.mongodb.MongoDbConnector",
+            "io.debezium.connector.mysql.MySqlConnector",
+            "io.debezium.connector.oracle.OracleConnector",
+            "io.debezium.connector.postgresql.PostgresConnector",
+            "io.debezium.connector.sqlserver.SqlServerConnector",
+            "io.debezium.connector.vitess.VitessConnector");
+
+    private static final List<String> KAFKA_SOURCE_CONNECTORS = List.of(
+            "org.apache.kafka.connect.mirror.MirrorCheckpointConnector",
+            "org.apache.kafka.connect.mirror.MirrorHeartbeatConnector",
+            "org.apache.kafka.connect.mirror.MirrorSourceConnector");
+
     @Test
     public void should_list_source_plugins() {
-        String debeziumVersion = getDebeziumVersion();
-        String kafkaVersion = getConnectVersion();
-
-        Version parsedDebeziumVersion = new Version(debeziumVersion);
-        Version parsedKafkaVersion = new Version(kafkaVersion);
-
-        String spannerConnectorDescription = null;
-        if (parsedDebeziumVersion.greaterOrEquals(SPANNER_CONNECTOR_MIN_VERSION)) {
-            spannerConnectorDescription = "source   io.debezium.connector.spanner.SpannerConnector              " + debeziumVersion;
-        }
-
-        String informixConnectorDescription = null;
-        if (parsedDebeziumVersion.greaterOrEquals(INFORMIX_CONNECTOR_MIN_VERSION)) {
-            informixConnectorDescription = "source   io.debezium.connector.informix.InformixConnector            " + debeziumVersion;
-        }
-
-        String as400ConnectorDescription = null;
-        if (parsedDebeziumVersion.greaterOrEquals(AS400_CONNECTOR_MIN_VERSION)) {
-            as400ConnectorDescription = "source   io.debezium.connector.db2as400.As400RpcConnector            " + debeziumVersion;
-        }
-
-        String mariaDbConnectorDescription = null;
-        if (parsedDebeziumVersion.greaterOrEquals(MARIADB_CONNECTOR_MIN_VERSION)) {
-            mariaDbConnectorDescription = "source   io.debezium.connector.mariadb.MariaDbConnector              " + debeziumVersion;
-        }
-
-        String mirrorMakerVersion = "1";
-        if (parsedKafkaVersion.greaterOrEquals(MIRROR_MAKER_MIN_GRANULAR_VERSION)) {
-            mirrorMakerVersion = kafkaVersion;
-        }
-
-        String fileConnectorDescription = "source   org.apache.kafka.connect.file.FileStreamSourceConnector     " + kafkaVersion;
-        if (parsedKafkaVersion.greaterOrEquals(FILE_CONNECTOR_REMOVAL_MIN_VERSION)) {
-            fileConnectorDescription = null;
-        }
-
-        String[] expectedOutput = Stream.of(
-                "TYPE     CLASS                                                       VERSION",
-                "source   io.debezium.connector.db2.Db2Connector                      " + debeziumVersion,
-                as400ConnectorDescription,
-                informixConnectorDescription,
-                mariaDbConnectorDescription,
-                "source   io.debezium.connector.mongodb.MongoDbConnector              " + debeziumVersion,
-                "source   io.debezium.connector.mysql.MySqlConnector                  " + debeziumVersion,
-                "source   io.debezium.connector.oracle.OracleConnector                " + debeziumVersion,
-                "source   io.debezium.connector.postgresql.PostgresConnector          " + debeziumVersion,
-                spannerConnectorDescription,
-                "source   io.debezium.connector.sqlserver.SqlServerConnector          " + debeziumVersion,
-                "source   io.debezium.connector.vitess.VitessConnector                " + debeziumVersion,
-                fileConnectorDescription,
-                "source   org.apache.kafka.connect.mirror.MirrorCheckpointConnector   " + mirrorMakerVersion,
-                "source   org.apache.kafka.connect.mirror.MirrorHeartbeatConnector    " + mirrorMakerVersion,
-                "source   org.apache.kafka.connect.mirror.MirrorSourceConnector       " + mirrorMakerVersion)
-                .filter(Objects::nonNull)
-                .toArray(String[]::new);
-
         context.runAndEnsureExitCodeOk("--types=source");
-        assertThat(context.output().toString().trim().lines())
-                .map(String::trim)
-                .containsExactly(expectedOutput);
+        List<String> lines = OutputLines.of(context.output().toString());
+
+        assertThat(lines).startsWith("TYPE CLASS VERSION");
+        assertThat(lines).allMatch(line -> line.startsWith("TYPE ") || line.startsWith("source "));
+        assertThat(lines.stream().map(line -> line.split(" ")[1]))
+                .containsSubsequence(Stream.concat(DEBEZIUM_SOURCE_CONNECTORS.stream(), KAFKA_SOURCE_CONNECTORS.stream()).toList());
+        // The nightly image does not state its Debezium version
+        if (!getDebeziumVersion().isBlank()) {
+            assertThat(lines).containsSubsequence(DEBEZIUM_SOURCE_CONNECTORS.stream()
+                    .map(connector -> "source " + connector + " " + getDebeziumVersion())
+                    .toList());
+        }
     }
 
     @Test

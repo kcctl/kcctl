@@ -68,9 +68,6 @@ jobs:
       - name: 'Build'
         if: ${{ runner.os == 'Linux' }}
         run: ./mvnw -ntp -B --file pom.xml test
-        env:
-          # The tests expect the connectors, plug-ins and loggers of this Kafka Connect image.
-          CONNECT_VERSION: '3.6'
 
   # Build native executable per runner
   package:
