@@ -14,7 +14,7 @@
 
   <groupId>org.kcctl</groupId>
   <artifactId>kcctl</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0.CR5</version>
   <properties>
     <!-- The bytecode level; the build runs on Java 25. Quarkus 3.8 processes classes with ASM 9.6,
          which reads class files up to Java 22. -->
