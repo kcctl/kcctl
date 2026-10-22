@@ -119,9 +119,8 @@ This project uses [Quarkus](https://quarkus.io/), the Supersonic Subatomic Java 
 
 To build the project, make sure to the following things are installed:
 
-* Java 17
-* Alternatively, for creating native binaries, GraalVM 22.1.0 or newer
-* When using GraalVM, the native image tool (install via `$JAVA_HOME/bin/gu install native-image`)
+* Java 25 (the project compiles to Java 21)
+* Alternatively, for creating native binaries, GraalVM for JDK 25
 * Docker must for running the integration tests (via Testcontainers)
 
 The following build commands are commonly used:

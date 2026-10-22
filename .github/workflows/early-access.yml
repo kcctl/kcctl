@@ -13,7 +13,7 @@ on:
     branches: [ main ]
 
 env:
-  JAVA_VERSION: '21'
+  JAVA_VERSION: '25'
   JAVA_DISTRO: 'temurin'
 
 jobs:
@@ -68,6 +68,9 @@ jobs:
       - name: 'Build'
         if: ${{ runner.os == 'Linux' }}
         run: ./mvnw -ntp -B --file pom.xml test
+        env:
+          # The tests expect the connectors, plug-ins and loggers of this Kafka Connect image.
+          CONNECT_VERSION: '3.6'
 
   # Build native executable per runner
   package:
@@ -76,7 +79,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest, macOS-13, macos-14, windows-latest ]
+        os: [ ubuntu-latest, macos-26-intel, macos-26, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out repository'
