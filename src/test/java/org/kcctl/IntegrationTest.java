@@ -106,7 +106,7 @@ public abstract class IntegrationTest {
 
         return debeziumContainer
                 .withNetwork(network)
-                .withKafka(kafka)
+                .withKafkaBroker(kafka)
                 .dependsOn(kafka)
                 // Force rapid offset commits, in order for offsets to appear quickly in the REST API for the 'get offsets' command tests
                 .withEnv("OFFSET_FLUSH_INTERVAL_MS", "1000");
