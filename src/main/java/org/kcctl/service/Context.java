@@ -15,6 +15,10 @@ import org.kcctl.util.Strings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+// Read and written with Jackson directly, outside the REST client, which registers its own types
+@RegisterForReflection
 public record Context(URI cluster, String bootstrapServers, String offsetTopic,
                       String username, String password,
                       Map<String, Object> clientConfig) {
