@@ -48,7 +48,6 @@ public abstract class IntegrationTest {
     public static final String DEBEZIUM_IMAGE = "quay.io/debezium/connect";
     public static final String CONNECT_VERSION_VAR = "CONNECT_VERSION";
     public static final String NIGHTLY_BUILD = "NIGHTLY";
-    public static final String TRUNK_BUILD = "TRUNK";
     public static final String LATEST_STABLE_BUILD = "LATEST_STABLE";
     public static final String KAFKA_VERSION_VAR = "KAFKA_VERSION";
     public static final String DEBEZIUM_VERSION_VAR = "DEBEZIUM_VERSION";
@@ -85,7 +84,6 @@ public abstract class IntegrationTest {
                 .orElse(LATEST_STABLE_BUILD);
 
         String debeziumTag = switch (connectVersion) {
-            case TRUNK_BUILD -> TRUNK_BUILD;
             case NIGHTLY_BUILD -> "nightly";
             case LATEST_STABLE_BUILD -> ContainerImageVersions.getStableVersion(IntegrationTest.DEBEZIUM_IMAGE);
             case "3.9" -> "3.1.3.Final";
@@ -101,8 +99,7 @@ public abstract class IntegrationTest {
             default -> throw new IllegalArgumentException("Kafka Connect version " + connectVersion + " is not yet supported");
         };
 
-        NativeImageEnabledDebeziumContainer debeziumContainer = TRUNK_BUILD.equals(debeziumTag) ? new ConnectTrunkDebeziumContainer()
-                : new NativeImageEnabledDebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag);
+        NativeImageEnabledDebeziumContainer debeziumContainer = new NativeImageEnabledDebeziumContainer(DEBEZIUM_IMAGE + ":" + debeziumTag);
 
         return debeziumContainer
                 .withNetwork(network)
@@ -114,12 +111,8 @@ public abstract class IntegrationTest {
 
     private static String readVariable(GenericContainer<?> container, String envVar) throws IOException, InterruptedException {
 
-        String connectVersion = Optional.ofNullable(System.getenv(CONNECT_VERSION_VAR))
-                .orElse(LATEST_STABLE_BUILD);
-        String command = KAFKA_VERSION_VAR.equals(envVar) && TRUNK_BUILD.equals(connectVersion) ? "cat /kafka/kafka_version" : "/usr/bin/printenv " + envVar;
-
         return container
-                .execInContainer("/bin/bash", "-c", command)
+                .execInContainer("/bin/bash", "-c", "/usr/bin/printenv " + envVar)
                 .getStdout()
                 .replace("\n", "");
 

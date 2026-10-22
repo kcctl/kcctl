@@ -8,7 +8,6 @@
 package org.kcctl;
 
 import org.testcontainers.containers.Network;
-import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.kafka.KafkaContainer;
 
 import io.debezium.testing.testcontainers.DebeziumContainer;
@@ -21,10 +20,6 @@ public class NativeImageEnabledDebeziumContainer extends DebeziumContainer {
 
     public NativeImageEnabledDebeziumContainer(final String containerImageName) {
         super(containerImageName);
-    }
-
-    public NativeImageEnabledDebeziumContainer(ImageFromDockerfile withFileFromClasspath) {
-        super(withFileFromClasspath);
     }
 
     public NativeImageEnabledDebeziumContainer withKafkaBroker(final KafkaContainer kafkaContainer) {
